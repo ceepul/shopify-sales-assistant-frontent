@@ -23,8 +23,12 @@ export default function App() {
             <NavigationMenu
               navigationLinks={[
                 {
-                  label: t("Setup"),
+                  label: "Setup",
                   destination: "/setup",
+                },
+                {
+                  label: "Customize",
+                  destination: "/customize",
                 },
               ]}
             />

@@ -6,13 +6,10 @@ import serveStatic from "serve-static";
 import 'dotenv/config.js'
 
 import shopify from "./shopify.js";
-import applyQrCodeApiEndpoints from "./middleware/qr-code-api.js";
-import applyAppApiEndpoints from "./middleware/app-api.js";
 import applyAppDataApiEndpoints from "./middleware/app-data-api.js";
+import applyMessageRoutesEndpoints from "./middleware/messageRoutes.js";
 
 import GDPRWebhookHandlers from "./gdpr.js";
-
-import applyQrCodePublicEndpoints from "./middleware/qr-code-public.js";
 
 
 const PORT = parseInt(
@@ -50,15 +47,12 @@ app.post(
 // If you are adding routes outside of the /api path, remember to
 // also add a proxy rule for them in web/frontend/vite.config.js
 
-applyQrCodePublicEndpoints(app);
-
 app.use("/api/*", shopify.validateAuthenticatedSession());
 
 app.use(express.json());
 
-applyAppApiEndpoints(app);
-applyQrCodeApiEndpoints(app);
 applyAppDataApiEndpoints(app);
+applyMessageRoutesEndpoints(app);
 
 app.use(shopify.cspHeaders());
 app.use(serveStatic(STATIC_PATH, { index: false }));

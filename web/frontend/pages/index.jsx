@@ -100,6 +100,10 @@ export default function HomePage() {
             content: "Setup Assistant",
             onAction: () => navigate("/setup"),
             }}
+            secondaryActions={[{
+              content: "Customize UI",
+              onAction: () => navigate("/customize")
+            }]}
         />
         {loadingMarkup}
         {emptyStateMarkup}

@@ -104,6 +104,7 @@ export default function SetupForm() {
             label="Welcome Message"
             labelHidden
             multiline
+            clearButton
           />
 
           <Box minHeight="0.5rem"/>
@@ -115,10 +116,11 @@ export default function SetupForm() {
           </Tooltip>
           <TextField
             {...personality}
-            label="Welcome Message"
+            label="Personality"
             labelHidden
             multiline
             helpText="(Optional) this adjusts your assistants personailty"
+            clearButton
           />
         </FormLayout>
       </Form>

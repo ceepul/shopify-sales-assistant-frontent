@@ -13,7 +13,6 @@ export const PineconeDB = {
   }, */
 
   upsert: async function (vectorArray, shopURL) {
-    const index = this.db.Index(this.index);
     const batchSize = 5;
     let upsertedCount = 0;
 
@@ -24,7 +23,7 @@ export const PineconeDB = {
         vectors: vectors,
         namespace: shopURL,
       };
-      const upsertResponse = await index.upsert({ upsertRequest });
+      const upsertResponse = await this.index.upsert({ upsertRequest });
       upsertedCount += upsertResponse.upsertedCount
     }
 
@@ -32,21 +31,32 @@ export const PineconeDB = {
   },
 
   delete: async function (id, namespace) {
-    const index = this.db.Index(this.index);
 
-    return await index.delete1({
+    return await this.index.delete1({
       id: id,
       namespace: namespace
     })
   },
 
   deleteAll: async function (namespace) {
-    const index = this.db.Index(this.index);
 
-    await index.delete1({
+    await this.index.delete1({
         namespace: namespace,
         deleteAll: deleteAll,
     })
+  },
+
+  query: async function (vector, namespace) {
+    const queryRequest = {
+      topK: 5,
+      vector: vector,
+      namespace: namespace,
+    }
+
+    //Query the index and store the response.
+    const queryResponse = await this.index.query({queryRequest});
+
+    return queryResponse
   },
 
   getIndexes: async function() {

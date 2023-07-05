@@ -8,22 +8,23 @@ import {
 import { useState } from "react";
 import { useAuthenticatedFetch } from "@shopify/app-bridge-react";
 
-export default function ConnectProductsCard({productsConnected}) {
+export default function ConnectProductsCard({productsConnected, handleConnectedStatus}) {
     const fetch = useAuthenticatedFetch();
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleConnectProducts = async () => {
         setIsSubmitting(true)
 
-        /* const response = await fetch("/api/upload-products", {
+        const response = await fetch("/api/products", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-        }); */
+        });
 
         setIsSubmitting(false)
+        handleConnectedStatus()
         {/*Remove console log before production */}
-        //const readable = await response.json()
-        //console.log(readable)
+        const readable = await response.json()
+        console.log(readable)
     }
 
     const connectProductsMarkup = (
@@ -47,7 +48,7 @@ export default function ConnectProductsCard({productsConnected}) {
     const deleteProductsMarkup = (
         <VerticalStack gap="4">
             <Text variant="headingMd" as="h6">
-                All Products Connected!
+                All Products Are Connected!
             </Text>
             <p>
                 You're good to go. The assistant will automatically make product reccomendations. 
@@ -59,7 +60,7 @@ export default function ConnectProductsCard({productsConnected}) {
                     destructive
                     loading={isSubmitting}
                     onClick={() => {handleConnectProducts()}}
-                >Delete Products</Button>
+                >Disconnect Products</Button>
             </Box>
         </VerticalStack>
       )

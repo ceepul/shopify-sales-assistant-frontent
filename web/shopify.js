@@ -23,7 +23,7 @@ await pinecone.init({
 });
 
 PineconeDB.db = pinecone;
-PineconeDB.index = "shopify-app-data" // *** This should be made scalable in the future 
+PineconeDB.index = pinecone.Index("shopify-app-data"); // *** This should be made scalable in the future 
 
 const shopify = shopifyApp({
   api: {

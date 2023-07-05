@@ -7,7 +7,7 @@ const openai = new OpenAIApi(configuration);
 
 /*Takes in an array of strings, makes a request to the OpenAI API,
  and returns an array of vector embeddings */
-export  async function embed(req, res, data, shopURL) {
+export async function embed(req, res, data, shopURL) {
 
     const response = await openai.createEmbedding({
         model: "text-embedding-ada-002",
