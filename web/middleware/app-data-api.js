@@ -1,6 +1,6 @@
 import express from "express";
 import shopify from "../shopify.js";
-import { getProduct } from "../helpers/admin-query.js";
+import { getProduct, getProductById } from "../helpers/admin-query.js";
 import { formatProductsAsVectors } from "../helpers/format-data.js";
 import { PineconeDB } from "../pinecone-db.js";
 import { getShopUrlFromSession } from "../helpers/admin-query.js";
@@ -24,6 +24,16 @@ export default function applyAppDataApiEndpoints(app) {
         }
     });
     
+    app.post("/api/productInfo", async (req, res) => {
+      try {
+        const productsData = await getProductById(req, res)
+
+        res.status(200).send(productsData);
+      } catch (error) {
+        res.status(500).send(error.message);
+      }
+    })
+
     app.delete("/api/products", async (req, res) => {
         try {
             const response = await PineconeDB.delete(
@@ -38,6 +48,7 @@ export default function applyAppDataApiEndpoints(app) {
 
     app.post("/api/query", async (req, res) => {
       try {
+        console.log(req.body)
         const query = req.body.query
 
         const shopURL = await getShopUrlFromSession(req, res)
