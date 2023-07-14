@@ -46,11 +46,11 @@ export const PineconeDB = {
     })
   },
 
-  query: async function (vector, namespace) {
+  query: async function (vector, namespace, topK) {
     const queryRequest = {
-      topK: 5,
       vector: vector,
       namespace: namespace,
+      topK: topK,
     }
 
     //Query the index and store the response.

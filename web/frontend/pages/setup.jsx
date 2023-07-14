@@ -25,7 +25,7 @@ export default function SetupPage() {
         title="Setup"
         breadcrumbs={breadcrumbs}
         primaryAction={null}
-        />
+        />        
         <Layout>
             <Layout.Section>
                 {/*Settings*/}

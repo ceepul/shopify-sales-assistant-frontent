@@ -59,6 +59,7 @@ export default function applyAppDataApiEndpoints(app) {
 
         res.status(200).send(JSON.stringify(response))
       } catch (error) {
+        console.log(`Error at /api/query: ${error}`)
         res.status(500).send(error.message)
       }
     });

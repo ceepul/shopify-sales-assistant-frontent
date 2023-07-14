@@ -15,6 +15,7 @@ import {
 import { useEffect, useState, useRef } from "react";
 import { useAuthenticatedFetch } from "@shopify/app-bridge-react";
 import { SendMajor, MobileHorizontalDotsMajor } from '@shopify/polaris-icons'
+import MessageUI from "./MessageUI";
 
 export default function Preview() {
   const [query, setQuery] = useState("");
@@ -27,6 +28,7 @@ export default function Preview() {
   const [messages, setMessages] = useState([
     {
       role: "assistant",
+      type: "text",
       content: welcomeMessage,
     },
   ])
@@ -38,62 +40,26 @@ export default function Preview() {
     const tempQuery = query
     setQuery("")
 
-    let tempMessages = messages
+    let tempMessages = [...messages]
     tempMessages.push(
     {
       role: "user",
+      type: "text",
       content: tempQuery,
     })
-    
-    console.log(tempMessages)
+
     try {
-      const response = await fetch("/api/message", {
+      const response = fetch("/api/message", {
         method: "POST",
         body: JSON.stringify({ query: tempQuery }),
         headers: { "Content-Type": "application/json" },
-      });
+      })
+
+      console.log(response)
 
       if (response.ok) {
-        // Handle the response here
-        const responseData = await response.json();
-        console.log(responseData)
-
-        tempMessages.push(
-          {
-            role: "assistant",
-            content: responseData.res,
-          })
-
-        if(responseData.query) { 
-          console.log("Making a product query")
-
-          const res = await fetch("/api/query", {
-            method: "POST",
-            body: JSON.stringify({ query: responseData.query }),
-            headers: { "Content-Type": "application/json" },
-          })
-
-          const relevantProducts = await res.json()
-
-          const productData = await fetch(`/api/productInfo`, {
-            method: "POST",
-            body: JSON.stringify({ ids: relevantProducts.matches[0].id }), // Closest vector - product id
-            headers: { "Content-Type": "application/json" },
-          });
-
-          if(productData.ok) {
-            const jsonProductData = await productData.json()
-            console.log(jsonProductData)
-
-            tempMessages.push(
-              {
-                role: "products",
-                content: jsonProductData,
-            })
-          } else {
-            console.error("Failed to get product information from id", productData.status)
-          }
-        }
+        
+        console.log("response ok")
 
       } else {
         console.error("Failed to send message:", response.status);
@@ -110,60 +76,17 @@ export default function Preview() {
   const messagesMarkup = (
     <VerticalStack gap="4">
       {messages.map((message, key) => {
-      if (message.role === "assistant") return (
-        <Box
-          key={key}
-          style={{
-            background: "var(--p-color-border-disabled)",
-            padding: "var(--p-space-2)",
-            maxWidth: "80%",
-            borderRadius: "10px 10px 10px 0px",
-          }}  
-        >
-          <Text>{message.content}</Text>
-        </Box>
-      )
-
-      else if (message.role === "user") return (
-          <Box
-          key={key}
-            style={{
-              background: "var(--p-color-border-interactive-subdued)",
-              padding: "var(--p-space-2)",
-              maxWidth: "80%",
-              marginLeft: "auto",
-              borderRadius: "10px 10px 0px 10px",
-            }}  
-          >
-            <Text>{message.content}</Text>
-          </Box>
-      )
-
-      else if (message.role === "products") {
         return (
-          <Box
-          key={key}
-            style={{
-              background: "var(--p-color-border-disabled)",
-              padding: "var(--p-space-2)",
-              maxWidth: "80%",
-              borderRadius: "10px 10px 10px 10px",
-            }}  
-          >
-            <Text variant="headingSm" as="h6">{message.content.title}</Text>
-            {message.content.images.nodes[0] ? 
-              <Image
-                source={message.content.images.nodes[0].src}
-                height="160px"
-              /> : null
-            }
+          <Box key={key}>
+            <MessageUI
+              type={message.type}
+              role={message.role}
+              content={message.content}
+            />
           </Box>
         )
-      }
-
-      else return null;
-    })}
-  </VerticalStack>)
+      })}
+    </VerticalStack>)
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
@@ -179,7 +102,6 @@ export default function Preview() {
   }, [messagesMarkup]);
 
   if(messages.length > 14) {
-    console.log(messages.length)
     const temp = messages
     temp.shift()
     setMessages(temp)
