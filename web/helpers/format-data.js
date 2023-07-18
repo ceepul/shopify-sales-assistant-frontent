@@ -16,7 +16,6 @@ export async function formatProductsAsVectors(req, res, productData, shopURL) {
     const embeddingRes = await embed(req, res, formattedData, shopURL)
 
     const vectors = productData.map((product, index) => {
-        console.log(product.id)
         return (
             {
                 id: product.id,

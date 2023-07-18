@@ -6,6 +6,7 @@ import {
 } from "../helpers/langchain.js";
 import { makeQuery } from "../helpers/admin-query.js";
 import { getProductById } from "../helpers/admin-query.js";
+import { ShopMateDB } from "../shopmate-db.js";
 
 export default function applyMessageRoutesEndpoints(app) {
   app.use(express.json());
@@ -14,7 +15,11 @@ export default function applyMessageRoutesEndpoints(app) {
     try {
       const input = await req.body.query
       console.log(`Message received: ${input}`)
-  
+
+      // Try catch ?
+      const shopId = res.locals.shopify.session.id
+      ShopMateDB.addMessage(shopId)
+
       // Prepare the headers for streaming
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache');
@@ -47,6 +52,12 @@ export default function applyMessageRoutesEndpoints(app) {
         const relevantMatches = matches.filter(match => matches[0].score - match.score < 0.02);
   
         for (let match of relevantMatches) {
+          /*
+            TO DO: Try catch somewhere 
+            If your query to Shopify fails because the product doesn't exist,
+            you could catch that error,
+            remove the product from your SQLite database, and optionally notify the user.
+          */
           const productData = await getProductById(req, res, match.id)
   
           const productMessage = {
@@ -57,6 +68,9 @@ export default function applyMessageRoutesEndpoints(app) {
           
           // Write the product data to the stream
           res.write(`data: ${JSON.stringify(productMessage)}\n\n`);
+
+          //Add a recommendation entry in the SQLite Database
+          ShopMateDB.addRecommendationEvent(shopId, match.id)
         }
       } else {
         // Return a default response

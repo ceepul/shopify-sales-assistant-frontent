@@ -3,41 +3,57 @@ import { embed } from "../openai.js";
 import { PineconeDB } from "../pinecone-db.js";
 
 export async function getShopUrlFromSession(req, res) {
-    return `https://${res.locals.shopify.session.shop}`;
-  }
+  return `https://${res.locals.shopify.session.shop}`;
+}
 
-export async function getProduct(req, res) {
-  /*
-    TO DO:
-    edit to get ALL products
-  */
+export async function getShopIdFromSession(req, res) {
+  return res.locals.shopify.session.id
+}
+
+export async function getAllProducts(req, res) {
   const client = new shopify.api.clients.Graphql({
     session: res.locals.shopify.session,
   });
 
-    const PRODUCTS_QUERY = `{
-        products(first: 50) {
+  let allProducts = [];
+  let hasNextPage = true;
+  let cursor = null;
+
+  while (hasNextPage) {
+    const PRODUCTS_QUERY = `
+      {
+        products(first: 50${cursor ? `, after: "${cursor}"` : ""}) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
           nodes {
             description
             title
             id
           }
-          pageInfo {
-            endCursor
-          }
         }
       }
     `;
-    
-      /* Query the Shopify GraphQL Admin API */
+
     const productData = await client.query({
       data: {
         query: PRODUCTS_QUERY,
       },
     });
-    // Return an array of just product objects
-    return productData.body.data.products.nodes
+
+    // Add new products to allProducts
+    const newProducts = productData.body.data.products.nodes;
+    allProducts = [...allProducts, ...newProducts];
+
+    // Update hasNextPage and cursor for next iteration
+    hasNextPage = productData.body.data.products.pageInfo.hasNextPage;
+    cursor = productData.body.data.products.pageInfo.endCursor;
+  }
+
+  return allProducts;
 }
+  
 
 export async function getProductById(req, res, ids) {
   /*

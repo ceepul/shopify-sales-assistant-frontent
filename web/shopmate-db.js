@@ -17,34 +17,43 @@ export const ShopMateDB = {
   db: null,
   ready: null,
 
-  create: async function (shop) {
+  create: async function ({ id, shop }) {
     await this.ready;
-
+  
+    const shopID = id
+    const shopDomain = shop
+    const storeInfo = '';
+    const assistantName = 'ShopMate';
+    const accentColour = '#47AFFF';
+    const lightMode = true;
+    const welcomeMessage = 'Welcome to our shop!';
+    const homeScreen = true;
+    const planID = 1;
+    const overLimit = false;
+  
     const query = `
       INSERT INTO ${this.shopsTableName}
-      (ShopID, ShopName, InstallDate, TotalRecommendations, TotalAddToCart, StoreInfo, AssistantName, AccentColour, LightMode, WelcomeMessage, HomeScreen, PlanID, OverLimit)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (ShopID, ShopDomain, StoreInfo, AssistantName, AccentColour, LightMode, WelcomeMessage, HomeScreen, PlanID, OverLimit)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       RETURNING id;
     `;
-
+  
     const rawResults = await this.__query(query, [
-      shop.shopID,
-      shop.shopName,
-      shop.installDate,
-      shop.totalRecommendations,
-      shop.totalAddToCart,
-      shop.storeInfo,
-      shop.assistantName,
-      shop.accentColour,
-      shop.lightMode ? 1 : 0,
-      shop.welcomeMessage,
-      shop.homeScreen ? 1 : 0,
-      shop.planID,
-      shop.overLimit ? 1 : 0
+      shopID,
+      shopDomain,
+      storeInfo,
+      assistantName,
+      accentColour,
+      lightMode ? 1 : 0,
+      welcomeMessage,
+      homeScreen ? 1 : 0,
+      planID,
+      overLimit ? 1 : 0
     ]);
-
+  
     return rawResults[0].id;
   },
+  
 
   readShop: async function (shopID) {
     await this.ready;
@@ -68,9 +77,6 @@ export const ShopMateDB = {
     const query = `
       UPDATE ${this.shopsTableName}
       SET
-        ShopName = ?,
-        TotalRecommendations = ?,
-        TotalAddToCart = ?,
         StoreInfo = ?,
         AssistantName = ?,
         AccentColour = ?,
@@ -84,9 +90,6 @@ export const ShopMateDB = {
     `;
 
     await this.__query(query, [
-      shop.shopName,
-      shop.totalRecommendations,
-      shop.totalAddToCart,
       shop.storeInfo,
       shop.assistantName,
       shop.accentColour,
@@ -144,8 +147,8 @@ export const ShopMateDB = {
     await this.ready;
   
     const query = `
-      INSERT INTO ${this.productsTableName} (ProductID, ShopID, Active, TotalRecommendations, TotalAddToCart)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO ${this.productsTableName} (ProductID, ShopID, Active, TotalRecommendations, TotalAddToCart, TotalProductViews)
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
   
     await this.__query(query, [
@@ -154,25 +157,28 @@ export const ShopMateDB = {
       product.active ? 1 : 0,
       product.totalRecommendations,
       product.totalAddToCart,
+      product.totalProductViews,
     ]);
   
     return true;
   },
 
-  updateProduct: async function (productID, recommendations, addCart) {
+  updateProduct: async function (productID, recommendations, addCart, productViews) {
     await this.ready;
     const query = `
       UPDATE ${this.productsTableName}
       SET
         TotalRecommendations = ?,
-        TotalAddToCart = ?
+        TotalAddToCart = ?,
+        TotalProductViews = ?
       WHERE
         ProductID = ?;
     `;
     await this.__query(query, [
       recommendations,
       addCart,
-      productID
+      productViews,
+      productID,
     ]);
     return true;
   },  
@@ -191,16 +197,15 @@ export const ShopMateDB = {
 
   addMessage: async function (shopID) {
     await this.ready;
-  
-    const query = `
+
+    let query = `
       INSERT INTO ${this.messagesTableName} (ShopID)
       VALUES (?)
     `;
-  
     await this.__query(query, [shopID]);
   
     return true;
-  },
+  },  
 
   addSession: async function (shopID) {
     await this.ready;
@@ -232,13 +237,19 @@ export const ShopMateDB = {
   addRecommendationEvent: async function (shopID, productID) {
     await this.ready;
   
-    const query = `
+    const insertQuery = `
       INSERT INTO ${this.recommendationEventsTableName}
       (ShopID, ProductID)
       VALUES (?, ?);
     `;
+    await this.__query(insertQuery, [shopID, productID]);
   
-    await this.__query(query, [shopID, productID]);
+    const updateQuery = `
+      UPDATE ${this.productsTableName}
+      SET TotalRecommendations = TotalRecommendations + 1
+      WHERE ProductID = ?;
+    `;
+    await this.__query(updateQuery, [productID]);
   
     return true;
   },
@@ -295,7 +306,6 @@ export const ShopMateDB = {
 
     query = `DELETE FROM ${this.productViewEventsTableName} WHERE ShopID = ?`;
     await this.__query(query, [shopID]);
-
   
     return true;
   },  
@@ -318,10 +328,7 @@ export const ShopMateDB = {
         CREATE TABLE ${this.shopsTableName} (
           id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
           ShopID VARCHAR(511) NOT NULL,
-          ShopName VARCHAR(511) NOT NULL,
-          InstallDate DATETIME NOT NULL,
-          TotalRecommendations INTEGER,
-          TotalAddToCart INTEGER,
+          ShopDomain VARCHAR(511) NOT NULL,
           StoreInfo TEXT,
           AssistantName VARCHAR(255),
           AccentColour VARCHAR(7),
@@ -345,6 +352,7 @@ export const ShopMateDB = {
           Active BOOLEAN,
           TotalRecommendations INTEGER,
           TotalAddToCart INTEGER,
+          TotalProductViews INTEGER,
           createdAt DATETIME NOT NULL DEFAULT (datetime(CURRENT_TIMESTAMP, 'localtime'))
         );
       `;
@@ -423,8 +431,6 @@ export const ShopMateDB = {
     }
   },
 
-  // ...
-
   __hasTable: async function (tableName) {
     const query = `
       SELECT name FROM sqlite_schema
@@ -436,5 +442,17 @@ export const ShopMateDB = {
     return rows.length === 1;
   },
 
-  // ...
+  /* Perform a query on the database. Used by the various CRUD methods. */
+  __query: function (sql, params = []) {
+    return new Promise((resolve, reject) => {
+      this.db.all(sql, params, (err, result) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(result);
+      });
+    });
+  },
+
 };

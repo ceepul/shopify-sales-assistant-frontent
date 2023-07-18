@@ -7,7 +7,7 @@ This repository is the frontend for Shopify’s app starter templates. **You pro
 ## Developer resources
 
 - [Introduction to Shopify apps](https://shopify.dev/apps/getting-started)
-  - [App authentication](https://shopify.dev/apps/auth)
+- [App authentication](https://shopify.dev/apps/auth)
 - [Shopify CLI command reference](https://shopify.dev/apps/tools/cli/app)
 - [Shopify API Library documentation](https://github.com/Shopify/shopify-node-api/tree/main/docs)
 

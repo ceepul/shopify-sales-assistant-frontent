@@ -35,63 +35,6 @@ export default function Preview() {
 
   const fetch = useAuthenticatedFetch();
 
-  /* const handleSendMessage = async () => {
-    setMessageRequestPending(true)
-    const tempQuery = query
-    setQuery("")
-
-    let tempMessages = [...messages]
-    tempMessages.push(
-    {
-      role: "user",
-      type: "text",
-      content: tempQuery,
-    })
-
-    try {
-      const response = fetch("/api/message", {
-        method: "POST",
-        body: JSON.stringify({ query: tempQuery }),
-        headers: { "Content-Type": "application/json" },
-      }).then((res) => {
-        const reader = res.body.getReader()
-        console.log("Reader ready")
-
-        const read = () => {
-          // read the data
-          reader.read().then(({ done, value }) => {
-            
-            if (done) {
-              console.log("[end]")
-              return;
-            }
-  
-            const decoder = new TextDecoder();
-            console.log("recieved: " + decoder.decode(value))
-            read();
-          })
-        }
-
-        read()
-      })
-
-      console.log(response)
-
-      if (response.ok) {
-        
-        console.log("response ok")
-
-      } else {
-        console.error("Failed to send message:", response.status);
-      }
-    } catch (error) {
-      console.error("Failed to send message:", error);
-    } finally {
-      setMessageRequestPending(false);
-      setMessages(tempMessages)
-    }
-  }; */
-
   const handleSendMessage = async () => {
     setMessageRequestPending(true);
 

@@ -6,8 +6,13 @@ import serveStatic from "serve-static";
 import 'dotenv/config.js'
 
 import shopify from "./shopify.js";
+import { ShopMateDB } from "./shopmate-db.js";
+
 import applyAppDataApiEndpoints from "./middleware/app-data-api.js";
 import applyMessageRoutesEndpoints from "./middleware/messageRoutes.js";
+import { getAllProducts, getShopUrlFromSession } from "./helpers/admin-query.js";
+import { formatProductsAsVectors } from "./helpers/format-data.js";
+import { PineconeDB } from "./pinecone-db.js";
 
 import GDPRWebhookHandlers from "./gdpr.js";
 
@@ -30,12 +35,46 @@ app.get(
   shopify.config.auth.callbackPath,
   shopify.auth.callback(),
 
-  /* Code to run on app installation, ie. set up metafields and link products 
-  async(req, res, next) => {
 
-    next();
+  /* Code to run on app installation, ie. set up metafields and link products  */
+  async (req, res, next) => {
+    try {
+      // Get shop data from session
+      const shopId = res.locals.shopify.session.id;
+      const shop = res.locals.shopify.session.shop;
+  
+      // Create shop in ShopMateDB
+      ShopMateDB.create({ id: shopId, shop: shop })
+  
+      // Get products
+      const products = await getAllProducts(req, res)
+  
+      // Get shop URL
+      const shopURL = await getShopUrlFromSession(req, res)
+  
+      // Format products as vectors
+      const vectorArray = await formatProductsAsVectors(req, res, products, shopURL)
+  
+      // Upsert vectorArray into PineconeDB
+      const upsertResponse = await PineconeDB.upsert(vectorArray, shopURL)
+
+      // Add each product to ShopMateDB
+      for (const product of products) {
+        await ShopMateDB.addProduct({
+          productID: product.id,
+          shopID: shopId,
+          active: true,
+          totalRecommendations: 0, 
+          totalAddToCart: 0,
+        });
+      }
+  
+      next();
+    } catch (error) {
+      console.error(`Failed to initialize app: ${error.message}`);
+      res.status(500).send(error.message);
+    }
   },
-  */
 
   shopify.redirectToShopifyOrAppRoot()
 );
