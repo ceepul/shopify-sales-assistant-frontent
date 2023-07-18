@@ -35,7 +35,7 @@ export default function Preview() {
 
   const fetch = useAuthenticatedFetch();
 
-  const handleSendMessage = async () => {
+  /* const handleSendMessage = async () => {
     setMessageRequestPending(true)
     const tempQuery = query
     setQuery("")
@@ -53,6 +53,26 @@ export default function Preview() {
         method: "POST",
         body: JSON.stringify({ query: tempQuery }),
         headers: { "Content-Type": "application/json" },
+      }).then((res) => {
+        const reader = res.body.getReader()
+        console.log("Reader ready")
+
+        const read = () => {
+          // read the data
+          reader.read().then(({ done, value }) => {
+            
+            if (done) {
+              console.log("[end]")
+              return;
+            }
+  
+            const decoder = new TextDecoder();
+            console.log("recieved: " + decoder.decode(value))
+            read();
+          })
+        }
+
+        read()
       })
 
       console.log(response)
@@ -70,7 +90,80 @@ export default function Preview() {
       setMessageRequestPending(false);
       setMessages(tempMessages)
     }
+  }; */
+
+  const handleSendMessage = async () => {
+    setMessageRequestPending(true);
+
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      {
+        role: "user",
+        type: "text",
+        content: query,
+      },
+    ]);
+  
+    try {
+      const response = await fetch("/api/message", {
+        method: "POST",
+        body: JSON.stringify({ query }),
+        headers: { "Content-Type": "application/json" },
+      });
+  
+      const reader = response.body.getReader();
+  
+      let buffer = "";
+  
+      const read = async () => {
+        const { done, value } = await reader.read();
+  
+        if (done) {
+          console.log("[end]");
+          setMessageRequestPending(false); // Set loading state to false when all messages are received
+          return;
+        }
+  
+        const decoder = new TextDecoder();
+        buffer += decoder.decode(value);
+  
+        let separatorPosition;
+        while ((separatorPosition = buffer.indexOf("\n\n")) !== -1) {
+          const message = buffer.slice(0, separatorPosition);
+          buffer = buffer.slice(separatorPosition + 2);
+  
+          if (message.startsWith("data: ")) {
+            const jsonText = message.slice(6); // remove "data: " prefix
+            try {
+              const json = JSON.parse(jsonText);
+              console.log("Received: ", json);
+  
+              // Append the message to the messages array
+              setMessages((prevMessages) => [
+                ...prevMessages,
+                {
+                  role: "assistant",
+                  type: json.type,
+                  content: json.content,
+                },
+              ]);
+            } catch (error) {
+              console.log("Error parsing JSON:", error);
+            }
+          }
+        }
+  
+        read();
+      };
+  
+      read();
+    } catch (error) {
+      setMessageRequestPending(false); // If an error occurs, also set loading state to false
+    } finally {
+      setQuery("");
+    }
   };
+  
 
   //Styles each message object depending on whether it is an assistant or user message
   const messagesMarkup = (
