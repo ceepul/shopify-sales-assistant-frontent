@@ -179,7 +179,8 @@ export default function Preview() {
           </Box>
         )
       })}
-    </VerticalStack>)
+    </VerticalStack>
+  )
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
