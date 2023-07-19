@@ -25,7 +25,7 @@ export const ShopMateDB = {
     const storeInfo = '';
     const assistantName = 'ShopMate';
     const accentColour = '#47AFFF';
-    const lightMode = true;
+    const darkMode = true;
     const welcomeMessage = 'Welcome to our shop!';
     const homeScreen = true;
     const planID = 1;
@@ -33,7 +33,7 @@ export const ShopMateDB = {
   
     const query = `
       INSERT INTO ${this.shopsTableName}
-      (ShopID, ShopDomain, StoreInfo, AssistantName, AccentColour, LightMode, WelcomeMessage, HomeScreen, PlanID, OverLimit)
+      (ShopID, ShopDomain, StoreInfo, AssistantName, AccentColour, darkMode, WelcomeMessage, HomeScreen, PlanID, OverLimit)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       RETURNING id;
     `;
@@ -44,7 +44,7 @@ export const ShopMateDB = {
       storeInfo,
       assistantName,
       accentColour,
-      lightMode ? 1 : 0,
+      darkMode ? 1 : 0,
       welcomeMessage,
       homeScreen ? 1 : 0,
       planID,
@@ -80,7 +80,7 @@ export const ShopMateDB = {
         StoreInfo = ?,
         AssistantName = ?,
         AccentColour = ?,
-        LightMode = ?,
+        darkMode = ?,
         WelcomeMessage = ?,
         HomeScreen = ?,
         PlanID = ?,
@@ -93,7 +93,7 @@ export const ShopMateDB = {
       shop.storeInfo,
       shop.assistantName,
       shop.accentColour,
-      shop.lightMode ? 1 : 0,
+      shop.darkMode ? 1 : 0,
       shop.welcomeMessage,
       shop.homeScreen ? 1 : 0,
       shop.planID,
@@ -117,15 +117,41 @@ export const ShopMateDB = {
   
     return true;
   },
+
+  getShopPreferences: async function (shopID) {
+    await this.ready;
   
-  updateShopPreferences: async function (shopID, color, lightMode, welcomeMessage, homeScreen) {
+    const query = `
+      SELECT 
+        AssistantName AS assistantName,
+        AccentColour AS accentColour,
+        DarkMode AS darkMode,
+        WelcomeMessage AS welcomeMessage,
+        HomeScreen AS homeScreen
+      FROM 
+        ${this.shopsTableName}
+      WHERE 
+        ShopID = ?;
+    `;
+  
+    const result = await this.__query(query, [shopID]);
+  
+    if (result.length > 0) {
+      return result[0];
+    } else {
+      return null
+    }
+  },
+  
+  updateShopPreferences: async function (shopID, assistantName, accentColour, darkMode, welcomeMessage, homeScreen) {
     await this.ready;
   
     const query = `
       UPDATE ${this.shopsTableName}
       SET
+        AssistantName = ?,
         AccentColour = ?,
-        LightMode = ?,
+        darkMode = ?,
         WelcomeMessage = ?,
         HomeScreen = ?
       WHERE
@@ -133,8 +159,9 @@ export const ShopMateDB = {
     `;
   
     await this.__query(query, [
-      color,
-      lightMode ? 1 : 0,
+      assistantName,
+      accentColour,
+      darkMode ? 1 : 0,
       welcomeMessage,
       homeScreen ? 1 : 0,
       shopID
@@ -331,8 +358,8 @@ export const ShopMateDB = {
           ShopDomain VARCHAR(511) NOT NULL,
           StoreInfo TEXT,
           AssistantName VARCHAR(255),
-          AccentColour VARCHAR(7),
-          LightMode BOOLEAN,
+          AccentColour VARCHAR(6),
+          darkMode BOOLEAN,
           WelcomeMessage TEXT,
           HomeScreen BOOLEAN,
           PlanID INTEGER,

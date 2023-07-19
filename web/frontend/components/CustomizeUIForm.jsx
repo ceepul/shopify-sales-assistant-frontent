@@ -1,129 +1,212 @@
-import { ContextualSaveBar } from "@shopify/app-bridge-react";
-import { useForm, useField, notEmptyString } from "@shopify/react-form";
+import { useState, useCallback } from "react";
+import { ContextualSaveBar, useAuthenticatedFetch } from "@shopify/app-bridge-react";
 import {
   Form, 
-  FormLayout, 
-  Layout, 
+  FormLayout,  
   TextField, 
-  VerticalStack,
   Text,
   AlphaCard,
   Box,
-  Tooltip,
   HorizontalStack,
-  ColorPicker,
-  Icon,
-  Button
+  Button,
+  Checkbox,
+  VerticalStack,
+  useBreakpoints,
+  Badge
 } from "@shopify/polaris";
 import { ColorsMajor } from '@shopify/polaris-icons';
-import { useCallback } from "react";
 
+export default function CustomizeUIForm({preferences, refetch}) {
 
-export default function CustomizeUIForm() {
+  const [assistantName, setAssistantName] = useState(preferences ? preferences.assistantName : "ShopMate");
+  const [accentColour, setAccentColour] = useState(preferences ? preferences.accentColour : "#47AFFF");
+  const [darkMode, setDarkMode] = useState(preferences ? preferences.darkMode : false);
+  const [homeScreen, setHomeScreen] = useState(preferences ? preferences.homeScreen : true);
+  const [welcomeMessage, setWelcomeMessage] = useState(preferences ? preferences.welcomeMessage : 
+      "Welcome to our store! Are there any products I could help you find?"
+    );
 
-  const onSubmit = useCallback(
-    (body) => {
-      (async () => {
-        
-      })();
-      return { status: "success" };
-    },
-    []
-  );
+  const [submitting, setSubmitting] = useState(false);
+  const [dirty, setDirty] = useState(false);
 
-  /*
-    Sets up the form state with the useForm hook.
+  const fetch = useAuthenticatedFetch();
 
-    Accepts a "fields" object that sets up each individual field with a default value and validation rules.
+  const onSubmit = async () => {
+    setSubmitting(true);
+    
+    const body = {
+      assistantName,
+      accentColour,
+      darkMode,
+      homeScreen,
+      welcomeMessage,
+    }
 
-    Returns a "fields" object that is destructured to access each of the fields individually, so they can be used in other parts of the component.
+    const response = await fetch("/api/preferences", {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: { "Content-Type": "application/json" },
+    });
+    if (response.ok) {
+      console.log("Success")
+    } else {
+      // Create a toast?
+      console.log("An error occured while updating preferences")
+    }
 
-    Returns helpers to manage form state, as well as component state that is based on form state.
-  */
-  const {
-    fields: {
-      primaryColor,
-      secondaryColor,
-    },
-    dirty,
-    reset,
-    submitting,
-    submit,
-    makeClean,
-  } = useForm({
-    fields: {
-      primaryColor: useField({
-        value: "4299E1",
-        validates: [notEmptyString("Primary color is required")],
-      }),
-      secondaryColor: useField({
-        value: "E2E8F0",
-        validates: [notEmptyString("Secondary color is required")],
-      }),
-    },
-    onSubmit,
-  });
+    setSubmitting(false);
+    setDirty(false);
+  }
+
+  const onReset = useCallback(() => {
+    refetch();
+    setDirty(false);
+  }, []);
+
+  const handleChangeAssistantName = (value) => {
+    setAssistantName(value);
+    setDirty(true);
+  };
+
+  const handleChangeAccentColour = (value) => {
+    setAccentColour(value);
+    setDirty(true);
+  };
+
+  const handleToggleDarkMode = () => {
+    setDarkMode(prev => !prev);
+    setDirty(true);
+  };
+
+  const handleToggleHomeScreen = () => {
+    setHomeScreen(prev => !prev);
+    setDirty(true);
+  };
+
+  const handleChangeWelcomeMessage = (value) => {
+    setWelcomeMessage(value);
+    setDirty(true);
+  };
+
+  const {mdDown} = useBreakpoints();
+
+  const SettingToggle = ({enabled, handleToggle, title, description}) => {
+    const contentStatus = enabled ? 'Disable' : 'Enable';
+    const toggleId = `${title.toLowerCase().replace(' ', '-')}-toggle-uuid`;
+    const badgeStatus = enabled ? 'success' : undefined;
+    const badgeContent = enabled ? 'On' : 'Off';
+
+    const settingStatusMarkup = (
+      <Badge
+        status={badgeStatus}
+        statusAndProgressLabelOverride={`Setting is ${badgeContent}`}
+      >
+        {badgeContent}
+      </Badge>
+    );
+
+    const actionMarkup = (
+      <Button
+        role="switch"
+        id={toggleId}
+        ariaChecked={enabled ? 'true' : 'false'}
+        onClick={handleToggle}
+        size="slim"
+      >
+        {contentStatus}
+      </Button>
+    );
+
+    const headerMarkup = (
+      <Box width="100%">
+        <HorizontalStack align="space-between">
+          <HorizontalStack
+            gap="4"
+            blockAlign="start"
+            wrap={false}
+          >
+            <Text variant="headingMd" as="h6">{title}</Text>
+            {settingStatusMarkup}
+          </HorizontalStack>
   
-  /* const colorMarkup = (
-    <VerticalStack gap="4">
-      <Text variant="headingMd" as="h6">
-        Primary Color
-      </Text>
-      <HorizontalStack gap="4">
-      <Box
-        style={{
-          background: 'var(--p-color-border-interactive-subdued)',
-          borderRadius: 8,
-          minWidth: 35,
-        }}>&nbsp;</Box>
-        <TextField 
-          {...primaryColor}
-          label="Primary Color"
-          labelHidden
-        />
-        <Button 
-          icon={ColorsMajor}
-          outline
-        />
-      </HorizontalStack>
-    </VerticalStack>
-  ) */
+          {!mdDown && (
+            <Box minWidth="fit-content">
+              <HorizontalStack align="end">{actionMarkup}</HorizontalStack>
+            </Box>
+          )}
+        </HorizontalStack>
+      </Box>
+    );
+
+    const descriptionMarkup = (
+      <VerticalStack gap="4">
+        <Text variant="bodyMd" as="p" color="subdued">
+          {description}
+        </Text>
+        {mdDown && (
+          <Box width="100%">
+            <HorizontalStack align="start">{actionMarkup}</HorizontalStack>
+          </Box>
+        )}
+      </VerticalStack>
+    );
+
+    return (
+      <VerticalStack gap="4">
+        {headerMarkup}
+        {descriptionMarkup}
+      </VerticalStack>
+    );
+  };
 
   return (
     <AlphaCard>
-      <Form>
-        <ContextualSaveBar 
+      <Form onSubmit={onSubmit}>
+        <ContextualSaveBar
           saveAction={{
-              label: "Save",
-              onAction: submit,
-              loading: submitting,
-              disabled: submitting,
+            label: "Save",
+            onAction: onSubmit,
+            loading: submitting,
+            disabled: submitting
           }}
           discardAction={{
-              label: "Discard",
-              onAction: reset,
-              loading: submitting,
-              disabled: submitting,
+            label: "Discard",
+            onAction: onReset,
+            loading: submitting,
+            disabled: submitting
           }}
           visible={dirty}
           fullWidth
         />
         <FormLayout>
           <Text variant="headingMd" as="h6">
-            Primary Color
+            Assistant Name
+          </Text>
+          <TextField
+            value={assistantName}
+            onChange={handleChangeAssistantName}
+            label="Name"
+            labelHidden
+          />
+
+          <Box minHeight="0.5rem"/>
+
+          <Text variant="headingMd" as="h6">
+            Accent Color
           </Text>
           <HorizontalStack gap="4">
-          <Box
-            style={{
-              background: 'var(--p-color-border-interactive-subdued)',
-              borderRadius: 8,
-              minWidth: 35,
-            }}>&nbsp;</Box>
+            <Box
+              style={{
+                background: 'var(--p-color-border-interactive-subdued)',
+                borderRadius: 8,
+                minWidth: 35,
+              }}>&nbsp;</Box>
             <TextField 
-              {...primaryColor}
-              label="Primary Color"
+              value={accentColour}
+              onChange={handleChangeAccentColour}
+              label="Accent Color"
               labelHidden
-              prefix="Hex #"
+              prefix="Hex"
             />
             <Button 
               icon={ColorsMajor}
@@ -131,40 +214,41 @@ export default function CustomizeUIForm() {
             />
           </HorizontalStack>
 
-          <Box minHeight="0.5rem"/>
+          <Box minHeight="1rem"/>
 
-          <Text variant="headingMd" as="h6">
-            Secondary Color
-          </Text>
-          <HorizontalStack gap="4">
-          <Box
-            style={{
-              background: 'var(--p-color-icon-inverse)',
-              borderRadius: 8,
-              minWidth: 35,
-            }}>&nbsp;</Box>
-            <TextField 
-              {...secondaryColor}
-              label="Secondary Color"
-              labelHidden
-              prefix="Hex #"
-            />
-            <Button 
-              icon={ColorsMajor}
-              outline
-            />
+          <SettingToggle
+            enabled={darkMode}
+            handleToggle={handleToggleDarkMode}
+            title="Dark Mode"
+            description="Switch the app to Dark Mode for better readability in low light environments."
+          />
 
-            <Box minHeight="0.5rem"/>
+          <Box minHeight="1rem"/>
 
-          </HorizontalStack>
+          <SettingToggle
+            enabled={homeScreen}
+            handleToggle={handleToggleHomeScreen}
+            title="Home Screen"
+            description="Displays a home screen outlining the functionality of the assistant instead of a welcome message (recommended)"
+          />
 
-          <Box minHeight="0.5rem"/>
+          {!homeScreen && 
+            <VerticalStack gap="4">
+              <Box minHeight="0.5rem"/>
+              <Text variant="headingMd" as="h6">
+                Welcome Message
+              </Text>
+              <TextField
+                value={welcomeMessage}
+                onChange={handleChangeWelcomeMessage}
+                label="Name"
+                labelHidden
+              />
+            </VerticalStack>
+          }
 
-          <Text variant="headingMd" as="h6">
-            Text Color
-          </Text>
         </FormLayout>
       </Form>
     </AlphaCard>
-  )
+  );
 }

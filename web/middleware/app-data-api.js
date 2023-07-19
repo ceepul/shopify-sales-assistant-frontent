@@ -5,6 +5,7 @@ import { formatProductsAsVectors } from "../helpers/format-data.js";
 import { PineconeDB } from "../pinecone-db.js";
 import { getShopUrlFromSession } from "../helpers/admin-query.js";
 import { embed } from "../openai.js";
+import { ShopMateDB } from "../shopmate-db.js";
 
 export default function applyAppDataApiEndpoints(app) {
     app.use(express.json());
@@ -63,4 +64,38 @@ export default function applyAppDataApiEndpoints(app) {
         res.status(500).send(error.message)
       }
     });
+
+    app.get("/api/preferences", async (req, res) => {
+      try {
+        const shopId = res.locals.shopify.session.id
+        const preferences = await ShopMateDB.getShopPreferences(shopId)
+
+        res.status(200).send(preferences);
+      } catch (error) {
+        console.log(`Error at /api/preferences: ${error.message}`)
+        res.status(500).send(error.message)
+      }
+    })
+
+    app.post("/api/preferences", async (req, res) => {
+      try {
+        const body = req.body
+        console.log(body)
+        
+        const shopId = res.locals.shopify.session.id
+        const response = await ShopMateDB.updateShopPreferences(
+          shopId,
+          body.assistantName,
+          body.accentColour,
+          body.darkMode,
+          body.welcomeMessage,
+          body.homeScreen
+        )
+
+        res.status(200).send(response);
+      } catch (error) {
+        console.log(`Error at /api/preferences: ${error.message}`)
+        res.status(500).send(error.message)
+      }
+    })
 }
