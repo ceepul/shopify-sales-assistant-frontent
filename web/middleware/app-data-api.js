@@ -80,7 +80,6 @@ export default function applyAppDataApiEndpoints(app) {
     app.post("/api/preferences", async (req, res) => {
       try {
         const body = req.body
-        console.log(body)
         
         const shopId = res.locals.shopify.session.id
         const response = await ShopMateDB.updateShopPreferences(

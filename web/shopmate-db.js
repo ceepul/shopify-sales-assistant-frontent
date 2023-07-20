@@ -358,7 +358,7 @@ export const ShopMateDB = {
           ShopDomain VARCHAR(511) NOT NULL,
           StoreInfo TEXT,
           AssistantName VARCHAR(255),
-          AccentColour VARCHAR(6),
+          AccentColour VARCHAR(7),
           darkMode BOOLEAN,
           WelcomeMessage TEXT,
           HomeScreen BOOLEAN,

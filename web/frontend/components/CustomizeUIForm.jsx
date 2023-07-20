@@ -15,6 +15,7 @@ import {
   Badge
 } from "@shopify/polaris";
 import { ColorsMajor } from '@shopify/polaris-icons';
+import { HexColorPicker } from "react-colorful"
 
 export default function CustomizeUIForm({preferences, refetch}) {
 
@@ -28,11 +29,24 @@ export default function CustomizeUIForm({preferences, refetch}) {
 
   const [submitting, setSubmitting] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [colorPickerVisible, setColorPickerVisible] = useState(false)
+
+  const [assistantNameError, setAssistantNameError] = useState(null);
+  const [welcomeMessageError, setWelcomeMessageError] = useState(null);
+  const [accentColourError, setAccentColourError] = useState(null);
 
   const fetch = useAuthenticatedFetch();
 
   const onSubmit = async () => {
     setSubmitting(true);
+    const isValidAssistantName = validateAssistantName(assistantName);
+    const isValidWelcomeMessage = validateWelcomeMessage(welcomeMessage);
+    const isValidAccentColour = validateAccentColour(accentColour);
+
+    if (!isValidAssistantName || !isValidWelcomeMessage || !isValidAccentColour) {
+      setSubmitting(false)
+      return;
+    }
     
     const body = {
       assistantName,
@@ -86,6 +100,37 @@ export default function CustomizeUIForm({preferences, refetch}) {
   const handleChangeWelcomeMessage = (value) => {
     setWelcomeMessage(value);
     setDirty(true);
+  };
+
+  const handleColorPickerVisibility = () => {
+    setColorPickerVisible(prev => !prev)
+  }
+
+  const validateAssistantName = (value) => {
+    if (value.trim() === '') {
+      setAssistantNameError('Assistant name cannot be blank.');
+      return false;
+    }
+    setAssistantNameError(null);
+    return true;
+  };
+  
+  const validateWelcomeMessage = (value) => {
+    if (value.trim() === '') {
+      setWelcomeMessageError('Welcome message cannot be blank.');
+      return false;
+    }
+    setWelcomeMessageError(null);
+    return true;
+  };
+  
+  const validateAccentColour = (value) => {
+    if (!/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)) {
+      setAccentColourError('Invalid hex color');
+      return false;
+    }
+    setAccentColourError(null);
+    return true;
   };
 
   const {mdDown} = useBreakpoints();
@@ -187,6 +232,7 @@ export default function CustomizeUIForm({preferences, refetch}) {
             onChange={handleChangeAssistantName}
             label="Name"
             labelHidden
+            error={assistantNameError}
           />
 
           <Box minHeight="0.5rem"/>
@@ -194,25 +240,36 @@ export default function CustomizeUIForm({preferences, refetch}) {
           <Text variant="headingMd" as="h6">
             Accent Color
           </Text>
+
           <HorizontalStack gap="4">
             <Box
               style={{
-                background: 'var(--p-color-border-interactive-subdued)',
+                backgroundColor: accentColour,
                 borderRadius: 8,
                 minWidth: 35,
-              }}>&nbsp;</Box>
+                minHeight: 35,
+              }}
+            />
             <TextField 
               value={accentColour}
               onChange={handleChangeAccentColour}
               label="Accent Color"
               labelHidden
               prefix="Hex"
+              error={accentColourError}
             />
             <Button 
               icon={ColorsMajor}
               outline
+              onClick={handleColorPickerVisibility}
             />
           </HorizontalStack>
+          {colorPickerVisible && 
+              <HexColorPicker 
+                color={accentColour}
+                onChange={handleChangeAccentColour}
+              />
+          }
 
           <Box minHeight="1rem"/>
 
@@ -243,6 +300,7 @@ export default function CustomizeUIForm({preferences, refetch}) {
                 onChange={handleChangeWelcomeMessage}
                 label="Name"
                 labelHidden
+                error={welcomeMessageError}
               />
             </VerticalStack>
           }

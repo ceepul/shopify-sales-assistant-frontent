@@ -10,6 +10,7 @@ import {
 import PlaceholderStat from "../components/PlaceholderStat"
 import Preview from "../components/Preview";
 import CustomizeUIForm from "../components/CustomizeUIForm";
+import Widget from "../components/Widget";
 import { useAppQuery } from '../hooks'
 
 export default function CustomizePage() {
@@ -26,8 +27,6 @@ export default function CustomizePage() {
       refetchOnReconnect: false,
     },
   });
-
-  console.log(preferences)
 
   if (isLoading || isRefetching) {
     return (
@@ -89,7 +88,7 @@ export default function CustomizePage() {
             </Layout.Section>
             <Layout.Section secondary>
                 {/*Live preview of UI*/}
-                <Preview />
+                <Widget />
             </Layout.Section>
         </Layout>
     </Page> 
