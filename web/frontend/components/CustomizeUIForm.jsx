@@ -16,44 +16,47 @@ import {
 } from "@shopify/polaris";
 import { ColorsMajor } from '@shopify/polaris-icons';
 import { HexColorPicker } from "react-colorful"
+import { useEffect } from "react";
 
-export default function CustomizeUIForm({preferences, refetch}) {
-
-  const [assistantName, setAssistantName] = useState(preferences ? preferences.assistantName : "ShopMate");
-  const [accentColour, setAccentColour] = useState(preferences ? preferences.accentColour : "#47AFFF");
-  const [darkMode, setDarkMode] = useState(preferences ? preferences.darkMode : false);
-  const [homeScreen, setHomeScreen] = useState(preferences ? preferences.homeScreen : true);
-  const [welcomeMessage, setWelcomeMessage] = useState(preferences ? preferences.welcomeMessage : 
-      "Welcome to our store! Are there any products I could help you find?"
-    );
-
+export default function CustomizeUIForm({preferences, refetch, resetPreferences, setPreferences}) {
+  
   const [submitting, setSubmitting] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [colorPickerVisible, setColorPickerVisible] = useState(false)
+  const [colorInput, setColourInput] = useState("#47AFFF")
 
   const [assistantNameError, setAssistantNameError] = useState(null);
   const [welcomeMessageError, setWelcomeMessageError] = useState(null);
   const [accentColourError, setAccentColourError] = useState(null);
 
+  useEffect(() => {
+    setColourInput(preferences.accentColour)
+  },[preferences])
+
   const fetch = useAuthenticatedFetch();
 
   const onSubmit = async () => {
     setSubmitting(true);
-    const isValidAssistantName = validateAssistantName(assistantName);
-    const isValidWelcomeMessage = validateWelcomeMessage(welcomeMessage);
-    const isValidAccentColour = validateAccentColour(accentColour);
+    const isValidAssistantName = validateAssistantName(preferences.assistantName);
+    const isValidWelcomeMessage = validateWelcomeMessage(preferences.welcomeMessage);
+    const isValidAccentColour = validateAccentColour(colorInput);
 
     if (!isValidAssistantName || !isValidWelcomeMessage || !isValidAccentColour) {
       setSubmitting(false)
       return;
     }
-    
+
+    setPreferences({
+      ...preferences,
+      accentColour: colorInput
+    });
+
     const body = {
-      assistantName,
-      accentColour,
-      darkMode,
-      homeScreen,
-      welcomeMessage,
+      assistantName: preferences.assistantName,
+      accentColour: colorInput,
+      darkMode: preferences.darkMode,
+      homeScreen: preferences.homeScreen,
+      welcomeMessage: preferences.welcomeMessage,
     }
 
     const response = await fetch("/api/preferences", {
@@ -74,31 +77,52 @@ export default function CustomizeUIForm({preferences, refetch}) {
 
   const onReset = useCallback(() => {
     refetch();
+    resetPreferences();
     setDirty(false);
   }, []);
 
   const handleChangeAssistantName = (value) => {
-    setAssistantName(value);
+    setPreferences({
+      ...preferences,
+      assistantName: value
+    });
     setDirty(true);
   };
 
-  const handleChangeAccentColour = (value) => {
-    setAccentColour(value);
+  const handleChangeColourPicker = (value) => {
+    setPreferences({
+      ...preferences,
+      accentColour: value
+    });
+    setDirty(true);
+  };
+
+  const handleChangeColourInput= (value) => {
+    setColourInput(value);
     setDirty(true);
   };
 
   const handleToggleDarkMode = () => {
-    setDarkMode(prev => !prev);
+    setPreferences((prev) => ({
+      ...prev,
+      darkMode: !prev.darkMode
+    }));
     setDirty(true);
   };
 
   const handleToggleHomeScreen = () => {
-    setHomeScreen(prev => !prev);
+    setPreferences((prev) => ({
+      ...prev,
+      homeScreen: !prev.homeScreen
+    }));
     setDirty(true);
   };
 
   const handleChangeWelcomeMessage = (value) => {
-    setWelcomeMessage(value);
+    setPreferences({
+      ...preferences,
+      welcomeMessage: value
+    });
     setDirty(true);
   };
 
@@ -228,7 +252,7 @@ export default function CustomizeUIForm({preferences, refetch}) {
             Assistant Name
           </Text>
           <TextField
-            value={assistantName}
+            value={preferences.assistantName}
             onChange={handleChangeAssistantName}
             label="Name"
             labelHidden
@@ -244,15 +268,15 @@ export default function CustomizeUIForm({preferences, refetch}) {
           <HorizontalStack gap="4">
             <Box
               style={{
-                backgroundColor: accentColour,
+                backgroundColor: preferences.accentColour,
                 borderRadius: 8,
                 minWidth: 35,
                 minHeight: 35,
               }}
             />
             <TextField 
-              value={accentColour}
-              onChange={handleChangeAccentColour}
+              value={colorInput}
+              onChange={handleChangeColourInput}
               label="Accent Color"
               labelHidden
               prefix="Hex"
@@ -266,41 +290,42 @@ export default function CustomizeUIForm({preferences, refetch}) {
           </HorizontalStack>
           {colorPickerVisible && 
               <HexColorPicker 
-                color={accentColour}
-                onChange={handleChangeAccentColour}
+                color={preferences.accentColour}
+                onChange={handleChangeColourPicker}
               />
           }
 
-          <Box minHeight="1rem"/>
+{/*           <Box minHeight="1rem"/>
 
           <SettingToggle
-            enabled={darkMode}
+            enabled={preferences.darkMode}
             handleToggle={handleToggleDarkMode}
             title="Dark Mode"
             description="Switch the app to Dark Mode for better readability in low light environments."
-          />
+          /> */}
 
           <Box minHeight="1rem"/>
 
           <SettingToggle
-            enabled={homeScreen}
+            enabled={preferences.homeScreen}
             handleToggle={handleToggleHomeScreen}
             title="Home Screen"
             description="Displays a home screen outlining the functionality of the assistant instead of a welcome message (recommended)"
           />
 
-          {!homeScreen && 
+          {!preferences.homeScreen && 
             <VerticalStack gap="4">
               <Box minHeight="0.5rem"/>
               <Text variant="headingMd" as="h6">
                 Welcome Message
               </Text>
               <TextField
-                value={welcomeMessage}
+                value={preferences.welcomeMessage}
                 onChange={handleChangeWelcomeMessage}
                 label="Name"
                 labelHidden
                 error={welcomeMessageError}
+                multiline
               />
             </VerticalStack>
           }

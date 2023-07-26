@@ -1,21 +1,8 @@
 import './Widget.css';
-import { 
-  Icon,
-  Button
-} from '@shopify/polaris';
-import {
-  InfoMinor,
-  ChevronDownMinor,
-  SendMajor,
-  HintMajor
-} from '@shopify/polaris-icons';
-import { useEffect, useState } from 'react';
 
 export default function Widget() {
   const welcomeMessage = "Hello, this is a welcome message now i am making it very very long to see the behaviour and whether ot not it wraps."
-  const [messages, setMessages] = useState([
-    
-  ])
+  const homeScreen = false;
 
   const emptyMarkup = (
     <div className="body-container">
@@ -74,7 +61,9 @@ export default function Widget() {
 
   const populatedMarkup = (
     <div className='body-container'>
-      
+      <div className="assistant-message">
+        <p className="assistant-text">{welcomeMessage}</p>
+      </div>
     </div>
   )
 
@@ -99,7 +88,7 @@ export default function Widget() {
         </div>
       </div>
 
-      {messages.length ? populatedMarkup : emptyMarkup}
+      {homeScreen ? emptyMarkup : populatedMarkup}
 
       <footer className="footer-container">
         <div className="input-field">

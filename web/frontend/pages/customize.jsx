@@ -5,19 +5,20 @@ import {
   SkeletonBodyText,
   AlphaCard,
   Text,
-  Box
+  Box,
+  VerticalStack,
+  SkeletonDisplayText
 } from "@shopify/polaris"
-import PlaceholderStat from "../components/PlaceholderStat"
-import Preview from "../components/Preview";
 import CustomizeUIForm from "../components/CustomizeUIForm";
-import Widget from "../components/Widget";
+import WidgetDynamicUI from "../components/WidgetDynamicUI";
 import { useAppQuery } from '../hooks'
-
+import { useEffect, useState } from "react";
+ 
 export default function CustomizePage() {
   const breadcrumbs = [{ content: "ShopMate", url: "/" }];
 
   const {
-    data: preferences,
+    data: queriedPreferences,
     isLoading,
     isRefetching,
     refetch
@@ -27,6 +28,24 @@ export default function CustomizePage() {
       refetchOnReconnect: false,
     },
   });
+
+  const [preferences, setPreferences] = useState({
+    assistantName: "ShopMate",
+    accentColour: "#47AFFF",
+    darkMode: false,
+    homeScreen: true,
+    welcomeMessage: "Welcome to our store! Are there any products I could help you find?",
+  });
+
+  useEffect(() => {
+    if (queriedPreferences) {
+      setPreferences(queriedPreferences);
+    }
+  }, [queriedPreferences]);
+
+  function resetPreferences() {
+    setPreferences(queriedPreferences);
+  }
 
   if (isLoading || isRefetching) {
     return (
@@ -39,36 +58,42 @@ export default function CustomizePage() {
         <Loading/>
         <Layout>
           <Layout.Section>
-            <AlphaCard>
-              <Text variant="headingMd" as="h6">Assistant Name</Text>
-              <Box minHeight="0.5rem"/>
-              <SkeletonBodyText />
-
-              <Box minHeight="2rem" />
-
-              <Text variant="headingMd" as="h6">Accent Color</Text>
-              <Box minHeight="0.5rem"/>
-              <SkeletonBodyText />
-
-              <Box minHeight="2.5rem" />
-
-              <Text variant="headingMd" as="h6">Dark Mode</Text>
-              <Box minHeight="0.5rem"/>
-              <SkeletonBodyText />
-
-              <Box minHeight="2.5rem" />
-
-              <Text variant="headingMd" as="h6">Home Screen</Text>
-              <Box minHeight="0.5rem"/>
-              <SkeletonBodyText />
-            </AlphaCard>
+            <VerticalStack gap="4">
+              <Text variant="headingLg" as="h5">Settings</Text>
+              <AlphaCard>
+                <Text variant="headingMd" as="h6">Assistant Name</Text>
+                <Box minHeight="0.5rem"/>
+                <SkeletonBodyText />
+  
+                <Box minHeight="2rem" />
+  
+                <Text variant="headingMd" as="h6">Accent Color</Text>
+                <Box minHeight="0.5rem"/>
+                <SkeletonBodyText />
+  
+  {/*               <Box minHeight="2.5rem" />
+  
+                <Text variant="headingMd" as="h6">Dark Mode</Text>
+                <Box minHeight="0.5rem"/>
+                <SkeletonBodyText /> */}
+  
+                <Box minHeight="2.5rem" />
+  
+                <Text variant="headingMd" as="h6">Home Screen</Text>
+                <Box minHeight="0.5rem"/>
+                <SkeletonBodyText />
+              </AlphaCard>
+            </VerticalStack>
           </Layout.Section>
           <Layout.Section secondary>
-            <AlphaCard>
-              <Text variant="headingMd" as="h6">Preview</Text>
-              <Box minHeight="0.5rem"/>
-              <SkeletonBodyText />
-            </AlphaCard>
+            <VerticalStack gap="4">
+              <Text variant="headingLg" as="h5">Preview</Text>
+              <AlphaCard>
+                <SkeletonDisplayText />
+                <Box minHeight="1rem"/>
+                <SkeletonBodyText />
+              </AlphaCard>
+            </VerticalStack>
           </Layout.Section>
         </Layout>
       </Page>
@@ -84,11 +109,21 @@ export default function CustomizePage() {
         />
         <Layout>
             <Layout.Section>
-                <CustomizeUIForm preferences={preferences} refetch={refetch}/>
+              <VerticalStack gap="4">
+                <Text variant="headingLg" as="h5">Settings</Text>
+                <CustomizeUIForm
+                  preferences={preferences}
+                  refetch={refetch}
+                  resetPreferences={resetPreferences}
+                  setPreferences={setPreferences}
+                />
+              </VerticalStack>
             </Layout.Section>
             <Layout.Section secondary>
-                {/*Live preview of UI*/}
-                <Widget />
+              <VerticalStack gap="4">
+                <Text variant="headingLg" as="h5">Preview</Text>
+                <WidgetDynamicUI preferences={preferences}/>
+              </VerticalStack>
             </Layout.Section>
         </Layout>
     </Page> 
