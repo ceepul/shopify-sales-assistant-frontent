@@ -1,85 +1,23 @@
-<button is="party-button">
-  <div id="chat-container"></div>
-</button>
-
-<style>
-  .visually-hidden {
-    position: absolute !important;
-    overflow: hidden;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    border: 0;
-    clip: rect(0 0 0 0);
-    word-wrap: normal !important;
-  }
-
-  @-webkit-keyframes rainbow {
-    0% {
-      border-color: hsl(0, 100%, 50%);
-    }
-    14% {
-      border-color: hsl(30, 100%, 50%);
-    }
-    28% {
-      border-color: hsl(60, 100%, 50%);
-    }
-    42% {
-      border-color: hsl(120, 100%, 50%);
-    }
-    56% {
-      border-color: hsl(240, 100%, 50%);
-    }
-    70% {
-      border-color: hsl(280, 100%, 50%);
-    }
-    84% {
-      border-color: hsl(320, 100%, 50%);
-    }
-    100% {
-      border-color: hsl(255, 100%, 50%);
-    }
-  }
-
-  button[is="party-button"] {
-    position: fixed;
-    bottom: 15px;
-    right: 15px;
-    width: 80px;
-    height: 80px;
-
-    border-radius: 50%;
-    border: 4px solid hsl(0, 100%, 50%);
-    animation: rainbow 10s infinite alternate;
-    -webkit-animation: rainbow 10s infinite alternate;
-    padding: 0;
-    font: inherit;
-    cursor: pointer;
-    outline: inherit;
-    z-index: 100;
-    transition: transform 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
-  }
-
-  button[is="party-button"]:hover {
-    transform: scale(1.10);
-  }
-
-  button[is="party-button"]:active {
-    transform: scale(0.95);
-  }
-
-  canvas:empty {
-    display: initial;
-  }
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link
+  rel="preconnect"
+  href="https://fonts.gstatic.com"
+  crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<chat-widget
+  data-avatar-url="{{ 'avatar.png' | asset_url }}"
+  data-close-icon-url="{{ 'down-chevron.svg' | asset_url }}"
+  data-close-icon-dark-url="{{ 'down-chevron-dark.svg' | asset_url }}"
+  data-info-icon-url="{{ 'info-circle.svg' | asset_url }}"
+  data-info-icon-dark-url="{{ 'info-circle-dark.svg' | asset_url }}"
+  data-send-icon-url="{{ 'send2.svg' | asset_url }}"></chat-widget>
 
 {% schema %}
   {
-    "name": "Party",
-    "target": "body",
-    "stylesheet": "image-gallery.css",
-    "javascript": "party-button.js",
+    "name": "Chat Widget",
+    "target": "head",
+    "stylesheet": "chat-widget.css",
+    "javascript": "chat-widget.js",
     "settings": []
   }
 {% endschema %}
