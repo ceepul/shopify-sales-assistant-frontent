@@ -31,8 +31,8 @@ class ChatWidget extends HTMLElement {
     <style>
       #chat-widget {
         position: fixed;
-        bottom: 15px;
-        right: 15px;
+        bottom: 20px;
+        right: 20px;
         z-index: 9999;
       }
 
@@ -41,12 +41,20 @@ class ChatWidget extends HTMLElement {
         height: 60px;
         border-radius: 50%;
         padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         font: inherit;
         cursor: pointer;
         outline: none;
         border: none;
         box-shadow: box-shadow: 0px 0px 4px #616161;
         ;
+      }
+
+      .toggle-icon {
+        width: 36px;
+        height: 36px;
       }
 
       button[is="chat-toggle"]:hover {
@@ -66,8 +74,8 @@ class ChatWidget extends HTMLElement {
         border-radius: 20px;
         width: 384px;
         height: 600px;
-        bottom: -8px;
-        right: 0px;
+        bottom: 72px;
+        right: 50px;
         background-color: #ffffff;
         overflow: hidden;
         transition: opacity 0.3s, transform 0.3s;
@@ -76,18 +84,17 @@ class ChatWidget extends HTMLElement {
       }
       
       .header-container {
-        z-index: 1;
         display: flex;
         justify-content: center;
         border: 0px none;
-        height: 136px;
+        height: 128px;
         width: 100%;
         top: 0;
-        position: absolute;
         overflow: hidden;
       }
       
       .header-background-round {
+        z-index: 1;
         background-color: #47afff;
         border-radius: 396px/66px;
         box-shadow: 0px 0px 4px #8b8680;
@@ -98,6 +105,7 @@ class ChatWidget extends HTMLElement {
       }
       
       .header-background-main {
+        z-index: 1;
         background: linear-gradient(180deg, rgb(0, 139, 245) 0%, rgb(71, 175, 255) 100%);
         height: 120px;
         position: relative;
@@ -105,6 +113,7 @@ class ChatWidget extends HTMLElement {
       }
       
       .header-content {
+        z-index: 1;
         display: flex;
         align-items: center;
         height: 68px;
@@ -174,12 +183,12 @@ class ChatWidget extends HTMLElement {
       }
       
       .body-container {
+        top: -8px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        height: 356px;
         position: relative;
-        width: 100%;
+        height: 364px;
         padding-inline: 20px;
         overflow-y: scroll;
         scrollbar-width: none; /* For Firefox */
@@ -190,7 +199,7 @@ class ChatWidget extends HTMLElement {
       .body-container::-webkit-scrollbar {
         display: none;
       }
-      
+
       .capabilities-container {
         display: flex;
         flex-direction: column;
@@ -209,7 +218,8 @@ class ChatWidget extends HTMLElement {
         font-family: "Open Sans", Helvetica;
         font-size: 18px;
         font-weight: 600;
-        letter-spacing: -1%;
+        letter-spacing: -0.01em;
+        margin: 0;
         margin-top: 12px;
         white-space: nowrap;
       }
@@ -218,7 +228,7 @@ class ChatWidget extends HTMLElement {
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-top: 20px;
+        margin-top: 16px;
         background-color: #d9d9d933;
         border-radius: 10px;
         position: relative;
@@ -233,6 +243,7 @@ class ChatWidget extends HTMLElement {
         font-weight: 400;
         line-height: 22px;
         white-space: nowrap;
+        margin: 0;
       }
       
       .example-text {
@@ -241,7 +252,9 @@ class ChatWidget extends HTMLElement {
         font-size: 12px;
         font-weight: 400;
         line-height: 22px;
+        letter-spacing: 0.01em;
         white-space: nowrap;
+        margin: 0;
       }
       
       .footer-container {
@@ -252,25 +265,46 @@ class ChatWidget extends HTMLElement {
         width: 100%;
       }
       
+      .input-group {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 12px 4px;
+      }
+      
       .input-field {
-        height: 36px;
-        left: 26px;
-        position: absolute;
-        top: 12px;
-        width: 334px;
+        flex-grow: 1;
+        height: 60px;
+        max-height: 108px;
+        border: none;
+        outline: none;
+        font-family: "Open Sans", Helvetica;
+        font-size: 16px;
+        font-weight: 400;
+        color: #969caa;
+        overflow-y: auto;
+        resize: none;
+        line-height: 1.3em;
+        box-sizing: border-box;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none;  /* Internet Explorer 10+ */
+      }
+      
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      .input-field::-webkit-scrollbar {
+        display: none;
       }
       
       .send-button-container {
         height: 40px;
         width: 40px;
-        position: absolute;
-        top: 4px;
-        left: 292px;
         display: flex;
         justify-content: center;
         align-items: center;
         background-color: transparent;
         border-radius: 8px;
+        border: none;
+        margin-left: 10px;
       }
       
       .send-button-container:hover {
@@ -281,21 +315,7 @@ class ChatWidget extends HTMLElement {
         object-fit: cover;
         height: 32px;
         width: 32px;
-      }
-      
-      
-      .input-placeholder {
-        color: #969caa;
-        font-family: "Open Sans", Helvetica;
-        font-size: 16px;
-        font-weight: 400;
-        height: 22px;
-        left: 14px;
-        line-height: 22px;
-        position: absolute;
-        top: 7px;
-        white-space: nowrap;
-      }
+      }      
       
       .footer-divider {
         width: 90%;
@@ -335,6 +355,10 @@ class ChatWidget extends HTMLElement {
         line-height: 22px;
         white-space: nowrap;
       }
+
+      .first-message {
+        margin-top: 32px;
+      }
       
       .assistant-message {
         background-color: #f1f2f4;
@@ -342,7 +366,7 @@ class ChatWidget extends HTMLElement {
         align-self: flex-start;
         padding: 10px;
         max-width: 85%;
-        margin-top: 20px;
+        margin-bottom: 20px;
       }
       
       .user-message {
@@ -351,7 +375,7 @@ class ChatWidget extends HTMLElement {
         align-self: flex-end;
         padding: 10px;
         max-width: 85%;
-        margin-top: 20px;
+        margin-bottom: 20px;
       }
       
       .assistant-text {
@@ -360,15 +384,19 @@ class ChatWidget extends HTMLElement {
         font-size: 13px;
         font-weight: 400;
         line-height: 18px;
-      }
+        letter-spacing: -0.005em;
+        margin: 0;
+    }
       
-      .user-text {
+    .user-text {
         color: #ffffff;
         font-family: "Open Sans", Helvetica;
         font-size: 13px;
         font-weight: 400;
         line-height: 18px;
-      }
+        letter-spacing: -0.005em;
+        margin: 0;
+    }
       
       .product-container {
         display: flex;
@@ -460,20 +488,34 @@ class ChatWidget extends HTMLElement {
       const infoIconURL = this.getAttribute('data-info-icon-url');
       const infoIconDarkURL = this.getAttribute('data-info-icon-dark-url');
       const sendIconURL = this.getAttribute('data-send-icon-url');
-  
-      const toggle = new ChatToggle(preferences.accentColor);
+      const capabilitiesIconURL = this.getAttribute('data-capabilities-icon-url');
+      const xIconURL = this.getAttribute('data-x-icon-url');
+      const xIconDarkURL = this.getAttribute('data-x-icon-dark-url');
+      const chatIconURL = this.getAttribute('data-chat-icon-url');
+      const chatIconDarkURL = this.getAttribute('data-chat-icon-dark-url');
+
+
+      const toggle = new ChatToggle(
+        preferences.autoOpen,
+        preferences.accentColor,
+        xIconURL,
+        xIconDarkURL,
+        chatIconURL,
+        chatIconDarkURL
+      );
       toggle.setAttribute('is', 'chat-toggle');
   
       const box = new ChatBox(
         preferences.accentColor,
         preferences.assistantName,
-        true, 
+        preferences.autoOpen, 
         avatarURL, 
         infoIconURL, 
         infoIconDarkURL,
         closeIconURL,
         closeIconDarkURL,
-        sendIconURL
+        sendIconURL,
+        capabilitiesIconURL
       );
       box.setAttribute('is', 'chat-box');
   
@@ -483,6 +525,7 @@ class ChatWidget extends HTMLElement {
 
   async fetchPreferences() {
     return ({
+      autoOpen: true,
       accentColor:"#47AFFF",
       assistantName: "ShopMate"
     })
@@ -492,33 +535,87 @@ class ChatWidget extends HTMLElement {
 customElements.define('chat-widget', ChatWidget);
 
 class ChatToggle extends HTMLButtonElement {
-  constructor(color) {
+  constructor(
+    autoOpen,
+    accentColor,
+    xIconURL,
+    xIconDarkURL,
+    chatIconURL,
+    chatIconDarkURL
+  ) {
     super();
-    this.style.backgroundColor = color;
+    this.autoOpen = autoOpen;
+    this.style.backgroundColor = accentColor;
     this.addEventListener('click', this.toggleChatBox.bind(this));
+    this.xIconURL = xIconURL;
+    this.xIconDarkURL = xIconDarkURL;
+    this.chatIconURL = chatIconURL;
+    this.chatIconDarkURL = chatIconDarkURL;
+    this.accentRgb = hexToRgb(accentColor);
+    this.luminance = calculateLuminance(this.accentRgb);
+    window.addEventListener('chatBoxClosed', () => this.updateIcon(false));
   }
 
+  connectedCallback() {
+    this.autoOpen? this.updateIcon(true) : this.updateIcon(false);
+  }
+  
+  isChatBoxOpen() {
+    const chatBox = this.getRootNode().querySelector('div[is="chat-box"]');
+    return chatBox.style.display === 'block';
+  }
+  
+  updateIcon(isChatBoxOpen) {
+    if(isChatBoxOpen) {
+      this.innerHTML = `
+        <img class="toggle-icon" alt="Toggle Icon" src="${this.luminance > 0.7 ? this.xIconDarkURL : this.xIconURL}" />
+      `;
+    } else {
+      this.innerHTML = `
+        <img class="toggle-icon" alt="Toggle Icon" src="${this.luminance > 0.7 ? this.chatIconDarkURL : this.chatIconURL}" />
+      `;
+    }
+  }
+  
   toggleChatBox() {
     const chatBox = this.getRootNode().querySelector('div[is="chat-box"]');
-    if (chatBox.style.display === 'none' || chatBox.style.display === '') {
+    if (this.isChatBoxOpen()) {
+      this.updateIcon(false); // update before starting the close animation
+      chatBox.style.opacity = '0';
+      chatBox.style.transform = 'translateY(20px)';
+      setTimeout(() => { 
+        chatBox.style.display = 'none';
+        localStorage.setItem('isChatBoxOpen', JSON.stringify(!this.isChatBoxOpen()));
+      }, 300);
+    } else {
       chatBox.style.display = 'block';
+      this.updateIcon(true);
       setTimeout(() => { 
         chatBox.style.opacity = '1';
         chatBox.style.transform = 'translateY(0px)';
+        localStorage.setItem('isChatBoxOpen', JSON.stringify(!this.isChatBoxOpen()));
       }, 50);
-    } else {
-      chatBox.style.opacity = '0';
-      chatBox.style.transform = 'translateY(20px)';
-      setTimeout(() => { chatBox.style.display = 'none'; }, 500);
     }
-  }
-}
+  } 
+}  
 
 customElements.define('chat-toggle', ChatToggle, { extends: "button" });
 
 class ChatBox extends HTMLDivElement {
-  constructor(accentColor, assistantName, autoOpen, avatarURL, infoIconURL, infoIconDarkURL, closeIconURL, closeIconDarkURL, sendIconURL) {
+  constructor(
+    accentColor, 
+    assistantName, 
+    autoOpen, 
+    avatarURL, 
+    infoIconURL, 
+    infoIconDarkURL, 
+    closeIconURL, 
+    closeIconDarkURL, 
+    sendIconURL, 
+    capabilitiesIconURL
+  ) {
     super();
+    this.messages = [];
     this.accentColor = accentColor
     this.assistantName = assistantName;
     this.autoOpen = autoOpen;
@@ -528,6 +625,18 @@ class ChatBox extends HTMLDivElement {
     this.closeIconURL = closeIconURL;
     this.closeIconDarkURL = closeIconDarkURL;
     this.sendIconURL = sendIconURL;
+    this.capabilitiesIconURL = capabilitiesIconURL;
+
+    // Load previous messages from local storage if they exist
+    if(localStorage.getItem('messages')) {
+      this.messages = JSON.parse(localStorage.getItem('messages'));
+    }
+
+    // Load autoOpen state from local storage if it exists
+    if(localStorage.getItem('autoOpen')) {
+      this.autoOpen = JSON.parse(localStorage.getItem('autoOpen'));
+    }
+
   }
 
   connectedCallback() {
@@ -582,24 +691,171 @@ class ChatBox extends HTMLDivElement {
           </div>
         </div>
       </div>
+    
       <div class="body-container"></div>
+    
       <div class="footer-container">
-        <div class="input-field">
-          <div class="input-placeholder">Start typing...</div>
-          <div class='send-button-container'>
-            <img class='send-button' alt="Send icon" src="${this.sendIconURL}" />
-          </div>
-        </div>
         <div class="footer-divider"/>
+        <div class="input-group">
+          <textarea id="chat-input" class="input-field" placeholder="Start typing..."></textarea>
+          <button id="send-button" class="send-button-container">
+            <img class='send-button' alt="Send icon" src="${this.sendIconURL}" />
+          </button>
+        </div>
         <div class="powered-by-container">
           <div class="powered-by-text">Powered by</div>
           <div class="powered-by-name" style="${poweredByNameStyle}">ShopMate</div>
         </div>
       </div>
     `;
-  
+
+    this.renderMessages();
+    
+    const sendButton = this.querySelector('#send-button');
+    sendButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.handleSubmit();
+    });
+
+    const input = this.querySelector('#chat-input');
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        this.handleSubmit();
+      }
+    });
+
+    const closeIcon = this.querySelector('.close-icon-container');
+    closeIcon.addEventListener('click', () => {
+      window.dispatchEvent(new Event('chatBoxClosed'));
+      this.style.opacity = '0'; 
+      this.style.transform = 'translateY(100px)';
+      setTimeout(() => { 
+        this.style.display = 'none'; 
+      }, 300);
+    });
+
     //Additional chat box code can be added here
-  }  
+  }
+
+  addMessage(type, content) {
+    // Add a new message to the list
+    this.messages.push({ type, content });
+    localStorage.setItem('messages', JSON.stringify(this.messages));
+    // Render all messages again
+    this.renderMessages();
+  }
+
+  renderMessages() {
+    console.log(this.messages.length)
+    const bodyContainer = this.querySelector('.body-container');
+    bodyContainer.innerHTML = '';
+
+    if (this.messages.length === 0) {
+      // Show the empty state markup
+      bodyContainer.innerHTML = `
+        <div class="capabilities-container">
+          <img class='capabilities-icon' alt="Capabilities icon" src="${this.capabilitiesIconURL}" />
+          <div class="capabilities-text">Capabilities</div>
+        </div>
+        <div class="example-container">
+            <p class="example-heading">Find exactly what your looking for</p>
+            <p class="example-text">“Show me low-top white shoes”</p>
+        </div>
+        <div class="example-container">
+            <div class="example-heading">Get smart style recommendations</div>
+            <p class="example-text">“I need a top I can wear to a semi-formal event on a hot</p>
+            <p class="example-text"> summer day and that will go with my beige dress pants”</p>
+        </div>
+      `;
+    } else {
+      // Display messages
+      this.messages.forEach((message, index) => {
+        this.appendMessage(message.type, message.content, index);
+      });
+    }
+  }
+
+  appendMessage(type, content, index) {
+    const bodyContainer = this.querySelector('.body-container');
+    let markup;
+
+    const firstMessageClass = index === 0 ? 'first-message' : '';
+    
+    if (type === 'assistant') {
+      markup = `
+      <div class="assistant-message ${firstMessageClass}">
+        <p class="assistant-text">${content}</p>
+      </div>
+      `;
+    } else if (type === 'user') {
+      markup = `
+      <div class="user-message ${firstMessageClass}">
+        <p class="user-text">${content}</p>
+      </div>
+      `;
+    } else if (type === 'product') {
+      markup = `
+      <div class='product-container'>
+        <div class='product-card'>
+          <img class="product-image" alt="Avatar" src="../assets/demo-shirt1.png" />
+          <div class='product-title'>Slim-Fit-Charcoal-Flannel</div>
+          <div class='product-action-container'>
+            <p class='product-price'>$79</p>
+            <div class='product-addToCart-button'>
+              <div class='product-addToCart-text'>ADD TO CART</div>
+            </div>
+          </div>
+        </div>
+        <div class='product-card'>
+          <img class="product-image" alt="Avatar" src="../assets/demo-shirt-2.png" />
+          <div class='product-title'>Slim-Fit-Charcoal-Flannel</div>
+          <div class='product-action-container'>
+            <p class='product-price'>$79</p>
+            <div class='product-addToCart-button'>
+              <div class='product-addToCart-text'>ADD TO CART</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      `;
+    }
+  
+    bodyContainer.insertAdjacentHTML('beforeend', markup);
+    setTimeout(() => {
+      bodyContainer.lastElementChild.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }
+
+  handleSubmit() {
+    const input = this.querySelector('#chat-input');
+    const text = input.value.trim();
+    input.value = '';  // clear the input
+
+    this.addMessage('user', text);
+    console.log(text)
+
+    // Send the message to API and process the response
+    // ...
+    // Once the response is received, add the assistant's message or product recommendation to the list
+    // this.addMessage('assistant', response.text);
+    // Or
+    // this.addMessage('product', response.products);
+  
+/*     const url = 'http://example.com/api';  // replace with your API endpoint
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ text })
+    };
+  
+    fetch(url, options)
+      .then(response => response.json())
+      .then(data => console.log(data))
+      .catch(err => console.error('Error:', err)); */
+  }
 }
 
 customElements.define('chat-box', ChatBox, { extends: 'div' });
