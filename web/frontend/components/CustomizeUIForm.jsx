@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ContextualSaveBar, useAuthenticatedFetch } from "@shopify/app-bridge-react";
 import {
   Form, 
@@ -9,16 +9,14 @@ import {
   Box,
   HorizontalStack,
   Button,
-  Checkbox,
   VerticalStack,
   useBreakpoints,
   Badge
 } from "@shopify/polaris";
 import { ColorsMajor } from '@shopify/polaris-icons';
 import { HexColorPicker } from "react-colorful"
-import { useEffect } from "react";
 
-export default function CustomizeUIForm({preferences, refetch, resetPreferences, setPreferences}) {
+export default function CustomizeUIForm({preferences, resetPreferences, setPreferences, setError, toggleToast}) {
   
   const [submitting, setSubmitting] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -33,7 +31,7 @@ export default function CustomizeUIForm({preferences, refetch, resetPreferences,
     setColourInput(preferences.accentColour)
   },[preferences])
 
-  const fetch = useAuthenticatedFetch();
+  const authFetch = useAuthenticatedFetch();
 
   const onSubmit = async () => {
     setSubmitting(true);
@@ -51,24 +49,45 @@ export default function CustomizeUIForm({preferences, refetch, resetPreferences,
       accentColour: colorInput
     });
 
-    const body = {
-      assistantName: preferences.assistantName,
-      accentColour: colorInput,
-      darkMode: preferences.darkMode,
-      homeScreen: preferences.homeScreen,
-      welcomeMessage: preferences.welcomeMessage,
-    }
+    try {
+      const shop = await authFetch("/api/shop", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      }).then((response) => response.text());
 
-    const response = await fetch("/api/preferences", {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: { "Content-Type": "application/json" },
-    });
-    if (response.ok) {
-      console.log("Success")
-    } else {
-      // Create a toast?
-      console.log("An error occured while updating preferences")
+      const body = {
+        shop: shop,
+        storeInfo: preferences.storeInfo,
+        assistantName: preferences.assistantName,
+        accentColour: colorInput,
+        darkMode: preferences.darkMode,
+        homeScreen: preferences.homeScreen,
+        welcomeMessage: preferences.welcomeMessage,
+      }
+
+      const response = await fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/preferences", {
+        method: "PATCH",
+        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        setError({
+          status: true, 
+          title: "Could not save preferences", 
+          body: "There was a problem updating your preferences. Please try again later."
+        })
+      } else {
+        toggleToast();
+      }
+
+    } catch (error) {
+      console.log(error)
+      setError({
+        status: true, 
+        title: "Could not save preferences", 
+        body: "There was a problem updating your preferences. Please try again later."
+      })
     }
 
     setSubmitting(false);
@@ -76,7 +95,6 @@ export default function CustomizeUIForm({preferences, refetch, resetPreferences,
   }
 
   const onReset = useCallback(() => {
-    refetch();
     resetPreferences();
     setDirty(false);
   }, []);

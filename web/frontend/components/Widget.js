@@ -61,9 +61,7 @@ export default function Widget() {
 
   const populatedMarkup = (
     <div className='body-container'>
-      <div className="assistant-message">
-        <p className="assistant-text">{welcomeMessage}</p>
-      </div>
+      {/*Messages will all go here */}
     </div>
   )
 

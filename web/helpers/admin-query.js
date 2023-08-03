@@ -10,6 +10,10 @@ export async function getShopIdFromSession(req, res) {
   return res.locals.shopify.session.id
 }
 
+export async function getShopFromSession(req, res) {
+  return res.locals.shopify.session.shop
+}
+
 export async function getAllProducts(req, res) {
   const client = new shopify.api.clients.Graphql({
     session: res.locals.shopify.session,
@@ -28,9 +32,25 @@ export async function getAllProducts(req, res) {
             endCursor
           }
           nodes {
-            description
-            title
             id
+            title
+            description(truncateAt: 1500)
+            images(first: 1) {
+              nodes {
+                src
+                altText
+              }
+            }
+            priceRangeV2 {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+            options {
+              name
+              values
+            }
           }
         }
       }

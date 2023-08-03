@@ -481,7 +481,21 @@ class ChatWidget extends HTMLElement {
   }
 
   connectedCallback() {
-    this.fetchPreferences().then(preferences => {
+    const shop = this.getAttribute('data-domain');
+    const cachedPreferences = sessionStorage.getItem(`preferences-${shop}`);
+
+    // If preferences are in the cache, use them. Otherwise, fetch from API
+    const preferencesPromise = cachedPreferences
+      ? Promise.resolve(JSON.parse(cachedPreferences))
+      : this.fetchPreferences(shop);
+
+    preferencesPromise.then(preferences => {
+      console.log(preferences)
+      if (!preferences) {
+        console.error('Failed to fetch shopping assistant preferences');
+        return;  // Exit the function if no preferences are fetched
+      }
+
       const avatarURL = this.getAttribute('data-avatar-url');
       const closeIconURL = this.getAttribute('data-close-icon-url');
       const closeIconDarkURL = this.getAttribute('data-close-icon-dark-url');
@@ -494,10 +508,13 @@ class ChatWidget extends HTMLElement {
       const chatIconURL = this.getAttribute('data-chat-icon-url');
       const chatIconDarkURL = this.getAttribute('data-chat-icon-dark-url');
 
+      // This determines whether the chatbot opens automatically.
+      // TODO: Setup and fetch from store preferences
+      const autoOpen = true;
 
       const toggle = new ChatToggle(
-        preferences.autoOpen,
-        preferences.accentColor,
+        autoOpen,
+        preferences.accentColour,
         xIconURL,
         xIconDarkURL,
         chatIconURL,
@@ -506,9 +523,11 @@ class ChatWidget extends HTMLElement {
       toggle.setAttribute('is', 'chat-toggle');
   
       const box = new ChatBox(
-        preferences.accentColor,
+        autoOpen,
+        preferences.accentColour,
         preferences.assistantName,
-        preferences.autoOpen, 
+        preferences.homeScreen,
+        preferences.welcomeMessage,
         avatarURL, 
         infoIconURL, 
         infoIconDarkURL,
@@ -523,12 +542,25 @@ class ChatWidget extends HTMLElement {
     });
   }
 
-  async fetchPreferences() {
-    return ({
-      autoOpen: true,
-      accentColor:"#47AFFF",
-      assistantName: "ShopMate"
-    })
+  async fetchPreferences(shop) {
+    console.log(shop)
+    try {
+      const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/preferences?shop=${shop}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+    
+      const preferences = await response.json();
+  
+      // Save the fetched preferences to the cache
+      sessionStorage.setItem(`preferences-${shop}`, JSON.stringify(preferences));
+  
+      return preferences;
+  
+    } catch (error) {
+      console.error('Error fetching preferences:', error);
+      return null;
+    }
   }
 }
 
@@ -557,7 +589,13 @@ class ChatToggle extends HTMLButtonElement {
   }
 
   connectedCallback() {
-    this.autoOpen? this.updateIcon(true) : this.updateIcon(false);
+    // If there is a value of open/closed in the local storage use that to set the icon
+    // Otherwise use the value from autoOpen to determine the correct icon
+    if (sessionStorage.getItem('isChatBoxOpen') != null) {
+      this.updateIcon(sessionStorage.getItem('isChatBoxOpen') === 'true' ? true : false)
+    } else {
+      this.autoOpen? this.updateIcon(true) : this.updateIcon(false);
+    }
   }
   
   isChatBoxOpen() {
@@ -585,16 +623,16 @@ class ChatToggle extends HTMLButtonElement {
       chatBox.style.transform = 'translateY(20px)';
       setTimeout(() => { 
         chatBox.style.display = 'none';
-        localStorage.setItem('isChatBoxOpen', JSON.stringify(!this.isChatBoxOpen()));
       }, 300);
+      sessionStorage.setItem('isChatBoxOpen', JSON.stringify(false));
     } else {
       chatBox.style.display = 'block';
       this.updateIcon(true);
       setTimeout(() => { 
         chatBox.style.opacity = '1';
         chatBox.style.transform = 'translateY(0px)';
-        localStorage.setItem('isChatBoxOpen', JSON.stringify(!this.isChatBoxOpen()));
       }, 50);
+      sessionStorage.setItem('isChatBoxOpen', JSON.stringify(true));
     }
   } 
 }  
@@ -603,9 +641,11 @@ customElements.define('chat-toggle', ChatToggle, { extends: "button" });
 
 class ChatBox extends HTMLDivElement {
   constructor(
+    autoOpen,
     accentColor, 
-    assistantName, 
-    autoOpen, 
+    assistantName,  
+    homeScreen,
+    welcomeMessage,
     avatarURL, 
     infoIconURL, 
     infoIconDarkURL, 
@@ -628,24 +668,38 @@ class ChatBox extends HTMLDivElement {
     this.capabilitiesIconURL = capabilitiesIconURL;
 
     // Load previous messages from local storage if they exist
-    if(localStorage.getItem('messages')) {
-      this.messages = JSON.parse(localStorage.getItem('messages'));
+    if (sessionStorage.getItem('messages')) {
+      this.messages = JSON.parse(sessionStorage.getItem('messages'));
+    } else if (!homeScreen) {
+      this.messages.push({ type: "user", content: welcomeMessage })
     }
 
     // Load autoOpen state from local storage if it exists
-    if(localStorage.getItem('autoOpen')) {
-      this.autoOpen = JSON.parse(localStorage.getItem('autoOpen'));
+    if(sessionStorage.getItem('autoOpen')) {
+      this.autoOpen = JSON.parse(sessionStorage.getItem('autoOpen'));
     }
 
   }
 
   connectedCallback() {
-    if (this.autoOpen) {
-      this.style.display = 'block';
-      setTimeout(() => { 
-        this.style.opacity = '1'; 
-        this.style.transform = 'translateY(0px)';
-      }, 50);
+    // If there is a value for open/closed in the session storage use that to set initial display value,
+    // Otherwise use value of autoOpen to determine open/closed
+    if (sessionStorage.getItem('isChatBoxOpen') != null) {
+      if (sessionStorage.getItem('isChatBoxOpen') === 'true') {
+        this.style.display = 'block';
+        setTimeout(() => { 
+          this.style.opacity = '1'; 
+          this.style.transform = 'translateY(0px)';
+        }, 50);
+      }
+    } else {
+      if (this.autoOpen) {
+        this.style.display = 'block';
+        setTimeout(() => { 
+          this.style.opacity = '1'; 
+          this.style.transform = 'translateY(0px)';
+        }, 50);
+      } 
     }
 
     const accentRgb = hexToRgb(this.accentColor);
@@ -725,6 +779,13 @@ class ChatBox extends HTMLDivElement {
       }
     });
 
+    const infoIcon = this.querySelector('.info-icon-container');
+    infoIcon.addEventListener('click', () => {
+      this.messages = [];
+      sessionStorage.setItem('messages', JSON.stringify(this.messages));
+      this.renderMessages();
+    })
+
     const closeIcon = this.querySelector('.close-icon-container');
     closeIcon.addEventListener('click', () => {
       window.dispatchEvent(new Event('chatBoxClosed'));
@@ -741,13 +802,12 @@ class ChatBox extends HTMLDivElement {
   addMessage(type, content) {
     // Add a new message to the list
     this.messages.push({ type, content });
-    localStorage.setItem('messages', JSON.stringify(this.messages));
+    sessionStorage.setItem('messages', JSON.stringify(this.messages));
     // Render all messages again
     this.renderMessages();
   }
 
   renderMessages() {
-    console.log(this.messages.length)
     const bodyContainer = this.querySelector('.body-container');
     bodyContainer.innerHTML = '';
 
@@ -830,10 +890,16 @@ class ChatBox extends HTMLDivElement {
   handleSubmit() {
     const input = this.querySelector('#chat-input');
     const text = input.value.trim();
-    input.value = '';  // clear the input
 
-    this.addMessage('user', text);
-    console.log(text)
+    if (text !== '') {
+      this.addMessage('user', text);
+      console.log(text)
+
+      // After sending the message, clear the input field
+      input.value = '';
+    } else {
+        console.log('Input is empty. Message not sent.');
+    }
 
     // Send the message to API and process the response
     // ...

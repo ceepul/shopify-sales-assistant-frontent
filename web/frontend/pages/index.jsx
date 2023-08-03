@@ -1,14 +1,14 @@
-import { useNavigate, TitleBar, Loading } from "@shopify/app-bridge-react";
+import { useNavigate, useAuthenticatedFetch, TitleBar, Loading } from "@shopify/app-bridge-react";
 import {
   AlphaCard,
   Banner,
+  Button,
   EmptyState,
   Layout,
   Page,
   SkeletonBodyText,
 } from "@shopify/polaris";
 import { useState } from "react";
-import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 import PlaceholderStat from "../components/PlaceholderStat";
 
 export default function HomePage() {
@@ -19,14 +19,22 @@ export default function HomePage() {
     const [productsConnected, setProductsConnected] = useState(true)
     const isLoading = false;
 
-    const handleConnectProducts = async () => {
-        const response = await fetch("/api/upload-products", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-        });
-        const readable = await response.json()
+    const handleClick = async () => {
+      const shop = await fetch("/api/shop", {
+         method: "GET",
+         headers: { "Content-Type": "application/json" },
+      }).then(response => response.text());
 
-        console.log(readable)
+      console.log(shop)
+
+      const preferences = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/preferences?shop=${shop}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      });
+
+      console.log(preferences)
+      const jsonRes = await preferences.json()
+      console.log(jsonRes)
     }
 
     const loadingMarkup = isLoading ? (
@@ -74,6 +82,7 @@ export default function HomePage() {
 
             {/*Two column stats section*/}
             <Layout.Section oneHalf>
+              <Button onClick={handleClick}>Test</Button>
                 <PlaceholderStat />
             </Layout.Section>
             <Layout.Section oneHalf>
