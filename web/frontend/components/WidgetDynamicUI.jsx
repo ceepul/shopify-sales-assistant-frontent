@@ -11,6 +11,8 @@ export default function WidgetDynamicUI({preferences}) {
     "Welcome to our store! Are there any products I could help you find?"
   );
 
+  const [assistantNameFontSize, setAssistantNameFontSize] = useState('22px');
+
   useEffect(() => {
     if (preferences) {
       const { assistantName, accentColour, darkMode, homeScreen, welcomeMessage } = preferences;
@@ -21,6 +23,13 @@ export default function WidgetDynamicUI({preferences}) {
       setWelcomeMessage(welcomeMessage);
     }
   }, [preferences]);
+
+  useEffect(() => {
+    if (assistantName.length > 13) {
+      setAssistantNameFontSize('20px')
+    } else setAssistantNameFontSize('22px')
+  }, [assistantName]);
+
 
   function hexToRgb(hex) {
     // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
@@ -45,7 +54,7 @@ export default function WidgetDynamicUI({preferences}) {
     const normalizedRgb = rgb.map(val => val / 255);
     const luminance = 0.2126 * normalizedRgb[0] + 0.7152 * normalizedRgb[1] + 0.0722 * normalizedRgb[2];
     return luminance;
-  }  
+  } 
 
   const accentRgb = hexToRgb(accentColour);
   const darkerAccentRgb = darkenRgb(accentRgb, 0.20); // Darken by 15%
@@ -62,6 +71,11 @@ export default function WidgetDynamicUI({preferences}) {
   
   const textColorStyle = {
     color: calculateLuminance(accentRgb) > 0.7 ? '#2a2a2a' : '#ffffff',
+  };
+
+  const assistantNameStyle = {
+    ...textColorStyle,
+    fontSize: assistantNameFontSize
   };
 
   const poweredByNameStyle = {
@@ -106,7 +120,7 @@ export default function WidgetDynamicUI({preferences}) {
         <div className="header-content">
           <img className="avatar" alt="Avatar" src="../assets/avatar.png" />
           <div className='title-container'>
-            <div className="assistant-name" style={textColorStyle}>{assistantName}</div>
+            <div className="assistant-name" style={assistantNameStyle}>{assistantName}</div>
             <div className="assistant-subtitle" style={textColorStyle}>AI Shopping Assistant</div>
           </div>
           <div className='info-icon-container'>

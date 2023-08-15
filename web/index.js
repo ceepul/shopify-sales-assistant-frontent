@@ -48,7 +48,6 @@ app.get(
         body: JSON.stringify({ shop }),
         headers: { "Content-Type": "application/json" }
       })
-      console.log(createShopResponse)
 
       // Initialize graphQL client
       const client = new shopify.api.clients.Graphql({
@@ -117,12 +116,12 @@ app.get(
 
         // Upsert vectorArray into PineconeDB
         const upsertResponse = await PineconeDB.upsert(vectorArray, shop)
-        console.log(upsertResponse)
         // Update hasNextPage and cursor for next iteration
         hasNextPage = productData.body.data.products.pageInfo.hasNextPage;
         cursor = productData.body.data.products.pageInfo.endCursor;
       }
   
+      console.log("Success!")
       next();
     } catch (error) {
       console.error(`Failed to initialize app: ${error.message}`);

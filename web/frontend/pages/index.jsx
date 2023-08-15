@@ -6,36 +6,52 @@ import {
   EmptyState,
   Layout,
   Page,
+  Text,
   SkeletonBodyText,
 } from "@shopify/polaris";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PlaceholderStat from "../components/PlaceholderStat";
+import MessagesChart from "../components/MessagesChart";
 
 export default function HomePage() {
 
     const navigate = useNavigate();
-    const fetch = useAuthenticatedFetch();
+    const authFetch = useAuthenticatedFetch();
 
     const [productsConnected, setProductsConnected] = useState(true)
-    const isLoading = false;
+    const [shop, setShop] = useState('')
+    const [isLoading, setIsLoading] = useState(true)
+    const [error, setError] = useState({
+      status: false,
+      title: "",
+      body: "",
+    });
 
-    const handleClick = async () => {
-      const shop = await fetch("/api/shop", {
-         method: "GET",
-         headers: { "Content-Type": "application/json" },
-      }).then(response => response.text());
-
-      console.log(shop)
-
-      const preferences = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/preferences?shop=${shop}`, {
+    const fetchShop = async () => {
+      const shop = await authFetch("/api/shop", {
         method: "GET",
-        headers: { "Content-Type": "application/json" }
-      });
+        headers: { "Content-Type": "application/json" },
+      }).then((response) => response.text());
 
-      console.log(preferences)
-      const jsonRes = await preferences.json()
-      console.log(jsonRes)
+      return shop
     }
+
+    useEffect(() => {
+      setIsLoading(true);
+      fetchShop()
+        .then((shop) => {
+          setShop(shop);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setError({
+            status: true, 
+            title: "Could not fetch shop",
+            body: "We are having trouble loading your store's information. Please try again later."
+          })
+          setIsLoading(false);
+        });
+    }, []);
 
     const loadingMarkup = isLoading ? (
         <Layout>
@@ -73,17 +89,30 @@ export default function HomePage() {
 
     const connectedMarkup = !isLoading && productsConnected ? (
         <Layout>
+            {/*Error banner */}
+            {error.status === true && 
+              <Layout.Section fullWidth>
+                <Banner 
+                  title={error.title} 
+                  onDismiss={() => {setError({status: false, title: "", body: ""})}}
+                  status="critical"
+                >
+                    <p>{error.body}</p>
+                </Banner>
+              </Layout.Section>
+            }
+
             {/*Any banner notification would go here*/}
             <Layout.Section fullWidth>
-            <Banner title="Notification" onDismiss={() => {}}>
-                <p>For help with setting up the chatbot visit the Getting Started Page</p>
-            </Banner>
+              <Banner title="Notification" onDismiss={() => {}}>
+                  <p>For help with setting up the chatbot visit the Getting Started Page</p>
+              </Banner>
             </Layout.Section>
+            
 
             {/*Two column stats section*/}
             <Layout.Section oneHalf>
-              <Button onClick={handleClick}>Test</Button>
-                <PlaceholderStat />
+                <MessagesChart shop={shop} />
             </Layout.Section>
             <Layout.Section oneHalf>
                 <PlaceholderStat />
@@ -114,9 +143,9 @@ export default function HomePage() {
               onAction: () => navigate("/customize")
             }]}
         />
-        {loadingMarkup}
-        {emptyStateMarkup}
-        {connectedMarkup}
+          {loadingMarkup}
+          {emptyStateMarkup}
+          {connectedMarkup}
         </Page>
     );
 }

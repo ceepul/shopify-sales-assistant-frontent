@@ -13,7 +13,7 @@ export const PineconeDB = {
   }, */
 
   upsert: async function (vectorArray, shopURL) {
-    const batchSize = 5;
+    const batchSize = 50;
     let upsertedCount = 0;
 
     for (let i = 0; i < vectorArray.length; i += batchSize) {

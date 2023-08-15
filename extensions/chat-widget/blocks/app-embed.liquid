@@ -16,6 +16,9 @@
   data-x-icon-dark-url="{{ 'x-icon-dark.svg' | asset_url }}"
   data-chat-icon-url="{{ 'chat-icon.svg' | asset_url }}"
   data-chat-icon-dark-url="{{ 'chat-icon-dark.svg' | asset_url }}"
+
+  data-auto-open="{{ block.settings.auto-open }}"
+  data-position="{{ block.settings.position }}"
   data-domain="{{ shop.permanent_domain }}"></chat-widget>
 
 {% schema %}
@@ -24,6 +27,27 @@
     "target": "head",
     "stylesheet": "chat-widget.css",
     "javascript": "chat-widget.js",
-    "settings": []
+    "settings": [
+      {
+        "id": "position",
+        "type": "select",
+        "label": "Position",
+        "default": "right",
+        "options": [
+          {
+            "value": "right",
+            "label": "Right"
+          }, {
+            "value": "left",
+            "label": "Left"
+          }
+        ]
+      }, {
+        "id": "auto-open",
+        "type": "checkbox",
+        "label": "Open Automatically",
+        "default": true
+      }
+    ]
   }
 {% endschema %}

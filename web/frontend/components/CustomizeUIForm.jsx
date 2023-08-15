@@ -100,6 +100,11 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
   }, []);
 
   const handleChangeAssistantName = (value) => {
+    if (value.length > 18) {
+      setAssistantNameError('Assistant name cannot be greater than 18 characters.')
+    } else {
+      setAssistantNameError(null)
+    }
     setPreferences({
       ...preferences,
       assistantName: value
@@ -151,6 +156,9 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
   const validateAssistantName = (value) => {
     if (value.trim() === '') {
       setAssistantNameError('Assistant name cannot be blank.');
+      return false;
+    } else if (value.length > 18) {
+      setAssistantNameError('Assistant name cannot be greater than 18 characters.')
       return false;
     }
     setAssistantNameError(null);

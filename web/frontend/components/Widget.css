@@ -24,9 +24,10 @@
 }
 
 .widget .header-background-round {
+  z-index: 1;
   background-color: #47afff;
   border-radius: 396px/66px;
-  box-shadow: 0px 2px 4px #00000040;
+  box-shadow: 0px 0px 4px #8b8680;
   height: 128px;
   left:-204px;
   position: absolute;
@@ -34,6 +35,7 @@
 }
 
 .widget .header-background-main {
+  z-index: 1;
   background: linear-gradient(180deg, rgb(0, 139, 245) 0%, rgb(71, 175, 255) 100%);
   height: 120px;
   position: relative;
@@ -41,12 +43,13 @@
 }
 
 .widget .header-content {
+  z-index: 1;
   display: flex;
   align-items: center;
   height: 68px;
   position: absolute;
   top: 34px;
-  width: 334px;
+  width: 342px;
 }
 
 .widget .avatar {
@@ -81,22 +84,24 @@
 }
 
 .widget .info-icon-container {
+  position: absolute;
   padding: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: transparent;
-  margin-left: 42px;
+  right: 34px;
   border-radius: 8px;
 }
 
 .widget .close-icon-container {
+  position: absolute;
   padding: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: transparent;
-  margin-left: 4px;
+  right: -8px;
   border-radius: 8px;
 }
 

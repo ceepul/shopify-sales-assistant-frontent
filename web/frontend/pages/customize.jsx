@@ -14,7 +14,7 @@ import {
 } from "@shopify/polaris"
 import CustomizeUIForm from "../components/CustomizeUIForm";
 import WidgetDynamicUI from "../components/WidgetDynamicUI";
-import { useAppQuery, useAuthenticatedFetch } from '../hooks'
+import { useAuthenticatedFetch } from '../hooks'
 import { useEffect, useState, useCallback } from "react";
  
 export default function CustomizePage() {
@@ -180,7 +180,8 @@ export default function CustomizePage() {
                 >
                     <p>{error.body}</p>
                 </Banner>
-              </Layout.Section>}
+              </Layout.Section>
+            }
   
             <Layout.Section>
               <VerticalStack gap="4">

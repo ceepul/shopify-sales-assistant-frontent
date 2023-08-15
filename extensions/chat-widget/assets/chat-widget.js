@@ -37,8 +37,8 @@ class ChatWidget extends HTMLElement {
       }
 
       button[is="chat-toggle"] {
-        width: 60px;
-        height: 60px;
+        width: 64px;
+        height: 64px;
         border-radius: 50%;
         padding: 0;
         display: flex;
@@ -53,8 +53,8 @@ class ChatWidget extends HTMLElement {
       }
 
       .toggle-icon {
-        width: 36px;
-        height: 36px;
+        width: 38px;
+        height: 38px;
       }
 
       button[is="chat-toggle"]:hover {
@@ -81,6 +81,7 @@ class ChatWidget extends HTMLElement {
         transition: opacity 0.3s, transform 0.3s;
         opacity: 0;
         transform: translateY(20px);
+        box-shadow: 0 4px 8px rgba(128, 128, 128, 0.2); /* Example box shadow */
       }
       
       .header-container {
@@ -119,7 +120,7 @@ class ChatWidget extends HTMLElement {
         height: 68px;
         position: absolute;
         top: 34px;
-        width: 334px;
+        width: 342px;
       }
       
       .avatar {
@@ -154,22 +155,24 @@ class ChatWidget extends HTMLElement {
       }
       
       .info-icon-container {
+        position: absolute;
         padding: 8px;
         display: flex;
         justify-content: center;
         align-items: center;
         background-color: transparent;
-        margin-left: 34px;
+        right: 34px;
         border-radius: 8px;
       }
       
       .close-icon-container {
+        position: absolute;
         padding: 8px;
         display: flex;
         justify-content: center;
         align-items: center;
         background-color: transparent;
-        margin-left: 4px;
+        right: -8px;
         border-radius: 8px;
       }
       
@@ -406,8 +409,8 @@ class ChatWidget extends HTMLElement {
         align-self: flex-start;
         min-height: 238px;
         max-width: 90%;
-        margin-top: 8px;
         padding: 10px;
+        margin-bottom: 16px;
         overflow-x: scroll;
         overflow-y: hidden;
       }
@@ -419,6 +422,8 @@ class ChatWidget extends HTMLElement {
         min-width: 156px;
         max-width: 156px;
         padding: 8px;
+        display: flex;
+        flex-direction: column;
       }
       
       .product-image {
@@ -437,9 +442,13 @@ class ChatWidget extends HTMLElement {
         font-weight: 600;
         letter-spacing: -1%;
         line-height: 18px;
-        white-space: nowrap;
-        overflow: hidden;
-        margin-top: 8px;
+        white-space: normal; /* Allows text to wrap */
+        overflow: hidden; /* Hides text that overflows */
+        text-overflow: ellipsis; /* Adds "..." to the end of overflowing text */
+        display: -webkit-box; /* Enables webkit line clamp */
+        -webkit-line-clamp: 2; /* Limits text to 2 lines */
+        -webkit-box-orient: vertical; /* Configures box orientation */
+        margin-top: auto; /* Pushes title towards the bottom */
       }
       
       .product-action-container {
@@ -455,7 +464,8 @@ class ChatWidget extends HTMLElement {
         font-weight: 400;
         line-height: 18px;
         white-space: nowrap;
-      }
+        margin-top: auto; /* Pushes price to the bottom */
+      }      
       
       .product-addToCart-button {
         background-color: #47afffcc;
@@ -475,6 +485,12 @@ class ChatWidget extends HTMLElement {
         white-space: nowrap;
       }
 
+      .product-link {
+        text-decoration: none;
+        color: inherit;
+        display: inline-block;
+      }      
+
     </style>
     <div id="chat-widget"></div>
     `;
@@ -490,7 +506,6 @@ class ChatWidget extends HTMLElement {
       : this.fetchPreferences(shop);
 
     preferencesPromise.then(preferences => {
-      console.log(preferences)
       if (!preferences) {
         console.error('Failed to fetch shopping assistant preferences');
         return;  // Exit the function if no preferences are fetched
@@ -508,9 +523,8 @@ class ChatWidget extends HTMLElement {
       const chatIconURL = this.getAttribute('data-chat-icon-url');
       const chatIconDarkURL = this.getAttribute('data-chat-icon-dark-url');
 
-      // This determines whether the chatbot opens automatically.
-      // TODO: Setup and fetch from store preferences
-      const autoOpen = true;
+      const autoOpen = this.getAttribute('data-auto-open') === "true";
+      const position =  this.getAttribute('data-position');
 
       const toggle = new ChatToggle(
         autoOpen,
@@ -518,12 +532,14 @@ class ChatWidget extends HTMLElement {
         xIconURL,
         xIconDarkURL,
         chatIconURL,
-        chatIconDarkURL
+        chatIconDarkURL,
       );
       toggle.setAttribute('is', 'chat-toggle');
   
       const box = new ChatBox(
+        shop,
         autoOpen,
+        position,
         preferences.accentColour,
         preferences.assistantName,
         preferences.homeScreen,
@@ -534,16 +550,27 @@ class ChatWidget extends HTMLElement {
         closeIconURL,
         closeIconDarkURL,
         sendIconURL,
-        capabilitiesIconURL
+        capabilitiesIconURL,
       );
       box.setAttribute('is', 'chat-box');
+
+      const widget = this.shadowRoot.querySelector('#chat-widget');
+      if (position === 'left') {
+        widget.style.right = 'auto';
+        widget.style.left = '20px';
+      } else {
+        widget.style.right = '20px';
+        widget.style.left = 'auto';
+      }
   
-      this.shadowRoot.querySelector('#chat-widget').append(toggle, box);
+      widget.append(toggle, box);
+
+    }).catch(error => {
+      console.error(`Error in processing preferences:`, error);
     });
   }
 
   async fetchPreferences(shop) {
-    console.log(shop)
     try {
       const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/preferences?shop=${shop}`, {
         method: "GET",
@@ -573,7 +600,7 @@ class ChatToggle extends HTMLButtonElement {
     xIconURL,
     xIconDarkURL,
     chatIconURL,
-    chatIconDarkURL
+    chatIconDarkURL,
   ) {
     super();
     this.autoOpen = autoOpen;
@@ -641,7 +668,9 @@ customElements.define('chat-toggle', ChatToggle, { extends: "button" });
 
 class ChatBox extends HTMLDivElement {
   constructor(
+    shop,
     autoOpen,
+    position,
     accentColor, 
     assistantName,  
     homeScreen,
@@ -655,10 +684,12 @@ class ChatBox extends HTMLDivElement {
     capabilitiesIconURL
   ) {
     super();
+    this.shop = shop;
     this.messages = [];
-    this.accentColor = accentColor
-    this.assistantName = assistantName;
     this.autoOpen = autoOpen;
+    this.position = position;
+    this.accentColor = accentColor;
+    this.assistantName = assistantName;
     this.avatarURL = avatarURL;
     this.infoIconURL = infoIconURL;
     this.infoIconDarkURL = infoIconDarkURL;
@@ -666,71 +697,74 @@ class ChatBox extends HTMLDivElement {
     this.closeIconDarkURL = closeIconDarkURL;
     this.sendIconURL = sendIconURL;
     this.capabilitiesIconURL = capabilitiesIconURL;
+    this.accentRgb = hexToRgb(accentColor);
+    this.darkerAccentRgb = darkenRgb(this.accentRgb, 0.20);
+    this.luminance = calculateLuminance(this.accentRgb);
 
     // Load previous messages from local storage if they exist
     if (sessionStorage.getItem('messages')) {
       this.messages = JSON.parse(sessionStorage.getItem('messages'));
     } else if (!homeScreen) {
-      this.messages.push({ type: "user", content: welcomeMessage })
+      this.messages.push({ role: "assistant", content: welcomeMessage })
     }
 
     // Load autoOpen state from local storage if it exists
     if(sessionStorage.getItem('autoOpen')) {
       this.autoOpen = JSON.parse(sessionStorage.getItem('autoOpen'));
     }
-
   }
 
   connectedCallback() {
+    // Position the chatbox on the left or right of the toggle button based on the position setting
+    if(this.position === 'left') {
+      this.style.left = '50px';
+      this.style.right = 'auto';
+    } else if(this.position === 'right') {
+        this.style.right = '50px';
+        this.style.left = 'auto';
+    }
+    
     // If there is a value for open/closed in the session storage use that to set initial display value,
     // Otherwise use value of autoOpen to determine open/closed
-    if (sessionStorage.getItem('isChatBoxOpen') != null) {
-      if (sessionStorage.getItem('isChatBoxOpen') === 'true') {
-        this.style.display = 'block';
-        setTimeout(() => { 
-          this.style.opacity = '1'; 
-          this.style.transform = 'translateY(0px)';
-        }, 50);
-      }
-    } else {
-      if (this.autoOpen) {
-        this.style.display = 'block';
-        setTimeout(() => { 
-          this.style.opacity = '1'; 
-          this.style.transform = 'translateY(0px)';
-        }, 50);
-      } 
-    }
+    if (sessionStorage.getItem('isChatBoxOpen') === 'true') {
+      this.style.display = 'block';
+      setTimeout(() => { 
+        this.style.opacity = '1'; 
+        this.style.transform = 'translateY(0px)';
+      }, 50);
+    } else if (this.autoOpen) {
+      this.style.display = 'block';
+      setTimeout(() => { 
+        this.style.opacity = '1'; 
+        this.style.transform = 'translateY(0px)';
+      }, 50);
+    } 
 
-    const accentRgb = hexToRgb(this.accentColor);
-    const darkerAccentRgb = darkenRgb(accentRgb, 0.20);
-    const luminance = calculateLuminance(accentRgb)
-
-    const headerBgMainStyle = `
+    const bgGradientColorStyle = `
       background: linear-gradient(180deg, 
-      rgb(${darkerAccentRgb[0]}, ${darkerAccentRgb[1]}, ${darkerAccentRgb[2]}) 0%, 
-      rgb(${accentRgb[0]}, ${accentRgb[1]}, ${accentRgb[2]}) 100%);
+      rgb(${this.darkerAccentRgb[0]}, ${this.darkerAccentRgb[1]}, ${this.darkerAccentRgb[2]}) 0%, 
+      rgb(${this.accentRgb[0]}, ${this.accentRgb[1]}, ${this.accentRgb[2]}) 100%);
     `;
 
-    const headerBgRoundStyle = `
+    const bgColorStyle = `
       background-color: ${this.accentColor}
     `;
 
     const textColorStyle = `
-    color: ${luminance > 0.7 ? '#2a2a2a' : '#ffffff'}
-  `;
-
-    const poweredByNameStyle = `
-      color: ${luminance > 0.7 ? '#2a2a2a' : this.accentColor}
+      color: ${this.luminance > 0.7 ? '#2a2a2a' : '#ffffff'}
     `;
 
-    const infoIconPath = `${luminance > 0.7 ? this.infoIconDarkURL : this.infoIconURL}`
-    const closeIconPath = `${luminance > 0.7 ? this.closeIconDarkURL : this.closeIconURL}`
+    const poweredByNameStyle = `
+      color: ${this.luminance > 0.7 ? '#2a2a2a' : this.accentColor}
+    `;
+
+    const infoIconPath = `${this.luminance > 0.7 ? this.infoIconDarkURL : this.infoIconURL}`
+    const closeIconPath = `${this.luminance > 0.7 ? this.closeIconDarkURL : this.closeIconURL}`
 
     this.innerHTML = `
       <div class="header-container">
-        <div class="header-background-round" style="${headerBgRoundStyle}"></div>
-        <div class="header-background-main" style="${headerBgMainStyle}"></div>
+        <div class="header-background-round" style="${bgColorStyle}"></div>
+        <div class="header-background-main" style="${bgGradientColorStyle}"></div>
         <div class="header-content">
           <img class="avatar" alt="Avatar" src="${this.avatarURL}" />
           <div class='title-container'>
@@ -799,9 +833,9 @@ class ChatBox extends HTMLDivElement {
     //Additional chat box code can be added here
   }
 
-  addMessage(type, content) {
+  addMessage(role, content) {
     // Add a new message to the list
-    this.messages.push({ type, content });
+    this.messages.push({ role, content });
     sessionStorage.setItem('messages', JSON.stringify(this.messages));
     // Render all messages again
     this.renderMessages();
@@ -823,105 +857,140 @@ class ChatBox extends HTMLDivElement {
             <p class="example-text">“Show me low-top white shoes”</p>
         </div>
         <div class="example-container">
-            <div class="example-heading">Get smart style recommendations</div>
+            <div class="example-heading">Get smart product recommendations</div>
             <p class="example-text">“I need a top I can wear to a semi-formal event on a hot</p>
-            <p class="example-text"> summer day and that will go with my beige dress pants”</p>
+            <p class="example-text"> summer day and that will go with my beige pants”</p>
         </div>
       `;
     } else {
       // Display messages
       this.messages.forEach((message, index) => {
-        this.appendMessage(message.type, message.content, index);
+        this.appendMessage(message.role, message.content, index);
       });
     }
   }
 
-  appendMessage(type, content, index) {
+  appendMessage(role, content, index) {
     const bodyContainer = this.querySelector('.body-container');
     let markup;
 
+    const bgColorStyle = `
+      background-color: ${this.accentColor};
+    `;
+
+    const textColorStyle = `
+      color: ${this.luminance > 0.7 ? '#2a2a2a' : '#ffffff'};
+    `;
+
     const firstMessageClass = index === 0 ? 'first-message' : '';
-    
-    if (type === 'assistant') {
+
+    if (role === 'assistant') {
       markup = `
       <div class="assistant-message ${firstMessageClass}">
         <p class="assistant-text">${content}</p>
       </div>
       `;
-    } else if (type === 'user') {
+    } else if (role === 'user') {
       markup = `
-      <div class="user-message ${firstMessageClass}">
-        <p class="user-text">${content}</p>
+      <div class="user-message ${firstMessageClass}" style="${bgColorStyle}">
+        <p class="user-text" style="${textColorStyle}">${content}</p>
       </div>
       `;
-    } else if (type === 'product') {
-      markup = `
-      <div class='product-container'>
-        <div class='product-card'>
-          <img class="product-image" alt="Avatar" src="../assets/demo-shirt1.png" />
-          <div class='product-title'>Slim-Fit-Charcoal-Flannel</div>
-          <div class='product-action-container'>
-            <p class='product-price'>$79</p>
-            <div class='product-addToCart-button'>
-              <div class='product-addToCart-text'>ADD TO CART</div>
+    } else if (role === 'product') {
+      const website_url = window.location.origin;
+      markup = "<div class='product-container'>";
+
+      content.forEach(product => {
+        const productURL = `${website_url}/products/${product.producthandle}`;
+        markup += `
+          <a href="${productURL}" class="product-link" data-product-id="${product.productId}">
+            <div class='product-card'>
+              <img class="product-image" alt="${product.imagealt}" src="${product.imagesrc}" />
+              <div class='product-title'>${product.title}</div>
+              <div class='product-action-container'>
+                <p class='product-price'>$${product.price}</p>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class='product-card'>
-          <img class="product-image" alt="Avatar" src="../assets/demo-shirt-2.png" />
-          <div class='product-title'>Slim-Fit-Charcoal-Flannel</div>
-          <div class='product-action-container'>
-            <p class='product-price'>$79</p>
-            <div class='product-addToCart-button'>
-              <div class='product-addToCart-text'>ADD TO CART</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      `;
+          </a>`;
+      });
+      
+      markup += "</div>";
     }
   
     bodyContainer.insertAdjacentHTML('beforeend', markup);
+
+    // Get all the product-link elements
+    const productLinks = bodyContainer.querySelectorAll('.product-link');
+    productLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        const productId = e.currentTarget.getAttribute('data-product-id');
+        this.addProductViewEvent(productId);
+      });
+    });
+
     setTimeout(() => {
       bodyContainer.lastElementChild.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   }
 
-  handleSubmit() {
+  async addProductViewEvent(productId) {
+    console.log(`Adding product view event with productID: ${productId}`)
+
+    fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/events/productView`, {
+      method: "POST",
+      body: JSON.stringify({ shop: this.shop, productId: productId }),
+      headers: { "Content-Type": "application/json" }
+    })
+  }
+
+  async handleSubmit() {
     const input = this.querySelector('#chat-input');
     const text = input.value.trim();
-
+  
     if (text !== '') {
       this.addMessage('user', text);
-      console.log(text)
-
-      // After sending the message, clear the input field
       input.value = '';
+  
+      try {
+        const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/message`, {
+          method: "POST",
+          body: JSON.stringify({ shop: this.shop, messages: this.messages }),
+          headers: { "Content-Type": "application/json" }
+        })
+  
+        if (!response.ok) {
+          console.error("There was an error sending the message");
+          return;
+        }
+        const jsonRes = await response.json();
+        this.addMessage(jsonRes.role, jsonRes.content);
+  
+        if (jsonRes.fetchProducts) { // Check if fetchProducts is true
+          const productResponse = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/productMessage`, {
+            method: "POST",
+            body: JSON.stringify({ shop: this.shop, query: jsonRes.content }), // Include the shop and the content from the previous response
+            headers: { "Content-Type": "application/json" }
+          });
+  
+          if (!productResponse.ok) {
+            console.error("There was an error sending the product message");
+            return;
+          }
+  
+          const productJsonRes = await productResponse.json();
+          if (productJsonRes.content) {
+            this.addMessage(productJsonRes.role, productJsonRes.content);
+          }
+        }
+  
+      } catch (error) {
+        console.error('Error sending message: ', error);
+      }
+  
     } else {
-        console.log('Input is empty. Message not sent.');
+      console.log('Input is empty. Message not sent.');
     }
-
-    // Send the message to API and process the response
-    // ...
-    // Once the response is received, add the assistant's message or product recommendation to the list
-    // this.addMessage('assistant', response.text);
-    // Or
-    // this.addMessage('product', response.products);
-  
-/*     const url = 'http://example.com/api';  // replace with your API endpoint
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ text })
-    };
-  
-    fetch(url, options)
-      .then(response => response.json())
-      .then(data => console.log(data))
-      .catch(err => console.error('Error:', err)); */
   }
-}
+}  
 
 customElements.define('chat-box', ChatBox, { extends: 'div' });
