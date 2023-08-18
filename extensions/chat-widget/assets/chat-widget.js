@@ -359,6 +359,22 @@ class ChatWidget extends HTMLElement {
         white-space: nowrap;
       }
 
+      .character-count-container {
+        height: 24px;
+        width: 64px;
+        position: absolute;
+        bottom: 16px;
+        left: 24px;
+      }
+      
+      .character-count-text {
+        color: #969caa;
+        font-family: "Open Sans", Helvetica;
+        font-size: 10px;
+        font-weight: 400;
+        line-height: 22px;
+      }
+
       .first-message {
         margin-top: 32px;
       }
@@ -577,11 +593,14 @@ class ChatWidget extends HTMLElement {
         headers: { "Content-Type": "application/json" }
       });
     
+      if (!response.ok) {
+        console.error('Error fetching preferences:', error);
+        return null;
+      }
+
       const preferences = await response.json();
-  
       // Save the fetched preferences to the cache
       sessionStorage.setItem(`preferences-${shop}`, JSON.stringify(preferences));
-  
       return preferences;
   
     } catch (error) {
@@ -605,53 +624,56 @@ class ChatToggle extends HTMLButtonElement {
     super();
     this.autoOpen = autoOpen;
     this.style.backgroundColor = accentColor;
-    this.addEventListener('click', this.toggleChatBox.bind(this));
-    this.xIconURL = xIconURL;
-    this.xIconDarkURL = xIconDarkURL;
-    this.chatIconURL = chatIconURL;
-    this.chatIconDarkURL = chatIconDarkURL;
     this.accentRgb = hexToRgb(accentColor);
     this.luminance = calculateLuminance(this.accentRgb);
-    window.addEventListener('chatBoxClosed', () => this.updateIcon(false));
+    this.xIconURL = this.luminance > 0.7 ? xIconDarkURL : xIconURL;
+    this.chatIconURL = this.luminance > 0.7 ? chatIconDarkURL : chatIconURL;
+    this.addEventListener('click', this.toggleChatBox.bind(this));
+
+    window.addEventListener('chatBoxClosed', () => {
+      this.toggleChatBox()
+    });
   }
 
   connectedCallback() {
     // If there is a value of open/closed in the local storage use that to set the icon
     // Otherwise use the value from autoOpen to determine the correct icon
     if (sessionStorage.getItem('isChatBoxOpen') != null) {
-      this.updateIcon(sessionStorage.getItem('isChatBoxOpen') === 'true' ? true : false)
+      sessionStorage.getItem('isChatBoxOpen') === 'true' ? this.updateIcon(true) : this.updateIcon(false)
     } else {
       this.autoOpen? this.updateIcon(true) : this.updateIcon(false);
+      sessionStorage.setItem('isChatBoxOpen', JSON.stringify(this.autoOpen))
     }
   }
   
   isChatBoxOpen() {
-    const chatBox = this.getRootNode().querySelector('div[is="chat-box"]');
-    return chatBox.style.display === 'block';
+    return sessionStorage.getItem('isChatBoxOpen') === 'true'
   }
   
   updateIcon(isChatBoxOpen) {
     if(isChatBoxOpen) {
       this.innerHTML = `
-        <img class="toggle-icon" alt="Toggle Icon" src="${this.luminance > 0.7 ? this.xIconDarkURL : this.xIconURL}" />
+        <img class="toggle-icon" alt="Toggle Icon" src="${this.xIconURL}" />
       `;
     } else {
       this.innerHTML = `
-        <img class="toggle-icon" alt="Toggle Icon" src="${this.luminance > 0.7 ? this.chatIconDarkURL : this.chatIconURL}" />
+        <img class="toggle-icon" alt="Toggle Icon" src="${this.chatIconURL}" />
       `;
     }
   }
   
   toggleChatBox() {
     const chatBox = this.getRootNode().querySelector('div[is="chat-box"]');
+
     if (this.isChatBoxOpen()) {
-      this.updateIcon(false); // update before starting the close animation
+      this.updateIcon(false); // update icon before starting the close animation
       chatBox.style.opacity = '0';
       chatBox.style.transform = 'translateY(20px)';
       setTimeout(() => { 
         chatBox.style.display = 'none';
       }, 300);
       sessionStorage.setItem('isChatBoxOpen', JSON.stringify(false));
+
     } else {
       chatBox.style.display = 'block';
       this.updateIcon(true);
@@ -691,15 +713,14 @@ class ChatBox extends HTMLDivElement {
     this.accentColor = accentColor;
     this.assistantName = assistantName;
     this.avatarURL = avatarURL;
-    this.infoIconURL = infoIconURL;
-    this.infoIconDarkURL = infoIconDarkURL;
-    this.closeIconURL = closeIconURL;
-    this.closeIconDarkURL = closeIconDarkURL;
     this.sendIconURL = sendIconURL;
     this.capabilitiesIconURL = capabilitiesIconURL;
     this.accentRgb = hexToRgb(accentColor);
     this.darkerAccentRgb = darkenRgb(this.accentRgb, 0.20);
     this.luminance = calculateLuminance(this.accentRgb);
+    this.infoIconURL = this.luminance > 0.7 ? infoIconDarkURL : infoIconURL;
+    this.closeIconURL = this.luminance > 0.7 ? closeIconDarkURL : closeIconURL;
+    this.showHomeScreen = homeScreen;
 
     // Load previous messages from local storage if they exist
     if (sessionStorage.getItem('messages')) {
@@ -707,38 +728,23 @@ class ChatBox extends HTMLDivElement {
     } else if (!homeScreen) {
       this.messages.push({ role: "assistant", content: welcomeMessage })
     }
-
-    // Load autoOpen state from local storage if it exists
-    if(sessionStorage.getItem('autoOpen')) {
-      this.autoOpen = JSON.parse(sessionStorage.getItem('autoOpen'));
-    }
   }
 
   connectedCallback() {
-    // Position the chatbox on the left or right of the toggle button based on the position setting
-    if(this.position === 'left') {
-      this.style.left = '50px';
-      this.style.right = 'auto';
-    } else if(this.position === 'right') {
-        this.style.right = '50px';
-        this.style.left = 'auto';
-    }
+    this.updatePosition();
+
+    window.addEventListener('resize', () => {
+      this.updatePosition();
+    });
     
-    // If there is a value for open/closed in the session storage use that to set initial display value,
-    // Otherwise use value of autoOpen to determine open/closed
+    // Check session storage for open / closed state and set styling accordingly
     if (sessionStorage.getItem('isChatBoxOpen') === 'true') {
       this.style.display = 'block';
       setTimeout(() => { 
         this.style.opacity = '1'; 
         this.style.transform = 'translateY(0px)';
       }, 50);
-    } else if (this.autoOpen) {
-      this.style.display = 'block';
-      setTimeout(() => { 
-        this.style.opacity = '1'; 
-        this.style.transform = 'translateY(0px)';
-      }, 50);
-    } 
+    }
 
     const bgGradientColorStyle = `
       background: linear-gradient(180deg, 
@@ -758,8 +764,8 @@ class ChatBox extends HTMLDivElement {
       color: ${this.luminance > 0.7 ? '#2a2a2a' : this.accentColor}
     `;
 
-    const infoIconPath = `${this.luminance > 0.7 ? this.infoIconDarkURL : this.infoIconURL}`
-    const closeIconPath = `${this.luminance > 0.7 ? this.closeIconDarkURL : this.closeIconURL}`
+    const infoIconPath = `${this.infoIconURL}`
+    const closeIconPath = `${this.closeIconURL}`
 
     this.innerHTML = `
       <div class="header-container">
@@ -790,6 +796,9 @@ class ChatBox extends HTMLDivElement {
             <img class='send-button' alt="Send icon" src="${this.sendIconURL}" />
           </button>
         </div>
+        <div class="character-count-container">
+          <div class="character-count-text">0/200</div>
+        </div>
         <div class="powered-by-container">
           <div class="powered-by-text">Powered by</div>
           <div class="powered-by-name" style="${poweredByNameStyle}">ShopMate</div>
@@ -806,6 +815,16 @@ class ChatBox extends HTMLDivElement {
     });
 
     const input = this.querySelector('#chat-input');
+    const charCountText = this.querySelector('.character-count-text');
+
+    input.addEventListener('input', (e) => {   // Note: Using the 'input' event instead of 'keydown' for better handling
+      let charCount = e.target.value.length;
+      // Update live character count
+      charCountText.textContent = `${charCount}/200`;
+      // Enable or disable the send button based on character count
+      sendButton.disabled = charCount > 200;
+    });
+
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
@@ -815,27 +834,55 @@ class ChatBox extends HTMLDivElement {
 
     const infoIcon = this.querySelector('.info-icon-container');
     infoIcon.addEventListener('click', () => {
-      this.messages = [];
-      sessionStorage.setItem('messages', JSON.stringify(this.messages));
-      this.renderMessages();
+      this.showHomeScreen = !this.showHomeScreen
+      this.renderMessages()
     })
 
     const closeIcon = this.querySelector('.close-icon-container');
     closeIcon.addEventListener('click', () => {
       window.dispatchEvent(new Event('chatBoxClosed'));
-      this.style.opacity = '0'; 
-      this.style.transform = 'translateY(100px)';
-      setTimeout(() => { 
-        this.style.display = 'none'; 
-      }, 300);
     });
 
     //Additional chat box code can be added here
   }
 
+  updatePosition() {
+    const windowWidth = window.innerWidth;
+    const transformValue = -20 + (windowWidth - 384) / 2
+
+    if(this.position === 'left') {
+        if (windowWidth < 524) {
+            console.log('left, center')
+            this.style.left = `${transformValue}px`;
+            this.style.right = 'auto';
+        } else {
+            console.log('left')
+            this.style.left = '50px';
+            this.style.right = 'auto';
+        }
+    } else {
+        if (windowWidth < 524) {
+            console.log('right, center')
+            this.style.right = `${transformValue}px`;
+            this.style.left = 'auto';
+        } else {
+            console.log('right')
+            this.style.right = '50px';
+            this.style.left = 'auto';
+        }
+    }
+  }
+
   addMessage(role, content) {
     // Add a new message to the list
     this.messages.push({ role, content });
+
+    // Check the length of the messages array
+    // If there is more than X messages, remove the oldest one.
+    if (this.messages.length > 30) {
+      this.messages.shift()
+    }
+    // Update messages in session storage
     sessionStorage.setItem('messages', JSON.stringify(this.messages));
     // Render all messages again
     this.renderMessages();
@@ -845,7 +892,7 @@ class ChatBox extends HTMLDivElement {
     const bodyContainer = this.querySelector('.body-container');
     bodyContainer.innerHTML = '';
 
-    if (this.messages.length === 0) {
+    if (this.messages.length === 0 || this.showHomeScreen) {
       // Show the empty state markup
       bodyContainer.innerHTML = `
         <div class="capabilities-container">
@@ -925,6 +972,7 @@ class ChatBox extends HTMLDivElement {
       link.addEventListener('click', (e) => {
         const productId = e.currentTarget.getAttribute('data-product-id');
         this.addProductViewEvent(productId);
+        sessionStorage.setItem('isChatBoxOpen', JSON.stringify(false))
       });
     });
 
@@ -934,8 +982,6 @@ class ChatBox extends HTMLDivElement {
   }
 
   async addProductViewEvent(productId) {
-    console.log(`Adding product view event with productID: ${productId}`)
-
     fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/events/productView`, {
       method: "POST",
       body: JSON.stringify({ shop: this.shop, productId: productId }),
@@ -945,50 +991,68 @@ class ChatBox extends HTMLDivElement {
 
   async handleSubmit() {
     const input = this.querySelector('#chat-input');
+    const charCountText = this.querySelector('.character-count-text');
     const text = input.value.trim();
+
+    // Check if the text exceeds 200 characters
+    if (text.length > 200) {
+      console.log('Message is too long. Not sent.');
+      return; // Exit the function early if the message is too long
+    }
+
+    // Check if the text is empty
+    if (text === '') {
+      console.log('Input is empty. Message not sent.');
+      return; // Exit the function early if the message is empty
+    }
   
-    if (text !== '') {
-      this.addMessage('user', text);
-      input.value = '';
-  
-      try {
-        const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/message`, {
+    this.addMessage('user', text); // Add the user's message to the message array
+
+    this.showHomeScreen = false;  // Don't show the homescreen, show the messages instead
+    this.renderMessages();
+
+    input.value = '';
+    charCountText.textContent = '0/200';
+
+    // Send only the 9 most recent messages to the message API
+    const trimmedMessages = this.messages.slice(-9);
+
+    console.log(trimmedMessages)
+
+    try {
+      const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/message`, {
+        method: "POST",
+        body: JSON.stringify({ shop: this.shop, messages: trimmedMessages }),
+        headers: { "Content-Type": "application/json" }
+      })
+
+      if (!response.ok) {
+        console.error("There was an error sending the message");
+        return;
+      }
+      const jsonRes = await response.json();
+      this.addMessage(jsonRes.role, jsonRes.content);
+
+      if (jsonRes.fetchProducts) { // Check if fetchProducts is true
+        const productResponse = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/productMessage`, {
           method: "POST",
-          body: JSON.stringify({ shop: this.shop, messages: this.messages }),
+          body: JSON.stringify({ shop: this.shop, query: jsonRes.content }), // Include the shop and the content from the previous response
           headers: { "Content-Type": "application/json" }
-        })
-  
-        if (!response.ok) {
-          console.error("There was an error sending the message");
+        });
+
+        if (!productResponse.ok) {
+          console.error("There was an error sending the product message");
           return;
         }
-        const jsonRes = await response.json();
-        this.addMessage(jsonRes.role, jsonRes.content);
-  
-        if (jsonRes.fetchProducts) { // Check if fetchProducts is true
-          const productResponse = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/productMessage`, {
-            method: "POST",
-            body: JSON.stringify({ shop: this.shop, query: jsonRes.content }), // Include the shop and the content from the previous response
-            headers: { "Content-Type": "application/json" }
-          });
-  
-          if (!productResponse.ok) {
-            console.error("There was an error sending the product message");
-            return;
-          }
-  
-          const productJsonRes = await productResponse.json();
-          if (productJsonRes.content) {
-            this.addMessage(productJsonRes.role, productJsonRes.content);
-          }
+
+        const productJsonRes = await productResponse.json();
+        if (productJsonRes.content) {
+          this.addMessage(productJsonRes.role, productJsonRes.content);
         }
-  
-      } catch (error) {
-        console.error('Error sending message: ', error);
       }
-  
-    } else {
-      console.log('Input is empty. Message not sent.');
+
+    } catch (error) {
+      console.error('Error sending message: ', error);
     }
   }
 }  

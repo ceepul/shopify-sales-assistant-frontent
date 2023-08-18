@@ -12,6 +12,8 @@ import {
 import { useState, useEffect } from "react";
 import PlaceholderStat from "../components/PlaceholderStat";
 import MessagesChart from "../components/MessagesChart";
+import RecommendationEventsChart from "../components/RecommendationEventsChart";
+import ProductStatsTable from "../components/ProductStatsTable";
 
 export default function HomePage() {
 
@@ -55,6 +57,7 @@ export default function HomePage() {
 
     const loadingMarkup = isLoading ? (
         <Layout>
+        <Loading />
         <Layout.Section>
             <AlphaCard sectioned>
                 <Loading />
@@ -115,12 +118,12 @@ export default function HomePage() {
                 <MessagesChart shop={shop} />
             </Layout.Section>
             <Layout.Section oneHalf>
-                <PlaceholderStat />
+                <RecommendationEventsChart shop={shop} />
             </Layout.Section>
 
             {/*Full width stats section*/}
             <Layout.Section>
-                <PlaceholderStat />
+                <ProductStatsTable shop={shop} />
             </Layout.Section>
         </Layout>
     ) : null;
@@ -135,12 +138,12 @@ export default function HomePage() {
         <TitleBar
             title="ShopMate"
             primaryAction={{
-            content: "Setup Assistant",
-            onAction: () => navigate("/setup"),
+            content: "Customize Assistant",
+            onAction: () => navigate("/customize"),
             }}
             secondaryActions={[{
-              content: "Customize UI",
-              onAction: () => navigate("/customize")
+              content: "Change Plan",
+              onAction: () => navigate("/plan")
             }]}
         />
           {loadingMarkup}

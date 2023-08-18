@@ -28,7 +28,7 @@ ChartJS.register(
   ChartJSToolTip,
 );
 
-export default function MessagesChart({ shop }) {
+export default function RecommendationEventsChart({ shop }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState({
     status: false,
@@ -36,15 +36,15 @@ export default function MessagesChart({ shop }) {
     body: "",
   });
   const [timePeriod, setTimePeriod] = useState('24hr');
-  const [messageData, setMessageData] = useState({ labels: [], data: [] })
-  const [totalMessagesInTimePeriod, setTotalMessagesInTimePeriod] = useState(0)
+  const [recommendationData, setrecommendationData] = useState({ labels: [], data: [] })
+  const [totalrecommendationsInTimePeriod, setTotalrecommendationsInTimePeriod] = useState(0)
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
 
       try {
-        const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/stats/messages?shop=${shop}&timePeriod=${timePeriod}`, {
+        const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/stats/recommendations?shop=${shop}&timePeriod=${timePeriod}`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
           }
@@ -53,8 +53,8 @@ export default function MessagesChart({ shop }) {
         if (!response.ok) {
           setError({
             status: true, 
-            title: "Could not load messages", 
-            body: "There was a problem fetching the message data. Please try again later."
+            title: "Could not load recommendations", 
+            body: "There was a problem fetching the recommendation data. Please try again later."
           })
           setIsLoading (false)
           return;
@@ -64,24 +64,24 @@ export default function MessagesChart({ shop }) {
 
         if (timePeriod === '24hr') { // If time period is in hours, adjust labels to match time zone
           const adjustedLabels = adjustTimeZone(data.labels)
-          setMessageData({ labels: adjustedLabels, data: data.data })
+          setrecommendationData({ labels: adjustedLabels, data: data.data })
         } else {
-          setMessageData(data)
+          setrecommendationData(data)
         }
         
-        const totalMessages = data.data.reduce((total, entry) => {
+        const totalrecommendations = data.data.reduce((total, entry) => {
           return total + (entry ? entry : 0);
         }, 0);
-        setTotalMessagesInTimePeriod(totalMessages)
+        setTotalrecommendationsInTimePeriod(totalrecommendations)
 
         setError({ status: false, title: "", body: "" });
   
       } catch (error) {
-        console.error('There was an error fetching message data:', error);
+        console.error('There was an error fetching recommendation data:', error);
         setError({
           status: true, 
-          title: "Could not load messages", 
-          body: "There was a problem fetching the message data. Please try again later."
+          title: "Could not load recommendations", 
+          body: "There was a problem fetching the recommendation data. Please try again later."
         })
       }
   
@@ -113,7 +113,7 @@ export default function MessagesChart({ shop }) {
     scales: {
       x: {
         ticks: {
-          maxTicksLimit: 8  // Limit the number of ticks displayed on x-axis
+          maxTicksLimit: 8
         },
         grid: {
           display: false,
@@ -123,10 +123,10 @@ export default function MessagesChart({ shop }) {
   };
 
   const data = {
-    labels: messageData.labels,
+    labels: recommendationData.labels,
     datasets: [{
-      label: 'Messages',
-      data: messageData.data,
+      label: 'Recommendations',
+      data: recommendationData.data,
       borderColor: 'rgba(75, 192, 192, 1)',
       borderWidth: 1,
       tension: 0.25
@@ -165,9 +165,9 @@ export default function MessagesChart({ shop }) {
         <div style={{ display: "flex", justifyContent: "space-between"}}>
           <div style={{display: "flex", alignItems: "center", gap: "0.5rem"}}>
             <Text variant="headingMd" as="h6">
-              Messages
+              Product Recommendations
             </Text>
-            <Tooltip content={`This chart shows the messages user's have sent the shopping assistant in the past ${timePeriod}.`}>
+            <Tooltip content={`This chart shows the number of products recommended to user's by the shopping assistant in the last ${timePeriod}.`}>
               <Icon source={InfoMinor} color="base" />
             </Tooltip>
           </div>
@@ -181,7 +181,7 @@ export default function MessagesChart({ shop }) {
         <Box minHeight="1em"/>
         <Divider />
         <Box minHeight="0.5em"/>
-        <Text>Total ({timePeriod}): <strong>{totalMessagesInTimePeriod}</strong></Text>
+        <Text>Total ({timePeriod}): <strong>{totalrecommendationsInTimePeriod}</strong></Text>
         <Box minHeight="1.5em"/>
         {loadingMarkup}
         {errorMarkup}
