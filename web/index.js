@@ -41,18 +41,45 @@ app.get(
     try {
       // Get shop data from session
       const shop = res.locals.shopify.session.shop;
-  
-      // Create shop in aws database
-      const createShopResponse = await fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop", {
-        method: "POST",
-        body: JSON.stringify({ shop }),
-        headers: { "Content-Type": "application/json" }
-      })
 
       // Initialize graphQL client
       const client = new shopify.api.clients.Graphql({
         session: res.locals.shopify.session,
       });
+
+      const SHOP_CONTACT_QUERY = `
+        {
+          shop {
+            name
+            contactEmail
+          }
+        }
+      `;
+
+      let shopName = '';
+      let contactEmail = '';
+
+      try {
+        const contactData = await client.query({
+          data: {
+            query: SHOP_CONTACT_QUERY,
+          },
+        });
+
+        const data = contactData.body.data.shop;
+        shopName = data.name;
+        contactEmail = data.contactEmail;
+
+      } catch (error) {
+        console.error("Error fetching contact data:", error);
+      }
+  
+      // Create shop in aws database
+      const createShopResponse = await fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop", {
+        method: "POST",
+        body: JSON.stringify({ shop, shopName, contactEmail }),
+        headers: { "Content-Type": "application/json" }
+      })
   
       // Connect all the store's products to database 50 at a time
       let hasNextPage = true;

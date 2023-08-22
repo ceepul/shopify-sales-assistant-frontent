@@ -336,7 +336,7 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
             enabled={preferences.homeScreen}
             handleToggle={handleToggleHomeScreen}
             title="Home Screen"
-            description="Displays a home screen outlining the functionality of the assistant instead of a welcome message (recommended)"
+            description="Displays a home screen outlining the functionality of the assistant instead of a welcome message"
           />
 
           {!preferences.homeScreen && 

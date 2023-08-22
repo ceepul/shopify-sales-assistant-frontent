@@ -1,0 +1,135 @@
+.pricing-card {
+  position: relative;
+  width: 300px;
+  background-color: white;
+  border: 1px solid lightgrey;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+}
+
+.pricing-card-top {
+  padding: 40px;
+}
+
+.pricing-card-bottom {
+  background-color: #f9f9f9;
+  padding: 8px;
+  padding-bottom: 24px;
+  border-radius: 0px 0px 12px 12px;
+}
+
+.pricing-title {
+  font-size: 24px;
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+.pricing-currency {
+  margin-right: 4px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.pricing-price {
+  font-size: 36px;
+  font-weight: 600;
+}
+
+.pricing-month {
+  font-size: 26px;
+  color: grey;
+  margin-left: 8px;
+}
+
+.pricing-features {
+  font-size: 16px;
+  list-style-type: none;
+  padding: 0;
+}
+
+.pricing-icon {
+  margin-top: 3px;
+  height: 16px;
+  width: 16px;
+}
+
+.pricing-features li {
+  padding-inline: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.feature-icon {
+  width: 10px;
+  height: 10px;
+  background-color: grey;
+  display: inline-block;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.pricing-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  width: 85%;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pricing-btn:hover {
+  background-color: darkgray;
+}
+
+/* Button styles for the non-active, non-primary plan */
+.pricing-btn {
+  background-color: transparent;
+  color: #E53D3F;
+  border: 1px solid #E53D3F;
+}
+
+.pricing-btn:hover {
+  background-color: #E53D3F;
+  color: white;
+}
+
+/* Button styles for the primary plan */
+.pricing-btn-primary {
+  background-color: #E53D3F;
+  color: white;
+}
+
+.pricing-btn-primary:hover {
+  background-color: #cc1b1d;
+}
+
+/* Button styles for the active plan */
+.pricing-btn-active {
+  background-color: white;
+  color: grey;
+  border: 1px solid grey;
+  cursor: not-allowed; /* Indicates it's not clickable */
+}
+
+.banner-active {
+  position: absolute; 
+  width: 40%;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #E53D3F;
+  color: white;
+  padding: 5px 15px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01rem;
+}
+

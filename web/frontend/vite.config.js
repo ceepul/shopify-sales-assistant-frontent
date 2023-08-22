@@ -61,5 +61,5 @@ export default defineConfig({
       "^/qrcodes/[0-9]+/image(\\?.*)?$": proxyOptions,
       "^/qrcodes/[0-9]+/scan(\\?.*)?$": proxyOptions,
     },
-  },  
+  },
 });

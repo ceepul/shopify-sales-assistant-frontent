@@ -505,7 +505,35 @@ class ChatWidget extends HTMLElement {
         text-decoration: none;
         color: inherit;
         display: inline-block;
-      }      
+      }  
+      
+      .loading-animation {
+        background-color: #f1f2f4;
+        border-radius: 10px 10px 10px 0px;
+        align-self: flex-start;
+        padding: 2px;
+        padding-inline: 12px;
+        max-width: 85%;
+        margin-bottom: 20px;
+      }
+      
+      .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        margin: 0px;
+        margin-inline: 1px;
+        background-color: #2e3138cc;
+        border-radius: 50%;
+        opacity: 0;
+        animation: fadeInOut 1.5s infinite;
+      }
+      
+      @keyframes fadeInOut {
+        0% { opacity: 0; }
+        50% { opacity: 1; }
+        100% { opacity: 0; }
+      }  
 
     </style>
     <div id="chat-widget"></div>
@@ -721,6 +749,7 @@ class ChatBox extends HTMLDivElement {
     this.infoIconURL = this.luminance > 0.7 ? infoIconDarkURL : infoIconURL;
     this.closeIconURL = this.luminance > 0.7 ? closeIconDarkURL : closeIconURL;
     this.showHomeScreen = homeScreen;
+    this.isLoading = false;
 
     // Load previous messages from local storage if they exist
     if (sessionStorage.getItem('messages')) {
@@ -917,6 +946,34 @@ class ChatBox extends HTMLDivElement {
     }
   }
 
+  showLoading() {
+    if (!this.isLoading) {
+      this.isLoading = true;
+      const bodyContainer = this.querySelector('.body-container');
+      const loadingMarkup = `
+        <div class="loading-animation">
+          <div class="dot" style="animation-delay: 0.2s;"></div>
+          <div class="dot" style="animation-delay: 0.4s;"></div>
+          <div class="dot" style="animation-delay: 0.6s;"></div>
+        </div>`;
+      bodyContainer.insertAdjacentHTML('beforeend', loadingMarkup);
+      setTimeout(() => {
+        bodyContainer.lastElementChild.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }
+
+  hideLoading() {
+    if (this.isLoading) {
+      this.isLoading = false;
+      const bodyContainer = this.querySelector('.body-container');
+      const loadingElement = bodyContainer.querySelector('.loading-animation');
+      if (loadingElement) {
+        loadingElement.remove();
+      }
+    }
+  }
+
   appendMessage(role, content, index) {
     const bodyContainer = this.querySelector('.body-container');
     let markup;
@@ -1010,14 +1067,13 @@ class ChatBox extends HTMLDivElement {
 
     this.showHomeScreen = false;  // Don't show the homescreen, show the messages instead
     this.renderMessages();
+    this.showLoading(); // Show the ... animation
 
     input.value = '';
     charCountText.textContent = '0/200';
 
     // Send only the 9 most recent messages to the message API
     const trimmedMessages = this.messages.slice(-9);
-
-    console.log(trimmedMessages)
 
     try {
       const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/message`, {
@@ -1028,12 +1084,15 @@ class ChatBox extends HTMLDivElement {
 
       if (!response.ok) {
         console.error("There was an error sending the message");
+        this.hideLoading();
         return;
       }
       const jsonRes = await response.json();
+      this.hideLoading();
       this.addMessage(jsonRes.role, jsonRes.content);
 
       if (jsonRes.fetchProducts) { // Check if fetchProducts is true
+        this.showLoading();
         const productResponse = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/productMessage`, {
           method: "POST",
           body: JSON.stringify({ shop: this.shop, query: jsonRes.content }), // Include the shop and the content from the previous response
@@ -1042,10 +1101,13 @@ class ChatBox extends HTMLDivElement {
 
         if (!productResponse.ok) {
           console.error("There was an error sending the product message");
+          this.hideLoading();
           return;
         }
 
         const productJsonRes = await productResponse.json();
+        this.hideLoading();
+
         if (productJsonRes.content) {
           this.addMessage(productJsonRes.role, productJsonRes.content);
         }

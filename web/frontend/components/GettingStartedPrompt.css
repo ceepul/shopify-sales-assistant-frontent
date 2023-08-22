@@ -1,0 +1,122 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); 
+  z-index: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  position: relative;
+  width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+}
+
+.close-button {
+  position: absolute;
+  top: 12px;
+  right: 6px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.step-icon {
+  width: 100px;
+  height: 100px;
+  margin-top: 20px;
+}
+
+.step-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.step-description {
+  font-size: 14px;
+  margin-top: 12px;
+  text-align: center;
+}
+
+.step-button {
+  margin-top: 24px;
+}
+
+.step-button-content {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-button-container {
+  margin-top: 32px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.step-dots {
+  margin-top: 24px;
+  display: flex;
+  gap: 8px;
+}
+
+.step-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: lightgrey;
+}
+
+.step-dots span.active {
+  background-color: black;
+}
+
+.step-space {
+  margin-top: 24px;
+}
+
+@media screen and (min-width: 30.625em) {
+  .modal-container {
+    /* Adjust width or any other styling here if needed */
+    width: 70%;
+  }
+}
+
+/* Style for desktop (md and up) */
+@media screen and (min-width: 48em) {
+  .modal-container {
+    width: 50%;
+  }
+}
+
+/* If you have specific styles for lg and xl, add them similarly */
+@media screen and (min-width: 65em) {
+  .modal-container {
+    width: 38%;
+  }
+}
+
+@media screen and (min-width: 90em) {
+
+}

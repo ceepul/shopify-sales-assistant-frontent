@@ -2,11 +2,8 @@ import { useNavigate, useAuthenticatedFetch, TitleBar, Loading } from "@shopify/
 import {
   AlphaCard,
   Banner,
-  Button,
-  EmptyState,
   Layout,
   Page,
-  Text,
   SkeletonBodyText,
 } from "@shopify/polaris";
 import { useState, useEffect } from "react";
@@ -14,13 +11,14 @@ import PlaceholderStat from "../components/PlaceholderStat";
 import MessagesChart from "../components/MessagesChart";
 import RecommendationEventsChart from "../components/RecommendationEventsChart";
 import ProductStatsTable from "../components/ProductStatsTable";
+import GettingStartedPrompt from "../components/GettingStartedPrompt";
 
 export default function HomePage() {
-
     const navigate = useNavigate();
     const authFetch = useAuthenticatedFetch();
 
-    const [productsConnected, setProductsConnected] = useState(true)
+    const [firstTimeUser, setFirstTimeUser] = useState(false)
+
     const [shop, setShop] = useState('')
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState({
@@ -38,6 +36,24 @@ export default function HomePage() {
       return shop
     }
 
+    const fetchFirstTimeUser = async () => {
+      try {
+        const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/firsttimeuser?shop=${shop}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        })  
+        if (!response.ok) {
+          // No need to log error here
+          return false;
+        }
+  
+        const data = await response.json();
+        return data.firstTimeUser;
+      } catch (error) {
+        return false;
+      }
+    }
+
     useEffect(() => {
       setIsLoading(true);
       fetchShop()
@@ -52,8 +68,24 @@ export default function HomePage() {
             body: "We are having trouble loading your store's information. Please try again later."
           })
           setIsLoading(false);
-        });
+        });  
     }, []);
+
+    useEffect(() => {
+      if (shop) { // Only run if shop is not an empty string
+        fetchFirstTimeUser(shop).then(res => {
+          setFirstTimeUser(res);
+          if (res) {
+            // Update so they are no longer a first time user
+            const response = fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/firsttimeuser", {
+              method: "PATCH",
+              body: JSON.stringify({ shop: shop, firstTimeUser: false }),
+              headers: { "Content-Type": "application/json" },
+            });
+          }
+        });
+      }
+    }, [shop]);
 
     const loadingMarkup = isLoading ? (
         <Layout>
@@ -67,32 +99,9 @@ export default function HomePage() {
         </Layout>
       ) : null;
 
-    const emptyStateMarkup =
-    !isLoading && !productsConnected ? (
-    <Layout>
-    <Layout.Section>
-        <AlphaCard sectioned>
-            <EmptyState
-            heading="Almost there!"
-            /* This button will take the user to a Create a QR code page */
-            action={{
-                content: "Connect Products",
-                onAction: () => navigate("/setup"),
-            }}
-            image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
-            >
-            <p>
-                Connect your store's products to start using the AI product recommender
-            </p>
-            </EmptyState>
-        </AlphaCard>
-    </Layout.Section>
-    </Layout>
-    ) : null;
-
-    const connectedMarkup = !isLoading && productsConnected ? (
+    const connectedMarkup = !isLoading ? (
         <Layout>
-            {/*Error banner */}
+            {/* Error banner */}
             {error.status === true && 
               <Layout.Section fullWidth>
                 <Banner 
@@ -128,11 +137,6 @@ export default function HomePage() {
         </Layout>
     ) : null;
 
-
-    /*
-    Use Polaris Page and TitleBar components to create the page layout,
-    and include the empty state contents set above.
-    */
     return (
         <Page>
         <TitleBar
@@ -147,8 +151,12 @@ export default function HomePage() {
             }]}
         />
           {loadingMarkup}
-          {emptyStateMarkup}
           {connectedMarkup}
+          <GettingStartedPrompt 
+            isActive={firstTimeUser} 
+            onClose={() => setFirstTimeUser(false)}
+            shop={shop}
+          />
         </Page>
     );
 }

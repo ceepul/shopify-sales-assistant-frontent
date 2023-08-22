@@ -19,70 +19,51 @@ export default function PlanPage() {
   ) : null
 
   const pageMarkup = !isLoading ? (
-    <Layout>
-      <Layout.Section fullWidth>
-        <div style={{display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem"}}>
+    <AlphaCard>
+      <div style={{marginTop: "40px", display: "flex", flexDirection: "column", alignItems: "center", gap: "4rem"}}>
+        <div style={{display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem"}}>
           <Text variant="heading2xl" as="h3">
-            Plans that fit your need
+            Find the right plan for your business
           </Text>
           <Text variant="bodyLg" as="p">
             Start with a 14-day free trial. Cancel at anytime.
           </Text>
         </div>
-      </Layout.Section>
-      <Layout.Section oneThird>
-        <PricingCard 
-          title={"Starter"}
-          price={49}
-          features={[
-            {
-              text: "1000 messages per month",
-            },
-            {
-              text: "unlimited product recommendations",
-            },
-            {
-              text: "custom website intigration",
-            }
-          ]}
-        />
-      </Layout.Section>
-      <Layout.Section oneThird>
-        <PricingCard 
-          primary
-          title={"Entreprenuer"}
-          price={129}
-          features={[
-            {
-              text: "5000 messages per month",
-            },
-            {
-              text: "unlimited product recommendations",
-            },
-            {
-              text: "custom website intigration",
-            }
-          ]}
-        />
-      </Layout.Section>
-      <Layout.Section oneThird>
-      <PricingCard 
-          title={"Scale"}
-          price={299}
-          features={[
-            {
-              text: "15000 messages per month",
-            },
-            {
-              text: "unlimited product recommendations",
-            },
-            {
-              text: "custom website intigration",
-            }
-          ]}
-        />
-      </Layout.Section>
-    </Layout>
+        <Layout>
+          <Layout.Section oneThird>
+            <div style={{display: 'flex', justifyContent: 'center'}}>
+              <PricingCard 
+                active={true}
+                title={"Starter"}
+                price={49}
+                features={['2000 messages per month', 'Seamless integration', 'UI customization']}
+              />
+            </div>
+          </Layout.Section>
+          <Layout.Section oneThird>
+            <div style={{display: 'flex', justifyContent: 'center'}}>
+              <PricingCard 
+                active={false}
+                primary
+                title={"Entreprenuer"}
+                price={129}
+                features={['6000 messages per month', 'Seamless integration', 'UI customization']}
+              />
+            </div>
+          </Layout.Section>
+          <Layout.Section oneThird>
+            <div style={{display: 'flex', justifyContent: 'center'}}>
+              <PricingCard 
+                active={false}
+                title={"Scale"}
+                price={299}
+                features={['20000 messages per month', 'Seamless integration', 'UI customization']}
+              />
+            </div>
+          </Layout.Section>
+        </Layout>
+      </div>
+    </AlphaCard>
   ) : null
 
   return (
