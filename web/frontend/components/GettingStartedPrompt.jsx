@@ -74,9 +74,9 @@ export default function GettingStartedPrompt({ isActive, onClose, shop }) {
     ),
     (
       <div className="modal-content">
-        <img className="step-icon" src="../assets/handshake.png" alt="Handshake Icon" />
+        <img className="step-image" src="../assets/embed-ss.png" alt="Web screen shot of app embedding" />
         <p className="step-title">Activate Your AI Assistant</p>
-        <p className="step-description">To let your AI shopping assistant start helping your customers, you'll first need to enable the app embed on your store.</p>
+        <p className="step-description">To let the AI shopping assistant start helping your customers, you'll first need to enable the app embed on your store.</p>
         
         <div className='step-button'>
           <Button primary onClick={handleEmbedLink}>
@@ -87,7 +87,6 @@ export default function GettingStartedPrompt({ isActive, onClose, shop }) {
           </Button>
         </div>
 
-        <div className='step-space' />
         <div className='step-space'>
           <Banner status="warning">
             Don't forget to <strong>save</strong> your theme changes.
@@ -107,10 +106,10 @@ export default function GettingStartedPrompt({ isActive, onClose, shop }) {
     ),
     (
       <div className="modal-content">
-        <img className="step-icon" src="../assets/handshake.png" alt="Handshake Icon" />
-        <p className="step-title">Next Steps</p>
-        <p className="step-description">You're AI shopping assistant is ready to go!.</p>
-        <p className="step-description step-space">Head over to the customize page to tailor the look and feel of your AI shopping assistant to match your store's branding.</p>
+        <img className="step-icon" src="../assets/home-trophy.png" alt="Trophy Icon" />
+        <p className="step-title">You're all set!</p>
+        <p className="step-description">The AI shopping assistant is ready to use!.</p>
+        <p className="step-description step-space">Next, head over to the customize page to tailor the look and feel of your AI shopping assistant to match your store's branding.</p>
 
         <div className='step-button-container'>
           <Button size='slim' onClick={handlePrev}>Prev</Button>

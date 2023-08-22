@@ -1,9 +1,5 @@
 import { 
-  AlphaCard,
-  Box,
   Icon,
-  Text,
-  VerticalStack
 } from "@shopify/polaris"
 import {
   CircleTickMajor
@@ -11,16 +7,6 @@ import {
 import './PricingCard.css'
 
 export default function PricingCard({ active, primary, title, price, features }) {
-
-  const featuresMarkup = (
-    <VerticalStack gap="4">
-      {features.map(feature => {
-        return (
-          <Text>{feature.text}</Text>
-        )
-      })}
-    </VerticalStack>
-  )
 
   return (
     <div className="pricing-card">

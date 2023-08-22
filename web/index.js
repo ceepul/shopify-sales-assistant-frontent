@@ -6,11 +6,8 @@ import serveStatic from "serve-static";
 import 'dotenv/config.js'
 
 import shopify from "./shopify.js";
-import { ShopMateDB } from "./shopmate-db.js";
 
 import applyAppDataApiEndpoints from "./middleware/app-data-api.js";
-import applyMessageRoutesEndpoints from "./middleware/messageRoutes.js";
-import { getAllProducts, getShopUrlFromSession } from "./helpers/admin-query.js";
 import { formatProductsAsVectors } from "./helpers/format-data.js";
 import { PineconeDB } from "./pinecone-db.js";
 
@@ -171,7 +168,6 @@ app.use("/api/*", shopify.validateAuthenticatedSession());
 app.use(express.json());
 
 applyAppDataApiEndpoints(app);
-applyMessageRoutesEndpoints(app);
 
 app.use(shopify.cspHeaders());
 app.use(serveStatic(STATIC_PATH, { index: false }));

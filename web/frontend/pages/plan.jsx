@@ -4,7 +4,6 @@ import {
   Layout,
   Page,
   Text,
-  Box
 } from "@shopify/polaris";
 import { useState } from "react";
 import PricingCard from "../components/PricingCard";

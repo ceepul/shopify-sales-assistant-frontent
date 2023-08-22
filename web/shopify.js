@@ -5,15 +5,11 @@ import { restResources } from "@shopify/shopify-api/rest/admin/2023-04";
 
 import sqlite3 from "sqlite3";
 import { join } from "path";
-import { ShopMateDB } from "./shopmate-db.js";
 
 import { PineconeClient } from "@pinecone-database/pinecone";
 import { PineconeDB } from "./pinecone-db.js";
 
 const database = new sqlite3.Database(join(process.cwd(), "database.sqlite"));
-
-ShopMateDB.db = database;
-ShopMateDB.init();
 
 const pinecone = new PineconeClient();
 await pinecone.init({

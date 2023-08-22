@@ -17,4 +17,3 @@ export async function embed(req, res, data, shopURL) {
 
     return response.data
 }
-

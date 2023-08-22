@@ -1,5 +1,4 @@
 import { embed } from "../openai.js"
-import { getShopUrlFromSession } from "./admin-query.js"
 
 // Accepts an array of product objects
 export async function formatProductsAsVectors(req, res, productData, shopURL) {
@@ -28,11 +27,4 @@ export async function formatProductsAsVectors(req, res, productData, shopURL) {
     })
 
     return vectors
-}
-
-export async function generateMessageUI(data) {
-  /* Takes in an array of objects and formats them to messages */
-  // If text - 
-  // If product -
-  // else null
 }

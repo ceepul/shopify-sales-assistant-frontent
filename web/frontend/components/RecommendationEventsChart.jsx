@@ -129,7 +129,7 @@ export default function RecommendationEventsChart({ shop }) {
       data: recommendationData.data,
       borderColor: 'rgba(75, 192, 192, 1)',
       borderWidth: 1,
-      tension: 0.25
+      tension: 0.4
     }]
   };
 

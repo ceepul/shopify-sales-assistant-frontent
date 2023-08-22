@@ -90,10 +90,16 @@ export default function HomePage() {
     const loadingMarkup = isLoading ? (
         <Layout>
         <Loading />
+        <Layout.Section oneHalf>
+            <PlaceholderStat />
+        </Layout.Section>
+        <Layout.Section oneHalf>
+            <PlaceholderStat />
+        </Layout.Section>
         <Layout.Section>
             <AlphaCard sectioned>
                 <Loading />
-                <SkeletonBodyText />
+                <SkeletonBodyText lines={4}/>
             </AlphaCard>
         </Layout.Section>
         </Layout>
