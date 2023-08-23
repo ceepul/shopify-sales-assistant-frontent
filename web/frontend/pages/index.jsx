@@ -12,12 +12,13 @@ import MessagesChart from "../components/MessagesChart";
 import RecommendationEventsChart from "../components/RecommendationEventsChart";
 import ProductStatsTable from "../components/ProductStatsTable";
 import GettingStartedPrompt from "../components/GettingStartedPrompt";
+import SubscriptionStatusBanner from "../components/SubscriptionStatusBanner";
 
 export default function HomePage() {
     const navigate = useNavigate();
     const authFetch = useAuthenticatedFetch();
 
-    const [firstTimeUser, setFirstTimeUser] = useState(false)
+    const [shopData, setShopData] = useState(null)
 
     const [shop, setShop] = useState('')
     const [isLoading, setIsLoading] = useState(true)
@@ -36,21 +37,31 @@ export default function HomePage() {
       return shop
     }
 
-    const fetchFirstTimeUser = async () => {
+    const fetchShopData = async () => {
       try {
-        const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/firsttimeuser?shop=${shop}`, {
+        const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/data?shop=${shop}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         })  
         if (!response.ok) {
-          // No need to log error here
-          return false;
+          setError({ 
+            status: true, 
+            title: "Failed to get shop data", 
+            body: "Please try again later." 
+          })
+          return null;
         }
   
+        setError({ status: false, title: "", body: "" })
         const data = await response.json();
-        return data.firstTimeUser;
+        return data;
       } catch (error) {
-        return false;
+        setError({ 
+          status: true, 
+          title: "Failed to get shop data", 
+          body: "Please try again later." 
+        })
+        return null;
       }
     }
 
@@ -73,8 +84,8 @@ export default function HomePage() {
 
     useEffect(() => {
       if (shop) { // Only run if shop is not an empty string
-        fetchFirstTimeUser(shop).then(res => {
-          setFirstTimeUser(res);
+        fetchShopData(shop).then(res => {
+          setShopData(res);
           if (res) {
             // Update so they are no longer a first time user
             const response = fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/firsttimeuser", {
@@ -120,13 +131,19 @@ export default function HomePage() {
               </Layout.Section>
             }
 
-            {/*Any banner notification would go here*/}
             <Layout.Section fullWidth>
-              <Banner title="Notification" onDismiss={() => {}}>
-                  <p>For help with setting up the chatbot visit the Getting Started Page</p>
-              </Banner>
+              {shopData && 
+              <SubscriptionStatusBanner 
+                  firstInstallDate={shopData.firstInstallDate}
+                  subscriptionStatus={shopData.subscriptionStatus}
+                  subscriptionStartDate={shopData.subscriptionStartDate}
+                  subscriptionEndDate={shopData.subscriptionEndDate}
+                  allowedMessages={10}
+                  messagesThisBillingPeriod={shopData.messagesThisBillingPeriod}
+              />}
             </Layout.Section>
-            
+
+            {/*Any banner notification would go here*/}
 
             {/*Two column stats section*/}
             <Layout.Section oneHalf>
@@ -159,8 +176,11 @@ export default function HomePage() {
             {loadingMarkup}
             {connectedMarkup}
             <GettingStartedPrompt 
-              isActive={firstTimeUser} 
-              onClose={() => setFirstTimeUser(false)}
+              isActive={shopData?.firstTimeUser ?? false} 
+              onClose={() => setShopData(prev => ({
+                ...prev,
+                firstTimeUser: false
+              }))}
               shop={shop}
             />
         </Page>

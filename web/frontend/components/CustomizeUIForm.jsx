@@ -78,6 +78,11 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
           body: "There was a problem updating your preferences. Please try again later."
         })
       } else {
+        setError({
+          status: false, 
+          title: "", 
+          body: ""
+        })
         toggleToast();
       }
 
