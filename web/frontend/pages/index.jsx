@@ -89,19 +89,19 @@ export default function HomePage() {
 
     const loadingMarkup = isLoading ? (
         <Layout>
-        <Loading />
-        <Layout.Section oneHalf>
-            <PlaceholderStat />
-        </Layout.Section>
-        <Layout.Section oneHalf>
-            <PlaceholderStat />
-        </Layout.Section>
-        <Layout.Section>
-            <AlphaCard sectioned>
-                <Loading />
-                <SkeletonBodyText lines={4}/>
-            </AlphaCard>
-        </Layout.Section>
+          <Loading />
+          <Layout.Section oneHalf>
+              <PlaceholderStat />
+          </Layout.Section>
+          <Layout.Section oneHalf>
+              <PlaceholderStat />
+          </Layout.Section>
+          <Layout.Section>
+              <AlphaCard sectioned>
+                  <Loading />
+                  <SkeletonBodyText lines={4}/>
+              </AlphaCard>
+          </Layout.Section>
         </Layout>
       ) : null;
 
@@ -145,24 +145,24 @@ export default function HomePage() {
 
     return (
         <Page>
-        <TitleBar
-            title="ShopMate"
-            primaryAction={{
-            content: "Customize Assistant",
-            onAction: () => navigate("/customize"),
-            }}
-            secondaryActions={[{
-              content: "Change Plan",
-              onAction: () => navigate("/plan")
-            }]}
-        />
-          {loadingMarkup}
-          {connectedMarkup}
-          <GettingStartedPrompt 
-            isActive={firstTimeUser} 
-            onClose={() => setFirstTimeUser(false)}
-            shop={shop}
+          <TitleBar
+              title="ShopMate"
+              primaryAction={{
+              content: "Customize Assistant",
+              onAction: () => navigate("/customize"),
+              }}
+              secondaryActions={[{
+                content: "Change Plan",
+                onAction: () => navigate("/plan")
+              }]}
           />
+            {loadingMarkup}
+            {connectedMarkup}
+            <GettingStartedPrompt 
+              isActive={firstTimeUser} 
+              onClose={() => setFirstTimeUser(false)}
+              shop={shop}
+            />
         </Page>
     );
 }

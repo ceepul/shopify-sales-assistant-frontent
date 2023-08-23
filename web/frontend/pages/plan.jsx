@@ -33,7 +33,7 @@ export default function PlanPage() {
             <div style={{display: 'flex', justifyContent: 'center'}}>
               <PricingCard 
                 active={true}
-                title={"Starter"}
+                title={"Basic"}
                 price={49}
                 features={['2000 messages per month', 'Seamless integration', 'UI customization']}
               />
