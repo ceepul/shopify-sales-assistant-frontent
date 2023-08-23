@@ -1,0 +1,115 @@
+CREATE TABLE subscription_plans (
+    plan_id INT PRIMARY KEY,
+    plan_name VARCHAR(255) NOT NULL,
+    features TEXT[],  -- Array of features
+    monthly_price DECIMAL(10, 2) NOT NULL,
+    trial_duration INT NOT NULL,
+    usage_price DECIMAL(10, 2),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price)
+VALUES (1, 'Basic', ARRAY['2000 messages per month', 'Seamless integration', 'UI customization'], 49.00, 14, NULL);
+
+INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price)
+VALUES (2, 'Entreprenuer', ARRAY['5000 messages per month', 'Seamless integration', 'UI customization'], 89.00, 14, NULL);
+
+INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price)
+VALUES (3, 'Scale', ARRAY['15000 messages per month', 'Seamless integration', 'UI customization', 'Remove Logo'], 219.00, 14, NULL);
+
+INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price)
+VALUES (4, 'Enterprise', ARRAY['40000 messages per month', 'Seamless integration', 'UI customization', 'Remove Logo'], 449.00, 14, 0.01);
+
+CREATE TABLE shops (
+    id SERIAL PRIMARY KEY,
+    shop VARCHAR(255) NOT NULL UNIQUE,
+    contact_email VARCHAR(255),
+    shop_name VARCHAR(255),
+    first_time_user BOOLEAN,
+    first_install_date DATE,
+    plan_id INTEGER, 
+    subscription_start_date DATE,
+    subscription_end_date DATE,
+    subscription_status VARCHAR(50), -- e.g., "active", "paused", "expired", "trial", etc.
+    messages_this_billing_period INTEGER,
+    pinecone_db_index VARCHAR(255),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (plan_id) REFERENCES subscription_plans(plan_id)
+);
+
+CREATE TABLE shop_preferences (
+    id SERIAL PRIMARY KEY,
+    shop VARCHAR(255) NOT NULL UNIQUE,
+    assistant_name VARCHAR(255),
+    accent_colour VARCHAR(7),
+    avatar_image_src VARCHAR(511), 
+    store_info TEXT,
+    dark_mode BOOLEAN DEFAULT FALSE,
+    welcome_message TEXT,
+    home_screen BOOLEAN DEFAULT FALSE,
+    over_limit BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (shop) REFERENCES shops(shop) ON DELETE CASCADE
+);
+
+CREATE TABLE products (
+    id SERIAL PRIMARY KEY,
+    product_id VARCHAR(255) NOT NULL UNIQUE,
+    product_handle VARCHAR(511) NOT NULL,
+    shop VARCHAR(255) NOT NULL,
+    active BOOLEAN,
+    title VARCHAR(511),
+    description TEXT,
+    image_src VARCHAR(511),
+    image_alt TEXT,
+    price DECIMAL(10,2),
+    options TEXT,
+    total_recommendations INTEGER,
+    total_product_views INTEGER,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (shop) REFERENCES shops(shop) ON DELETE CASCADE
+);
+
+CREATE TABLE messages (
+    id SERIAL PRIMARY KEY,
+    shop VARCHAR(255) NOT NULL,
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (shop) REFERENCES shops(shop) ON DELETE CASCADE
+);
+
+CREATE TABLE recommendation_events (
+    id SERIAL PRIMARY KEY,
+    shop VARCHAR(255) NOT NULL,
+    product_id VARCHAR(255) NOT NULL,
+    recommended_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (shop) REFERENCES shops(shop) ON DELETE CASCADE
+);
+
+CREATE TABLE product_view_events (
+    id SERIAL PRIMARY KEY,
+    shop VARCHAR(255) NOT NULL,
+    product_id VARCHAR(255) NOT NULL,
+    viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (shop) REFERENCES shops(shop) ON DELETE CASCADE
+);
+
+CREATE TABLE bills (
+    id SERIAL PRIMARY KEY,
+    shop VARCHAR(255) NOT NULL,
+    bill_date DATE NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    number_of_messages INTEGER NOT NULL,
+    is_paid BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE subscription_history (
+    id SERIAL PRIMARY KEY,
+    shop VARCHAR(255) NOT NULL, 
+    plan_id INTEGER,
+    start_date DATE,
+    end_date DATE,
+    status VARCHAR(50), -- e.g., "active", "paused", "expired", "trial", etc.
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (plan_id) REFERENCES subscription_plans(plan_id)
+);
