@@ -6,16 +6,24 @@ import {
 } from '@shopify/polaris-icons';
 import './PricingCard.css'
 
-export default function PricingCard({ active, primary, title, price, features }) {
+export default function PricingCard({ planId, active, primary, planName, planPrice, features, handleSubscribe }) {
+
+  const onClick = () => {
+    handleSubscribe({
+      planId: planId,
+      planName: planName,
+      planPrice: planPrice
+    })
+  }
 
   return (
     <div className="pricing-card">
       {primary && <div className="banner-active">Most Popular</div>}
       <div className="pricing-card-top">
-        <h2 className="pricing-title">{title}</h2>
+        <h2 className="pricing-title">{planName}</h2>
         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
           <span className='pricing-currency'>$</span>
-          <span className="pricing-price">{price}</span>
+          <span className="pricing-price">{planPrice}</span>
           <span className="pricing-month">/month</span>
         </div>
       </div>
@@ -30,12 +38,12 @@ export default function PricingCard({ active, primary, title, price, features })
         </ul>
         { active ? 
           primary ? 
-            <button className="pricing-btn pricing-btn-active" disabled>Active Plan</button> :
-            <button className="pricing-btn pricing-btn-active" disabled>Active Plan</button> 
+            <button className="pricing-btn pricing-btn-active" onClick={onClick} disabled>Active Plan</button> :
+            <button className="pricing-btn pricing-btn-active" onClick={onClick} disabled>Active Plan</button> 
         :
           primary ? 
-            <button className="pricing-btn pricing-btn-primary">Choose Plan</button> :
-            <button className="pricing-btn">Choose Plan</button>
+            <button className="pricing-btn pricing-btn-primary" onClick={onClick}>Choose Plan</button> :
+            <button className="pricing-btn" onClick={onClick}>Choose Plan</button>
         }
       </div>
     </div>

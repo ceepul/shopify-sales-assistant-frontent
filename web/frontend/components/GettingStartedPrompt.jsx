@@ -109,13 +109,13 @@ export default function GettingStartedPrompt({ isActive, onClose, shop }) {
         <img className="step-icon" src="../assets/home-trophy.png" alt="Trophy Icon" />
         <p className="step-title">You're all set!</p>
         <p className="step-description">The AI shopping assistant is ready to use!.</p>
-        <p className="step-description step-space">Next, head over to the customize page to tailor the look and feel of your AI shopping assistant to match your store's branding.</p>
+        <p className="step-description step-space">Next, select a plan to continue using your shopping assistant after the free trial has expired.</p>
 
         <div className='step-button-container'>
           <Button size='slim' onClick={handlePrev}>Prev</Button>
           <div style={{display: 'flex', gap: "8px"}}>
-            <Button size='slim' url="/customize">Customize</Button>
-            <Button primary size='slim' onClick={onClose}>Finish</Button>
+            <Button size='slim' onClick={onClose}>Finish</Button>
+            <Button primary size='slim' url="/plan"> View Plans</Button>
           </div>
         </div>
         <div className="step-dots">

@@ -7,7 +7,7 @@ import 'dotenv/config.js'
 
 import shopify from "./shopify.js";
 
-import applyAppDataApiEndpoints from "./middleware/app-data-api.js";
+import applyAppApiEndpoints from "./middleware/app-api.js";
 import { formatProductsAsVectors } from "./helpers/format-data.js";
 import { PineconeDB } from "./pinecone-db.js";
 
@@ -167,7 +167,7 @@ app.use("/api/*", shopify.validateAuthenticatedSession());
 
 app.use(express.json());
 
-applyAppDataApiEndpoints(app);
+applyAppApiEndpoints(app);
 
 app.use(shopify.cspHeaders());
 app.use(serveStatic(STATIC_PATH, { index: false }));

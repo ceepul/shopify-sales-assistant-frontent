@@ -103,4 +103,9 @@ export default {
     deliveryMethod: DeliveryMethod.EventBridge,
     arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/48101949441/shopify-recommendation-app'
   },
+
+  APP_SUBSCRIPTION_UPDATE: {
+    deliveryMethod: DeliveryMethod.EventBridge,
+    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/48101949441/shopify-recommendation-app'
+  },
 };

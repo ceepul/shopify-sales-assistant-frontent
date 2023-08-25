@@ -1,4 +1,4 @@
-import { TitleBar, Loading, useAuthenticatedFetch } from "@shopify/app-bridge-react"
+import { TitleBar, Loading, useAuthenticatedFetch, useNavigate } from "@shopify/app-bridge-react"
 import { 
   AlphaCard,
   Layout,
@@ -7,17 +7,21 @@ import {
   SkeletonBodyText,
   SkeletonDisplayText,
   Box,
-  Banner
+  Banner,
+  ButtonGroup,
+  Button,
 } from "@shopify/polaris";
 import { useState, useEffect } from "react";
-import PricingCard from "../components/PricingCard";
+import PricingCard from "../../components/PricingCard";
 
-export default function PlanPage() {
+export default function PlanSettingsPage() {
   const breadcrumbs = [{ content: "ShopMate", url: "/" }];
 
   const authFetch = useAuthenticatedFetch();
+  const navigate = useNavigate();
 
   const [planDetails, setPlanDetails] = useState(null)
+  const [currentPlanDetails, setCurrentPlanDetails] = useState(null)
 
   const [shop, setShop] = useState('')
   const [shopData, setShopData] = useState(null)
@@ -67,7 +71,7 @@ export default function PlanPage() {
       if (!response.ok) {
         setError({ 
           status: true, 
-          title: "Failed to get subscription data", 
+          title: "Failed to get current plan data", 
           body: "Please try again later." 
         })
         return null;
@@ -79,7 +83,7 @@ export default function PlanPage() {
     } catch (error) {
       setError({ 
         status: true, 
-        title: "Failed to get subscription data", 
+        title: "Failed to get current plan data", 
         body: "Please try again later." 
       })
       return null;
@@ -89,27 +93,35 @@ export default function PlanPage() {
   useEffect(() => {
     setIsLoading(true);
 
-    fetchPlanDetails().then(data => setPlanDetails(data))
-
     fetchShop()
       .then((shop) => {
         setShop(shop);
-        setIsLoading(false);
       })
       .catch((err) => {
         setError({ 
           status: true, 
-          title: "Failed to get subscription data", 
+          title: "Failed to get current plan data", 
           body: "Please try again later." 
         })
-        setIsLoading(false);
       });  
+
+    fetchPlanDetails().then((data) => {
+      setPlanDetails(data)
+      setIsLoading(false);
+    })
   }, []);
 
   useEffect(() => {
     if (shop) { // Only run if shop is not an empty string
       fetchShopData(shop).then(res => {
         setShopData(res);
+
+        let plan = planDetails?.find(plan => plan.planId === shopData?.planId)
+        if (!plan) {
+          plan = planDetails?.find(plan => plan.planId === 4)
+        }
+        setCurrentPlanDetails(plan)
+
         if (res) {
           // Update so they are no longer a first time user
           const response = fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/firsttimeuser", {
@@ -122,90 +134,21 @@ export default function PlanPage() {
     }
   }, [shop]);
 
+  const handleCancelSubscription = async () => {
+    console.log("TODO: Handle Cancel Subscription")
+  }
+
   const loadingMarkup = isLoading ? (
       <Layout>
         <Loading />
         <Layout.Section fullWidth>
+          <SkeletonDisplayText />
+          <Box minHeight="1rem"/>
           <AlphaCard>
-            <SkeletonBodyText lines={3} />
-          </AlphaCard>
-        </Layout.Section>
-        <Layout.Section oneThird>
-          <AlphaCard>
-            <SkeletonDisplayText />
-            <Box minHeight="4rem"/>
-            <SkeletonBodyText lines={3} />
-            <Box minHeight="10rem"/>
-          </AlphaCard>
-        </Layout.Section>
-        <Layout.Section oneThird>
-          <AlphaCard>
-            <SkeletonDisplayText />
-            <Box minHeight="4rem"/>
-            <SkeletonBodyText lines={3} />
-            <Box minHeight="10rem"/>
-          </AlphaCard>
-        </Layout.Section>
-        <Layout.Section oneThird>
-          <AlphaCard>
-            <SkeletonDisplayText />
-            <Box minHeight="4rem"/>
-            <SkeletonBodyText lines={3} />
-            <Box minHeight="10rem"/>
+            <SkeletonBodyText lines={4} />
           </AlphaCard>
         </Layout.Section>
       </Layout>
-  ) : null
-
-  const pageMarkup = !isLoading && !pageLoadError ? (
-    <AlphaCard>
-      <div style={{marginTop: "40px", display: "flex", flexDirection: "column", alignItems: "center", gap: "4rem"}}>
-        <div style={{display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem"}}>
-          <Text variant="heading2xl" as="h3">
-            Find the right plan for your business
-          </Text>
-          <Text variant="bodyLg" as="p">
-            Start with a 14-day free trial. Cancel at anytime.
-          </Text>
-        </div>
-        <Layout>
-          <Layout.Section oneThird>
-            <div style={{display: 'flex', justifyContent: 'center'}}>
-              <PricingCard 
-                key={planDetails[0].planId}
-                active={shopData?.planId === planDetails[0].planId}
-                title={planDetails[0].planName}
-                price={planDetails[0].monthlyPrice}
-                features={planDetails[0].features}
-              />
-            </div>
-          </Layout.Section>
-          <Layout.Section oneThird>
-            <div style={{display: 'flex', justifyContent: 'center'}}>
-              <PricingCard 
-                key={planDetails[1].planId}
-                active={shopData?.planId === planDetails[1].planId}
-                title={planDetails[1].planName}
-                price={planDetails[1].monthlyPrice}
-                features={planDetails[1].features}
-                primary
-              />
-            </div>
-          </Layout.Section>
-          <Layout.Section oneThird>
-            <div style={{display: 'flex', justifyContent: 'center'}}>
-              <PricingCard 
-                key={planDetails[2].planId}
-                active={shopData?.planId === planDetails[2].planId}
-                title={planDetails[2].planName}
-                price={planDetails[2].monthlyPrice}
-                features={planDetails[2].features}
-              />
-            </div>
-          </Layout.Section>
-        </Layout>
-      </div>
-    </AlphaCard>
   ) : null
 
   const pageLoadErrorMarkup = !isLoading && pageLoadError ? (
@@ -213,7 +156,7 @@ export default function PlanPage() {
       <div style={{margin: "40px", display: "flex", flexDirection: "column", alignItems: "center", gap: "4rem"}}>
         <div style={{display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem"}}>
           <Text variant="headingXl" as="h3">
-            There was an error loading the pricing page
+            There was an error loading your plan settings
           </Text>
           <Text variant="bodyLg" as="p">
             Please try again later.
@@ -223,12 +166,81 @@ export default function PlanPage() {
     </AlphaCard>
   ) : null
 
+  const pageMarkup = !isLoading && !pageLoadError ? (
+    <Layout>
+      <Layout.Section primary>
+        <div style={{paddingInline: '1rem'}}>
+          <Text variant="headingXl" as="h3">Your Plan</Text>
+          <Box minHeight="1rem"/>
+          <AlphaCard>
+            <Text variant="bodyLg" as="p">Plan Name:</Text>
+            <Text>{currentPlanDetails?.planName}</Text>
+            <Box minHeight="1rem"/>
+  
+            <Text variant="bodyLg" as="p">Plan Status:</Text>
+            <Text>{shopData?.subscriptionStatus}</Text>
+            <Box minHeight="1rem"/>
+  
+            <Text variant="bodyLg" as="p">Price:</Text>
+            <Text>${currentPlanDetails?.monthlyPrice}</Text>
+            <Box minHeight="1rem"/>
+  
+            <Text variant="bodyLg" as="p">Messages Included:</Text>
+            <Text>{currentPlanDetails?.messagesPerMonth}</Text>
+            <Box minHeight="1rem"/>
+  
+            {currentPlanDetails?.usagePrice && 
+              <>
+                <Text variant="bodyLg" as="p">Price after included messages:</Text>
+                <Text>${currentPlanDetails.usagePrice} /message</Text>
+              </>
+            }
+            <Box minHeight="1rem"/>
+  
+            <Text variant="bodyLg" as="p">Features: </Text>
+            {currentPlanDetails?.features?.map((feature, index) => {
+              return (
+              <div key={index}>
+                <Text>- {feature}</Text>
+                <Box minHeight="0.5rem"/>
+              </div>
+              )
+            })}
+            <Box minHeight="1rem"/>
+  
+            <Box minHeight="2rem"/>
+            <ButtonGroup>
+              <Button onClick={handleCancelSubscription}>Cancel Subscription</Button>
+              <Button primary onClick={() => navigate("/plan")}>Change Plan</Button>
+            </ButtonGroup>
+  
+          </AlphaCard>
+        </div>
+      </Layout.Section>
+
+      <Layout.Section secondary>
+        <Box minHeight="2.75rem"/>
+        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          {currentPlanDetails && 
+            <PricingCard 
+              planId={currentPlanDetails.planId}
+              active={true}
+              title={currentPlanDetails.planName}
+              price={currentPlanDetails.monthlyPrice}
+              features={currentPlanDetails.features}
+              handlePlanAction={null}
+            />
+          }
+        </div>
+      </Layout.Section>
+    </Layout>
+  ) : null
+
   return (
     <Page fullWidth>
       <TitleBar
         title="Edit QR code"
         breadcrumbs={breadcrumbs}
-        primaryAction={null}
       />
       {/* Error banner */}
       {error.status === true && 
