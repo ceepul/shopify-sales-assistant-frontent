@@ -30,6 +30,10 @@ export default function App() {
                   label: "Plan",
                   destination: "/plan",
                 },
+                {
+                  label: "Getting Started",
+                  destination: "/getting-started",
+                },
               ]}
             />
             <Routes pages={pages} />

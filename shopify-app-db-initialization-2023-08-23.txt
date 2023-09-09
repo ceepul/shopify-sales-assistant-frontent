@@ -1,24 +1,28 @@
 CREATE TABLE subscription_plans (
     plan_id INT PRIMARY KEY,
-    plan_name VARCHAR(255) NOT NULL,
+    plan_name VARCHAR(255) NOT NULL UNIQUE,
     features TEXT[],  -- Array of features
     monthly_price DECIMAL(10, 2) NOT NULL,
     trial_duration INT NOT NULL,
     usage_price DECIMAL(10, 2),
+    messages_per_month INT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price)
-VALUES (1, 'Basic', ARRAY['2000 messages per month', 'Seamless integration', 'UI customization'], 49.00, 14, NULL);
+INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month)
+VALUES (0, 'Free Trial', ARRAY['300 messages', 'Seamless integration', 'UI customization'], 0.00, 14, NULL, 300);
 
-INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price)
-VALUES (2, 'Entreprenuer', ARRAY['5000 messages per month', 'Seamless integration', 'UI customization'], 89.00, 14, NULL);
+INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month)
+VALUES (1, 'Basic', ARRAY['2000 messages per month', 'Seamless integration', 'UI customization'], 49.00, 14, NULL, 2000);
 
-INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price)
-VALUES (3, 'Scale', ARRAY['15000 messages per month', 'Seamless integration', 'UI customization', 'Remove Logo'], 219.00, 14, NULL);
+INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month)
+VALUES (2, 'Entreprenuer', ARRAY['5000 messages per month', 'Seamless integration', 'UI customization'], 89.00, 14, NULL, 5000);
 
-INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price)
-VALUES (4, 'Enterprise', ARRAY['40000 messages per month', 'Seamless integration', 'UI customization', 'Remove Logo'], 449.00, 14, 0.01);
+INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month)
+VALUES (3, 'Scale', ARRAY['15000 messages per month', 'Seamless integration', 'UI customization', 'Remove Logo'], 219.00, 14, NULL, 15000);
+
+INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month)
+VALUES (4, 'Enterprise', ARRAY['40000 messages per month', 'Seamless integration', 'UI customization', 'Remove Logo'], 449.00, 14, 0.01, 40000);
 
 CREATE TABLE shops (
     id SERIAL PRIMARY KEY,
@@ -30,7 +34,8 @@ CREATE TABLE shops (
     plan_id INTEGER, 
     subscription_start_date DATE,
     subscription_end_date DATE,
-    subscription_status VARCHAR(50), -- e.g., "active", "paused", "expired", "trial", etc.
+    subscription_status VARCHAR(50),
+    subscription_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
     messages_this_billing_period INTEGER,
     pinecone_db_index VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

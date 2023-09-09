@@ -15,7 +15,7 @@ import { useState, useEffect } from "react";
 import PricingCard from "../../components/PricingCard";
 
 export default function PlanSettingsPage() {
-  const breadcrumbs = [{ content: "ShopMate", url: "/" }];
+  const breadcrumbs = [{ content: "ShopMate", url: "/" }, { content: "Plan", url: "/plan" }];
 
   const authFetch = useAuthenticatedFetch();
   const navigate = useNavigate();
@@ -112,13 +112,13 @@ export default function PlanSettingsPage() {
   }, []);
 
   useEffect(() => {
-    if (shop) { // Only run if shop is not an empty string
+    if (shop && planDetails) { // Only run if shop is not an empty string
       fetchShopData(shop).then(res => {
         setShopData(res);
 
-        let plan = planDetails?.find(plan => plan.planId === shopData?.planId)
+        let plan = planDetails?.find(plan => plan.planId === res?.planId)
         if (!plan) {
-          plan = planDetails?.find(plan => plan.planId === 4)
+          plan = planDetails?.find(plan => plan.planId === 0)
         }
         setCurrentPlanDetails(plan)
 
@@ -225,8 +225,8 @@ export default function PlanSettingsPage() {
             <PricingCard 
               planId={currentPlanDetails.planId}
               active={true}
-              title={currentPlanDetails.planName}
-              price={currentPlanDetails.monthlyPrice}
+              planName={currentPlanDetails.planName}
+              planPrice={currentPlanDetails.monthlyPrice}
               features={currentPlanDetails.features}
               handlePlanAction={null}
             />
@@ -239,7 +239,7 @@ export default function PlanSettingsPage() {
   return (
     <Page fullWidth>
       <TitleBar
-        title="Edit QR code"
+        title="Details"
         breadcrumbs={breadcrumbs}
       />
       {/* Error banner */}

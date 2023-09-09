@@ -208,7 +208,7 @@ export default function PlanPage() {
             <div style={{display: 'flex', justifyContent: 'center'}}>
               <PricingCard 
                 planId={planDetails[1].planId}
-                active={shopData?.planId === planDetails[1].planId}
+                active={shopData?.subscriptionStatus === 'ACTIVE' && shopData?.planId === planDetails[1].planId} // Active plan and plan id matches.
                 planName={planDetails[1].planName}
                 planPrice={planDetails[1].monthlyPrice}
                 features={planDetails[1].features}
@@ -220,7 +220,7 @@ export default function PlanPage() {
             <div style={{display: 'flex', justifyContent: 'center'}}>
               <PricingCard 
                 planId={planDetails[2].planId}
-                active={shopData?.planId === planDetails[2].planId}
+                active={shopData?.subscriptionStatus === 'ACTIVE' && shopData?.planId === planDetails[2].planId}
                 planName={planDetails[2].planName}
                 planPrice={planDetails[2].monthlyPrice}
                 features={planDetails[2].features}
@@ -233,7 +233,7 @@ export default function PlanPage() {
             <div style={{display: 'flex', justifyContent: 'center'}}>
               <PricingCard 
                 planId={planDetails[3].planId}
-                active={shopData?.planId === planDetails[3].planId}
+                active={shopData?.subscriptionStatus === 'ACTIVE' && shopData?.planId === planDetails[3].planId}
                 planName={planDetails[3].planName}
                 planPrice={planDetails[3].monthlyPrice}
                 features={planDetails[3].features}
@@ -264,7 +264,7 @@ export default function PlanPage() {
   return (
     <Page fullWidth>
       <TitleBar
-        title="Edit QR code"
+        title="Plan"
         breadcrumbs={breadcrumbs}
         primaryAction={{
           content: "Plan Settings",

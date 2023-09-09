@@ -98,6 +98,8 @@ export default function HomePage() {
       }
     }, [shop]);
 
+    console.log(shopData)
+
     const loadingMarkup = isLoading ? (
         <Layout>
           <Loading />

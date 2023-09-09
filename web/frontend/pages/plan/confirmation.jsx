@@ -12,7 +12,7 @@ import { useLocation } from 'react-router-dom'
 import { useEffect, useState } from "react";
 
 export default function ConfirmationPage() {
-  const breadcrumbs = [{ content: "ShopMate", url: "/" }];
+  const breadcrumbs = [{ content: "ShopMate", url: "/" }, { content: "Plan", url: "/plan" }];
   const navigate = useNavigate();
   const location = useLocation();
   const authFetch = useAuthenticatedFetch();
@@ -27,8 +27,6 @@ export default function ConfirmationPage() {
     3. Final Error -> Show Error Message
   */
   const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-  const [subscriptionData, setSubscriptionData] = useState(null);
 
   const searchParams = new URLSearchParams(location.search);
   const charge_id = searchParams.get('charge_id');
@@ -38,34 +36,9 @@ export default function ConfirmationPage() {
     return null; // don't render the component further
   }
 
-  const fetchSubscriptionData = async () => {
-    try {
-      const response = await authFetch(`/api/billing/subscription-data/${charge_id}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      })
-  
-      console.log(response)
-
-      if (!response.ok) {
-        console.error('Response was not okay')
-        setIsError(true)
-      }
-
-      const data = await response.json()
-      return data;
-
-    } catch (error) {
-      console.error("Error fetching subscription data: ", error)
-      setIsError(true)
-    }
-  }
-
   useEffect(() => {
-    fetchSubscriptionData().then(data => setSubscriptionData(data))
+    setIsLoading(false)
   }, []);
-
-  console.log(subscriptionData)
 
   const loadingMarkup = isLoading ? (
     <AlphaCard>
@@ -75,26 +48,17 @@ export default function ConfirmationPage() {
     </AlphaCard>
   ) : null
 
-  const errorMarkup = !isLoading && isError ? (
-    <AlphaCard>
+  const successMarkup = !isLoading ? (
+    <AlphaCard padding='8'>
       <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-        <Text variant="headingLg">There was an error on our end.</Text>
+        <img width='160' src="../assets/home-trophy.png" alt="Trophy Icon" />
+        <Text variant="headingXl">Success!</Text>
         <Box minHeight="1rem"/>
-        <Text variant="bodyMd">Don't worry. Our team has been notified and is looking into the issue.</Text>
-        <Box minHeight="1rem"/>
+        <Text variant="bodyMd">Your current plan has been updated.</Text>
+        <Box minHeight="2.5rem"/>
         <Button onClick={() => navigate('/')}>Back to App</Button>
-      </div>
-    </AlphaCard>
-  ) : null
-
-  const successMarkup = !isLoading && !isError ? (
-    <AlphaCard>
-      <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-        <Text variant="headingLg">Success!</Text>
-        <Box minHeight="1rem"/>
-        <Text variant="bodyMd">You current plan is now the $CURRENT PLAN HERE</Text>
-        <Box minHeight="1rem"/>
-        <Button onClick={() => navigate('/')}>Back to App</Button>
+        <Box minHeight="1.5rem"/>
+        <Text variant="bodySm">Please note that it may take a few moments for changes to be reflected in the app.</Text>
       </div>
     </AlphaCard>
   ) : null
@@ -102,7 +66,7 @@ export default function ConfirmationPage() {
   return (
     <Page>
       <TitleBar
-        title="Edit QR code"
+        title="Confirmation"
         breadcrumbs={breadcrumbs}
         primaryAction={{
           content: "Back to App",
@@ -110,9 +74,7 @@ export default function ConfirmationPage() {
         }}
       />
       {loadingMarkup}
-      {errorMarkup}
       {successMarkup}
     </Page>
-
   )
 }

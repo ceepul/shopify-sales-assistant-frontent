@@ -11,10 +11,8 @@ export default {
    * https://shopify.dev/docs/apps/webhooks/configuration/mandatory-webhooks#customers-data_request
    */
   CUSTOMERS_DATA_REQUEST: {
-    deliveryMethod: DeliveryMethod.Http,
-    callbackUrl: "/api/webhooks",
-    callback: async (topic, shop, body, webhookId) => {
-      const payload = JSON.parse(body);
+    deliveryMethod: DeliveryMethod.EventBridge,
+    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/48101949441/shopify-recommendation-app'
       // Payload has the following shape:
       // {
       //   "shop_id": 954889,
@@ -33,7 +31,6 @@ export default {
       //     "id": 9999
       //   }
       // }
-    },
   },
 
   /**
@@ -43,10 +40,8 @@ export default {
    * https://shopify.dev/docs/apps/webhooks/configuration/mandatory-webhooks#customers-redact
    */
   CUSTOMERS_REDACT: {
-    deliveryMethod: DeliveryMethod.Http,
-    callbackUrl: "/api/webhooks",
-    callback: async (topic, shop, body, webhookId) => {
-      const payload = JSON.parse(body);
+    deliveryMethod: DeliveryMethod.EventBridge,
+    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/48101949441/shopify-recommendation-app'
       // Payload has the following shape:
       // {
       //   "shop_id": 954889,
@@ -62,7 +57,6 @@ export default {
       //     220458
       //   ]
       // }
-    },
   },
 
   /**
@@ -72,16 +66,13 @@ export default {
    * https://shopify.dev/docs/apps/webhooks/configuration/mandatory-webhooks#shop-redact
    */
   SHOP_REDACT: {
-    deliveryMethod: DeliveryMethod.Http,
-    callbackUrl: "/api/webhooks",
-    callback: async (topic, shop, body, webhookId) => {
-      const payload = JSON.parse(body);
+    deliveryMethod: DeliveryMethod.EventBridge,
+    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/48101949441/shopify-recommendation-app'
       // Payload has the following shape:
       // {
       //   "shop_id": 954889,
       //   "shop_domain": "{shop}.myshopify.com"
       // }
-    },
   },
 
   APP_UNINSTALLED: {
@@ -104,7 +95,7 @@ export default {
     arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/48101949441/shopify-recommendation-app'
   },
 
-  APP_SUBSCRIPTION_UPDATE: {
+  APP_SUBSCRIPTIONS_UPDATE: {
     deliveryMethod: DeliveryMethod.EventBridge,
     arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/48101949441/shopify-recommendation-app'
   },

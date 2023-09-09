@@ -32,12 +32,21 @@ app.get(
   shopify.config.auth.callbackPath,
   shopify.auth.callback(),
 
-
   /* Code to run on app installation, ie. set up metafields and link products  */
   async (req, res, next) => {
     try {
       // Get shop data from session
       const shop = res.locals.shopify.session.shop;
+      const accessToken = res.locals.shopify.session.accessToken;
+
+      // Store accessToken
+      const storeTokenResponse = await fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/store-secret", {
+        method: "POST",
+        body: JSON.stringify({ shop: shop, accessToken: accessToken }),
+        headers: { "Content-Type": "application/json" }
+      })
+
+      console.log("Token stored successfully")
 
       // Initialize graphQL client
       const client = new shopify.api.clients.Graphql({
@@ -77,6 +86,8 @@ app.get(
         body: JSON.stringify({ shop, shopName, contactEmail }),
         headers: { "Content-Type": "application/json" }
       })
+
+      console.log("Shop Created successfully")
   
       // Connect all the store's products to database 50 at a time
       let hasNextPage = true;

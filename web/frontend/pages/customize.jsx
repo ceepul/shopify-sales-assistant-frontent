@@ -38,6 +38,7 @@ export default function CustomizePage() {
     darkMode: false,
     homeScreen: true,
     welcomeMessage: "Welcome to our store! Are there any products I could help you find?",
+    logoVisible: true,
   });
 
   const authFetch = useAuthenticatedFetch()
@@ -76,7 +77,10 @@ export default function CustomizePage() {
     setIsLoading(true);
     fetchPreferences()
       .then((data) => {
-        setPreferences(data);
+        setPreferences(prevPreferences => ({
+          ...prevPreferences,
+          ...data
+        }));
         setIsLoading(false);
       })
       .catch((err) => {
@@ -93,7 +97,10 @@ export default function CustomizePage() {
     setIsLoading(true);
     fetchPreferences()
       .then((data) => {
-        setPreferences(data);
+        setPreferences(prevPreferences => ({
+          ...prevPreferences,
+          ...data
+        }));
         setIsLoading(false);
       })
       .catch((err) => {
@@ -110,7 +117,7 @@ export default function CustomizePage() {
     return (
       <Page>
         <TitleBar
-          title="Edit QR code"
+          title="Customize"
           breadcrumbs={breadcrumbs}
           primaryAction={null}
         />
@@ -121,16 +128,18 @@ export default function CustomizePage() {
               <Text variant="headingLg" as="h5">Settings</Text>
               <AlphaCard>
                 <Text variant="headingMd" as="h6">Assistant Name</Text>
-                <Box minHeight="0.5rem"/>
+                <Box minHeight="1rem"/>
                 <SkeletonBodyText />
+                <Box minHeight="1rem"/>
   
                 <Box minHeight="2rem" />
   
                 <Text variant="headingMd" as="h6">Accent Color</Text>
-                <Box minHeight="0.5rem"/>
+                <Box minHeight="1rem"/>
                 <SkeletonBodyText />
+                <Box minHeight="1rem"/>
   
-  {/*               <Box minHeight="2.5rem" />
+                {/*<Box minHeight="2.5rem" />
   
                 <Text variant="headingMd" as="h6">Dark Mode</Text>
                 <Box minHeight="0.5rem"/>
@@ -139,8 +148,9 @@ export default function CustomizePage() {
                 <Box minHeight="2.5rem" />
   
                 <Text variant="headingMd" as="h6">Home Screen</Text>
-                <Box minHeight="0.5rem"/>
+                <Box minHeight="1rem"/>
                 <SkeletonBodyText />
+                <Box minHeight="1rem"/>
               </AlphaCard>
             </VerticalStack>
           </Layout.Section>
@@ -159,50 +169,52 @@ export default function CustomizePage() {
     );
   }
 
-  return (
-    <Frame>
-      <Page>
-          <TitleBar
-            title="Customize"
-            breadcrumbs={breadcrumbs}
-            primaryAction={null}
-          />
-          {toastActive && <Toast content="Preferences Updated" onDismiss={toggleToast} />}
-          <Layout>
-  
-            {/*Error banner */}
-            {error.status === true && 
-              <Layout.Section fullWidth>
-                <Banner 
-                  title={error.title} 
-                  onDismiss={() => {setError({status: false, title: "", body: ""})}}
-                  status="critical"
-                >
-                    <p>{error.body}</p>
-                </Banner>
+  if (!isLoading) {
+    return (
+      <Frame>
+        <Page>
+            <TitleBar
+              title="Customize"
+              breadcrumbs={breadcrumbs}
+              primaryAction={null}
+            />
+            {toastActive && <Toast content="Preferences Updated" onDismiss={toggleToast} />}
+            <Layout>
+    
+              {/*Error banner */}
+              {error.status === true && 
+                <Layout.Section fullWidth>
+                  <Banner 
+                    title={error.title} 
+                    onDismiss={() => {setError({status: false, title: "", body: ""})}}
+                    status="critical"
+                  >
+                      <p>{error.body}</p>
+                  </Banner>
+                </Layout.Section>
+              }
+    
+              <Layout.Section>
+                <VerticalStack gap="4">
+                  <Text variant="headingLg" as="h5">Settings</Text>
+                  <CustomizeUIForm
+                    preferences={preferences}
+                    resetPreferences={refetchPreferences}
+                    setPreferences={setPreferences}
+                    setError={setError}
+                    toggleToast={toggleToast}
+                  />
+                </VerticalStack>
               </Layout.Section>
-            }
-  
-            <Layout.Section>
-              <VerticalStack gap="4">
-                <Text variant="headingLg" as="h5">Settings</Text>
-                <CustomizeUIForm
-                  preferences={preferences}
-                  resetPreferences={refetchPreferences}
-                  setPreferences={setPreferences}
-                  setError={setError}
-                  toggleToast={toggleToast}
-                />
-              </VerticalStack>
-            </Layout.Section>
-            <Layout.Section secondary>
-              <VerticalStack gap="4">
-                <Text variant="headingLg" as="h5">Preview</Text>
-                <WidgetDynamicUI preferences={preferences}/>
-              </VerticalStack>
-            </Layout.Section>
-          </Layout>
-      </Page> 
-    </Frame>
-  )
+              <Layout.Section secondary>
+                <VerticalStack gap="4">
+                  <Text variant="headingLg" as="h5">Preview</Text>
+                  <WidgetDynamicUI preferences={preferences}/>
+                </VerticalStack>
+              </Layout.Section>
+            </Layout>
+        </Page> 
+      </Frame>
+    )
+  }
 }
