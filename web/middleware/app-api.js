@@ -35,6 +35,23 @@ const SUBSCRIBE_MUTATION = `
     }
 `;
 
+const CANCEL_SUBSCRIPTION_MUTATION = `
+  mutation CancelSubscription($id: ID!) {
+    appSubscriptionCancel(
+      id: $id
+    ) {
+      userErrors {
+        field
+        message
+      }
+      appSubscription {
+        id
+        status
+      }
+    }
+  }
+`;
+
 export default function applyAppApiEndpoints(app) {
   app.use(express.json());
 
@@ -83,6 +100,32 @@ export default function applyAppApiEndpoints(app) {
 
       // Return the response and URL
       res.status(200).send(response.body.data.appSubscriptionCreate)
+      
+    } catch (error) {
+      console.log(error)
+      res.status(500).send(error.message);
+    }
+  })
+
+  app.post("/api/billing/cancel-subscription", async (req, res) => {
+    try {
+      const subscriptionId = req.body.subscriptionId
+
+      // Send a graphQL request to cancel the subscription
+      const client = new shopify.api.clients.Graphql({
+        session: res.locals.shopify.session,
+      });
+
+      const response = await client.query({
+        data: {
+          query: CANCEL_SUBSCRIPTION_MUTATION,
+          variables: {
+              id: subscriptionId,
+          },
+        },
+      });
+
+      res.status(200).send('Subscription Cancelled Sucessfully.')
       
     } catch (error) {
       console.log(error)

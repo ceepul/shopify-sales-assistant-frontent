@@ -12,12 +12,11 @@ export default function SubscriptionStatusBanner({
 
   const currentDate = new Date();
   const endOfTrialDate = new Date(firstInstallDate);
-  endOfTrialDate.setDate(endOfTrialDate.getDate() + 14); // 14-day free trial
+  endOfTrialDate.setDate(endOfTrialDate.getDate() + 7); // 7-day free trial
   const daysLeftInTrial = Math.ceil((endOfTrialDate - currentDate) / (1000 * 60 * 60 * 24));
 
   const endSubscriptionDate = subscriptionEndDate ? new Date(subscriptionEndDate) : new Date()
   const daysLeftInSubscription = Math.ceil((endSubscriptionDate - currentDate) / (1000 * 60 * 60 * 24) + gracePeriod);
-  console.log(daysLeftInSubscription)
 
   if (subscriptionStatus === "trial") {
     if (daysLeftInTrial <= 0) {

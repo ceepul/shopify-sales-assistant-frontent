@@ -32,6 +32,7 @@ CREATE TABLE shops (
     first_time_user BOOLEAN,
     first_install_date DATE,
     plan_id INTEGER, 
+    graphql_plan_id VARCHAR(255),
     subscription_start_date DATE,
     subscription_end_date DATE,
     subscription_status VARCHAR(50),
@@ -111,10 +112,11 @@ CREATE TABLE bills (
 CREATE TABLE subscription_history (
     id SERIAL PRIMARY KEY,
     shop VARCHAR(255) NOT NULL, 
-    plan_id INTEGER,
-    start_date DATE,
-    end_date DATE,
-    status VARCHAR(50), -- e.g., "active", "paused", "expired", "trial", etc.
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (plan_id) REFERENCES subscription_plans(plan_id)
+    plan_name VARCHAR(255),
+    graphql_plan_id VARCHAR(255),
+    status VARCHAR(50),
+    subscription_end_date DATE,
+    resetMessages BOOLEAN,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    posted_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

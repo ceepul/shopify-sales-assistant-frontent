@@ -87,7 +87,6 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
       }
 
     } catch (error) {
-      console.log(error)
       setError({
         status: true, 
         title: "Could not save preferences", 

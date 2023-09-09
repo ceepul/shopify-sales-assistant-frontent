@@ -10,6 +10,8 @@ import {
   Banner,
   ButtonGroup,
   Button,
+  Modal,
+  Spinner,
 } from "@shopify/polaris";
 import { useState, useEffect } from "react";
 import PricingCard from "../../components/PricingCard";
@@ -32,6 +34,9 @@ export default function PlanSettingsPage() {
     body: "",
   });
   const [pageLoadError, setPageLoadError] = useState(false)
+  const [showCancelPlanModal, setShowCancelPlanModal] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [planCancelled, setPlanCancelled] = useState(false);
 
   const fetchPlanDetails = async () => {
     try {
@@ -121,22 +126,103 @@ export default function PlanSettingsPage() {
           plan = planDetails?.find(plan => plan.planId === 0)
         }
         setCurrentPlanDetails(plan)
-
-        if (res) {
-          // Update so they are no longer a first time user
-          const response = fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/firsttimeuser", {
-            method: "PATCH",
-            body: JSON.stringify({ shop: shop, firstTimeUser: false }),
-            headers: { "Content-Type": "application/json" },
-          });
-        }
       });
     }
   }, [shop]);
 
-  const handleCancelSubscription = async () => {
-    console.log("TODO: Handle Cancel Subscription")
+  const openModal = () => setShowCancelPlanModal(true);
+  const closeModal = () => setShowCancelPlanModal(false);
+
+  const delay = (ms) => new Promise(res => setTimeout(res, ms));
+
+  const confirmCancelSubscription = async () => {
+    try {
+      setModalLoading(true);
+
+      const response = await authFetch("/api/billing/cancel-subscription", {
+        method: "POST",
+        body: JSON.stringify({ subscriptionId: shopData.graphqlPlanId }),
+        headers: { "Content-Type": "application/json" },
+      })
+
+      if (!response.ok) {
+        setError({ 
+          status: true, 
+          title: "Failed to cancel subscription", 
+          body: "Please try again later." 
+        })
+        await delay(1500);
+        setModalLoading(false);
+        setShowCancelPlanModal(false);
+        return
+      }
+
+
+      setError({ status: false, title: "", body: "" })
+      await delay(1500);
+      setPlanCancelled(true)
+      setModalLoading(false);
+      
+    } catch (error) {
+      setError({ 
+        status: true, 
+        title: "Failed to cancel subscription", 
+        body: "Please try again later." 
+      })
+      await delay(1500);
+      setModalLoading(false);
+      setShowCancelPlanModal(false);
+    }
   }
+
+  const handleCancelSubscription = () => {
+    openModal();
+  }
+
+  const cancelModalMarkup = (
+    <Modal
+      open={showCancelPlanModal}
+      onClose={closeModal}
+      title={planCancelled ? "Subscription Cancelled" : "Are you sure?"}
+      primaryAction={planCancelled ? 
+      {
+        content: 'Close',
+        onAction: closeModal
+      } :
+      {
+        content: 'Cancel',
+        onAction: closeModal
+      }}
+      secondaryActions={!planCancelled && [
+        {
+          content: 'Confirm',
+          onAction: confirmCancelSubscription,
+        },
+      ]}
+    >
+      {modalLoading && 
+        <Modal.Section>
+          <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+            <Spinner />
+          </div>
+        </Modal.Section>
+      }
+      {!modalLoading && planCancelled &&
+        <Modal.Section>
+          <p>
+            You're subscription has been Cancelled. If you wish to continue using the shopping assistant please select a new plan.
+          </p>
+        </Modal.Section>
+      }
+      {!modalLoading && !planCancelled &&
+        <Modal.Section>
+          <p>
+            Do you really want to cancel your subscription? Your shopping assistant will no longer appear on your website.
+          </p>
+        </Modal.Section>
+      }
+    </Modal>
+  );
 
   const loadingMarkup = isLoading ? (
       <Layout>
@@ -210,7 +296,9 @@ export default function PlanSettingsPage() {
   
             <Box minHeight="2rem"/>
             <ButtonGroup>
-              <Button onClick={handleCancelSubscription}>Cancel Subscription</Button>
+              {shopData?.subscriptionStatus === 'ACTIVE' && !planCancelled &&
+                <Button onClick={handleCancelSubscription}>Cancel Subscription</Button>
+              }
               <Button primary onClick={() => navigate("/plan")}>Change Plan</Button>
             </ButtonGroup>
   
@@ -224,11 +312,11 @@ export default function PlanSettingsPage() {
           {currentPlanDetails && 
             <PricingCard 
               planId={currentPlanDetails.planId}
-              active={true}
+              active={shopData?.subscriptionStatus === 'ACTIVE'}
               planName={currentPlanDetails.planName}
               planPrice={currentPlanDetails.monthlyPrice}
               features={currentPlanDetails.features}
-              handlePlanAction={null}
+              handleSubscribe={() => navigate('/plan')}
             />
           }
         </div>
@@ -258,6 +346,7 @@ export default function PlanSettingsPage() {
       {loadingMarkup}
       {pageMarkup}
       {pageLoadErrorMarkup}
+      {cancelModalMarkup}
     </Page>
   )
 }

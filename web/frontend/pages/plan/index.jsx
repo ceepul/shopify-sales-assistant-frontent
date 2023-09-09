@@ -123,8 +123,28 @@ export default function PlanPage() {
     }
   }, [shop]);
 
+  function getRemainingTrialDays(firstInstallDate) {
+      const trialDuration = 7;  // 7-day trial
+      const startDate = new Date(firstInstallDate);
+      const trialEndDate = new Date(startDate);
+      trialEndDate.setDate(startDate.getDate() + trialDuration);
+      
+      const currentDate = new Date();
+
+      if (currentDate > trialEndDate) {
+          return 0;  // trial has ended
+      } else {
+          // calculate the difference between current date and trial end date in milliseconds
+          const diff = trialEndDate - currentDate;
+          
+          // convert the difference to days
+          const daysRemaining = Math.ceil(diff / (1000 * 60 * 60 * 24));
+          return daysRemaining;
+      }
+  }
+
   const handleSubscribe = async ({ planId, planName, planPrice }) => {
-    const trialDays = 4 //Calculate trial days based on firstInstallDate
+    const trialDays = getRemainingTrialDays(shopData?.firstInstallDate);
     const relativeUrl = '/'
 
     try {
