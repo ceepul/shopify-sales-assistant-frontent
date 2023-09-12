@@ -5,6 +5,7 @@ import {
   Layout,
   Page,
   SkeletonBodyText,
+  Text
 } from "@shopify/polaris";
 import { useState, useEffect } from "react";
 import PlaceholderStat from "../components/PlaceholderStat";
@@ -18,7 +19,8 @@ export default function HomePage() {
     const navigate = useNavigate();
     const authFetch = useAuthenticatedFetch();
 
-    const [shopData, setShopData] = useState(null)
+    const [shopData, setShopData] = useState(null);
+    const [currentPlanDetails, setCurrentPlanDetails] = useState(null);
 
     const [shop, setShop] = useState('')
     const [isLoading, setIsLoading] = useState(true)
@@ -65,6 +67,34 @@ export default function HomePage() {
       }
     }
 
+    const fetchCurrentPlanDetails = async () => {
+      try {
+        const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/current-plan?shop=${shop}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        })  
+        if (!response.ok) {
+          setError({ 
+            status: true, 
+            title: "Failed to get shop data", 
+            body: "Please try again later." 
+          })
+          return null;
+        }
+  
+        setError({ status: false, title: "", body: "" })
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        setError({ 
+          status: true, 
+          title: "Failed to get shop data", 
+          body: "Please try again later." 
+        })
+        return null;
+      }
+    }
+
     useEffect(() => {
       setIsLoading(true);
       fetchShop()
@@ -84,9 +114,9 @@ export default function HomePage() {
 
     useEffect(() => {
       if (shop) { // Only run if shop is not an empty string
-        fetchShopData(shop).then(res => {
-          setShopData(res);
-          if (res) {
+        fetchShopData(shop).then(data => {
+          setShopData(data);
+          if (data.firstTimeUser) {
             // Update so they are no longer a first time user
             const response = fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/firsttimeuser", {
               method: "PATCH",
@@ -94,6 +124,9 @@ export default function HomePage() {
               headers: { "Content-Type": "application/json" },
             });
           }
+        });
+        fetchCurrentPlanDetails(shop).then(data => {
+          setCurrentPlanDetails(data)
         });
       }
     }, [shop]);
@@ -143,14 +176,30 @@ export default function HomePage() {
               />}
             </Layout.Section>
 
-            {/*Any banner notification would go here*/}
-
             {/*Two column stats section*/}
             <Layout.Section oneHalf>
                 <MessagesChart shop={shop} />
             </Layout.Section>
             <Layout.Section oneHalf>
                 <RecommendationEventsChart shop={shop} />
+            </Layout.Section>
+
+            <Layout.Section>
+              <AlphaCard>
+                <div style={{display: 'flex', flexDirection: 'column', gap: '0.75rem'}}>
+                    <Text variant="bodyLg">
+                      {`Messages remaining this billing cycle:`}
+                    </Text>
+                    {currentPlanDetails && shopData &&
+                      <div>
+                        <Text variant="bodyLg">
+                          <strong>{currentPlanDetails?.messagesPerMonth - shopData?.messagesThisBillingPeriod}</strong>{` /${currentPlanDetails?.messagesPerMonth}`}
+                        </Text>
+                        <Text variant="bodyMd">{`Your next billing cycle starts on ${shopData?.subscriptionEndDate}`}</Text>
+                      </div>
+                    }
+                </div>
+              </AlphaCard>
             </Layout.Section>
 
             {/*Full width stats section*/}

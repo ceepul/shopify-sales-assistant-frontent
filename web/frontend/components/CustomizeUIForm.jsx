@@ -63,6 +63,7 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
         darkMode: preferences.darkMode,
         homeScreen: preferences.homeScreen,
         welcomeMessage: preferences.welcomeMessage,
+        avatarImageSrc: preferences.avatarImageSrc,
       }
 
       const response = await fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/preferences", {
@@ -152,6 +153,14 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
     });
     setDirty(true);
   };
+
+  const handleChangeAvatar = (value) => {
+    setPreferences({
+      ...preferences,
+      avatarImageSrc: value
+    });
+    setDirty(true);
+  }
 
   const handleColorPickerVisibility = () => {
     setColorPickerVisible(prev => !prev)
@@ -336,6 +345,30 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
 
           <Box minHeight="1rem"/>
 
+          <VerticalStack gap="4">
+            <Text variant="headingMd" as="h6">Select Avatar</Text>
+            <HorizontalStack gap="4">
+              {["default_v14.png", "default_v40.png", "default_v35.png", "default_v47.png", "default_v18.png", "default_v33.png",
+                "default_v7.png", "default_v30.png", "default_v26.png", "default_v1.png", "default_v29.png", "default_v9.png"].map((src, index) => (
+                <img 
+                  key={index}
+                  src={`https://shopify-recommendation-app.s3.amazonaws.com/avatars/${src}`}
+                  alt={src}
+                  onClick={() => handleChangeAvatar(src)}
+                  style={{
+                    cursor: 'pointer',
+                    width: '64px',
+                    borderRadius: preferences?.avatarImageSrc === src ? '50%' : '0',
+                    transform: preferences?.avatarImageSrc === src ? 'scale(1.1)' : 'scale(1)',
+                    boxShadow: preferences?.avatarImageSrc === src ? '0 2px 4px 1px grey' : 'none',
+                  }}                  
+                />
+              ))}
+            </HorizontalStack>
+          </VerticalStack>
+
+          <Box minHeight="1rem"/>
+
           <SettingToggle
             enabled={preferences.homeScreen}
             handleToggle={handleToggleHomeScreen}
@@ -359,7 +392,6 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
               />
             </VerticalStack>
           }
-
         </FormLayout>
       </Form>
     </AlphaCard>

@@ -10,17 +10,19 @@ export default function WidgetDynamicUI({preferences}) {
   const [welcomeMessage, setWelcomeMessage] = useState(
     "Welcome to our store! Are there any products I could help you find?"
   );
+  const [avatarImageSrc, setAvatarImageSrc] = useState('default_v1.png')
 
   const [assistantNameFontSize, setAssistantNameFontSize] = useState('22px');
 
   useEffect(() => {
     if (preferences) {
-      const { assistantName, accentColour, darkMode, homeScreen, welcomeMessage } = preferences;
+      const { assistantName, accentColour, darkMode, homeScreen, welcomeMessage, avatarImageSrc } = preferences;
       setAssistantName(assistantName);
       setAccentColour(accentColour);
       setDarkMode(darkMode);
       setHomeScreen(homeScreen);
       setWelcomeMessage(welcomeMessage);
+      setAvatarImageSrc(avatarImageSrc)
     }
   }, [preferences]);
 
@@ -118,7 +120,7 @@ export default function WidgetDynamicUI({preferences}) {
         <div className="header-background-round" style={headerBgStyle} />
         <div className="header-background-main" style={headerBgMainStyle} />
         <div className="header-content">
-          <img className="avatar" alt="Avatar" src="../assets/avatar.png" />
+          <img className="avatar" alt="Avatar" src={`https://shopify-recommendation-app.s3.amazonaws.com/avatars/${preferences.avatarImageSrc}`} />
           <div className='title-container'>
             <div className="assistant-name" style={assistantNameStyle}>{assistantName}</div>
             <div className="assistant-subtitle" style={textColorStyle}>AI Shopping Assistant</div>

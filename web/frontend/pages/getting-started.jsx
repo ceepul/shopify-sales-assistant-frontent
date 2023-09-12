@@ -55,6 +55,7 @@ export default function GettingStartedPage() {
               <List type="bullet">
                 <List.Item>Assistant name</List.Item>
                 <List.Item>Theme color</List.Item>
+                <List.Item>Avatar icon</List.Item>
                 <List.Item>Welcome message</List.Item>
                 <List.Item>Logo visibility</List.Item>
               </List>

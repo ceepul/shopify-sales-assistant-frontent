@@ -72,7 +72,7 @@ app.get(
           },
         });
 
-        const data = contactData.body.data.shop;
+        const data = contactData?.body?.data.shop;
         shopName = data.name;
         contactEmail = data.contactEmail;
 
@@ -107,11 +107,15 @@ app.get(
                 title
                 description(truncateAt: 1500)
                 status
+                tags
                 featuredImage {
                   altText
                   src
                 }
                 priceRangeV2 {
+                  maxVariantPrice {
+                    amount
+                  }
                   minVariantPrice {
                     amount
                     currencyCode

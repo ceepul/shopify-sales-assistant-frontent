@@ -8,6 +8,10 @@ import {
   SkeletonDisplayText,
   Box,
   Banner,
+  Modal,
+  Button,
+  TextField,
+  VerticalStack
 } from "@shopify/polaris";
 import { useState, useEffect } from "react";
 import PricingCard from '../../components/PricingCard'
@@ -28,6 +32,82 @@ export default function PlanPage() {
     body: "",
   });
   const [pageLoadError, setPageLoadError] = useState(false)
+
+  const [showContactUsModal, setShowContactUsModal] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    company: '',
+    message: '',
+  });
+  const [formNameError, setFormNameError] = useState(null)
+  const [formEmailError, setFormEmailError] = useState(null)
+  const [formCompanyError, setFormCompanyError] = useState(null)
+  const [formMessageError, setFormMessageError] = useState(null)
+
+  const handleFormInputChange = (field) => (value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
+  };
+
+  const validateFormName = (value) => {
+    if (value.trim() === '') {
+      setFormNameError('Name cannot be blank.');
+      return false;
+    }
+    setFormNameError(null);
+    return true;
+  };
+
+  const validateFormEmail = (value) => {
+    if (value.trim() === '') {
+      setFormEmailError('Email cannot be blank.');
+      return false;
+    }
+    setFormEmailError(null);
+    return true;
+  };
+
+  const validateFormCompany = (value) => {
+    if (value.trim() === '') {
+      setFormCompanyError('Company cannot be blank.');
+      return false;
+    }
+    setFormCompanyError(null);
+    return true;
+  };
+
+  const validateFormMessage = (value) => {
+    if (value.trim().length > 3000) {
+        setFormMessageError('Message cannot be greater than 3000 characters');
+        return false;
+    }
+    setFormMessageError(null);
+    return true;
+  };
+  
+  const handleContactFormSubmit = () => {
+    const isValidName = validateFormName(formData.name)
+    const isValidEmail = validateFormEmail(formData.email)
+    const isValidCompany = validateFormCompany(formData.company)
+    const isValidMessage = validateFormMessage(formData.message)
+
+    if (!isValidName || !isValidEmail || !isValidCompany || !isValidMessage) return;
+
+    // Handle form submission. For now, simply log the formData.
+    console.log(formData);
+  
+    // After submission, close the modal and clear the form fields.
+    setShowContactUsModal(false);
+    setFormData({
+      name: '',
+      email: '',
+      company: '',
+      message: '',
+    });
+  };
 
   const fetchPlanDetails = async () => {
     try {
@@ -123,8 +203,7 @@ export default function PlanPage() {
     }
   }, [shop]);
 
-  function getRemainingTrialDays(firstInstallDate) {
-      const trialDuration = 7;  // 7-day trial
+  function getRemainingTrialDays(firstInstallDate, trialDuration) {
       const startDate = new Date(firstInstallDate);
       const trialEndDate = new Date(startDate);
       trialEndDate.setDate(startDate.getDate() + trialDuration);
@@ -143,8 +222,8 @@ export default function PlanPage() {
       }
   }
 
-  const handleSubscribe = async ({ planId, planName, planPrice }) => {
-    const trialDays = getRemainingTrialDays(shopData?.firstInstallDate);
+  const handleSubscribe = async ({ planId, planName, planPrice, trialDuration }) => {
+    const trialDays = getRemainingTrialDays(shopData?.firstInstallDate, trialDuration);
     const relativeUrl = '/'
 
     try {
@@ -232,6 +311,7 @@ export default function PlanPage() {
                 planName={planDetails[1].planName}
                 planPrice={planDetails[1].monthlyPrice}
                 features={planDetails[1].features}
+                trialDuration={planDetails[1].trialDuration}
                 handleSubscribe={(props) => handleSubscribe(props)}
               />
             </div>
@@ -241,10 +321,11 @@ export default function PlanPage() {
               <PricingCard 
                 planId={planDetails[2].planId}
                 active={shopData?.subscriptionStatus === 'ACTIVE' && shopData?.planId === planDetails[2].planId}
+                primary
                 planName={planDetails[2].planName}
                 planPrice={planDetails[2].monthlyPrice}
                 features={planDetails[2].features}
-                primary
+                trialDuration={planDetails[2].trialDuration}
                 handleSubscribe={(props) => handleSubscribe(props)}
               />
             </div>
@@ -257,8 +338,87 @@ export default function PlanPage() {
                 planName={planDetails[3].planName}
                 planPrice={planDetails[3].monthlyPrice}
                 features={planDetails[3].features}
+                trialDuration={planDetails[3].trialDuration}
                 handleSubscribe={(props) => handleSubscribe(props)}
               />
+            </div>
+          </Layout.Section>
+
+          {/* Request Custom Plan Section */}
+          <Layout.Section>
+            <div style={{
+                position: 'relative',
+                textAlign: 'center',
+                marginBottom: '30px'
+            }}>
+              <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
+                <Text variant="headingLg">Can't find a plan that suits your needs?</Text>
+                <div style={{ maxWidth: '600px' }}>
+                  <Text>
+                    We understand that every business is unique. If our available plans don't meet your requirements,
+                    let us know! We're here to tailor a custom plan just for you.
+                  </Text>
+                </div>
+                <Button onClick={() => setShowContactUsModal(true)}>
+                  Request Custom Plan
+                </Button>
+              </div>
+  
+              <Modal
+                open={showContactUsModal}
+                onClose={() => setShowContactUsModal(false)}
+                title="Request a Custom Plan"
+                primaryAction={{
+                  content: 'Send Request',
+                  onAction: handleContactFormSubmit,
+                }}
+                secondaryActions={[
+                  {
+                    content: 'Cancel',
+                    onAction: () => setShowContactUsModal(false),
+                  },
+                ]}
+              >
+                <Modal.Section>
+                  <VerticalStack gap='6'>
+                    <TextField
+                      label="Name"
+                      value={formData.name}
+                      placeholder="Name"
+                      onChange={handleFormInputChange('name')}
+                      required
+                      error={formNameError}
+                    />
+                    <TextField
+                      label="Email"
+                      type="email"
+                      value={formData.email}
+                      placeholder="Email"
+                      onChange={handleFormInputChange('email')}
+                      required
+                      error={formEmailError}
+                    />
+                    <TextField
+                      label="Company"
+                      value={formData.company}
+                      placeholder="Company"
+                      onChange={handleFormInputChange('company')}
+                      required
+                      error={formCompanyError}
+                    />
+                    <TextField
+                      label="Message"
+                      value={formData.message}
+                      placeholder="Tell us a bit about your company's needs..."
+                      onChange={handleFormInputChange('message')}
+                      multiline={3}
+                      error={formMessageError}
+                      helpText={`${formData.message.length}/3000 characters`} 
+                    />
+                    <Text variant="bodyMd">Our team will reach out to you within 2 business days to discuss a tailored solution for your business.</Text>
+                  </VerticalStack>
+                </Modal.Section>
+              </Modal>
             </div>
           </Layout.Section>
         </Layout>

@@ -555,7 +555,6 @@ class ChatWidget extends HTMLElement {
         return;  // Exit the function if no preferences are fetched
       }
 
-      const avatarURL = this.getAttribute('data-avatar-url');
       const closeIconURL = this.getAttribute('data-close-icon-url');
       const closeIconDarkURL = this.getAttribute('data-close-icon-dark-url');
       const infoIconURL = this.getAttribute('data-info-icon-url');
@@ -588,7 +587,7 @@ class ChatWidget extends HTMLElement {
         preferences.assistantName,
         preferences.homeScreen,
         preferences.welcomeMessage,
-        avatarURL, 
+        preferences.avatarImageSrc,
         infoIconURL, 
         infoIconDarkURL,
         closeIconURL,
@@ -725,7 +724,7 @@ class ChatBox extends HTMLDivElement {
     assistantName,  
     homeScreen,
     welcomeMessage,
-    avatarURL, 
+    avatarImageSrc, 
     infoIconURL, 
     infoIconDarkURL, 
     closeIconURL, 
@@ -740,7 +739,7 @@ class ChatBox extends HTMLDivElement {
     this.position = position;
     this.accentColor = accentColor;
     this.assistantName = assistantName;
-    this.avatarURL = avatarURL;
+    this.avatarImageSrc = avatarImageSrc;
     this.sendIconURL = sendIconURL;
     this.capabilitiesIconURL = capabilitiesIconURL;
     this.accentRgb = hexToRgb(accentColor);
@@ -801,7 +800,7 @@ class ChatBox extends HTMLDivElement {
         <div class="header-background-round" style="${bgColorStyle}"></div>
         <div class="header-background-main" style="${bgGradientColorStyle}"></div>
         <div class="header-content">
-          <img class="avatar" alt="Avatar" src="${this.avatarURL}" />
+          <img class="avatar" alt="Avatar" src="https://shopify-recommendation-app.s3.amazonaws.com/avatars/${this.avatarImageSrc}" />
           <div class='title-container'>
             <div class="assistant-name" style="${textColorStyle}">${this.assistantName}</div>
             <div class="assistant-subtitle" style="${textColorStyle}">AI Shopping Assistant</div>

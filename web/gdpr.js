@@ -11,8 +11,12 @@ export default {
    * https://shopify.dev/docs/apps/webhooks/configuration/mandatory-webhooks#customers-data_request
    */
   CUSTOMERS_DATA_REQUEST: {
-    deliveryMethod: DeliveryMethod.EventBridge,
-    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/48101949441/shopify-recommendation-app'
+    deliveryMethod: DeliveryMethod.Http,
+    callbackUrl: "https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/webhooks/customers/data-request",
+    callback: async (topic, shop, body, webhookId) => {
+      const payload = JSON.parse(body);
+      console.log('Customer Data Request with payload: ', payload)
+    },
       // Payload has the following shape:
       // {
       //   "shop_id": 954889,
@@ -40,8 +44,12 @@ export default {
    * https://shopify.dev/docs/apps/webhooks/configuration/mandatory-webhooks#customers-redact
    */
   CUSTOMERS_REDACT: {
-    deliveryMethod: DeliveryMethod.EventBridge,
-    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/48101949441/shopify-recommendation-app'
+    deliveryMethod: DeliveryMethod.Http,
+    callbackUrl: "https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/webhooks/customers/redact",
+    callback: async (topic, shop, body, webhookId) => {
+      const payload = JSON.parse(body);
+      console.log('Customer Redact with payload: ', payload)
+    },
       // Payload has the following shape:
       // {
       //   "shop_id": 954889,
@@ -66,8 +74,12 @@ export default {
    * https://shopify.dev/docs/apps/webhooks/configuration/mandatory-webhooks#shop-redact
    */
   SHOP_REDACT: {
-    deliveryMethod: DeliveryMethod.EventBridge,
-    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/48101949441/shopify-recommendation-app'
+    deliveryMethod: DeliveryMethod.Http,
+    callbackUrl: "https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/webhooks/shop/redact",
+    callback: async (topic, shop, body, webhookId) => {
+      const payload = JSON.parse(body);
+      console.log('Shop Redact with payload: ', payload)
+    },
       // Payload has the following shape:
       // {
       //   "shop_id": 954889,

@@ -6,13 +6,14 @@ import {
 } from '@shopify/polaris-icons';
 import './PricingCard.css'
 
-export default function PricingCard({ planId, active, primary, planName, planPrice, features, handleSubscribe }) {
+export default function PricingCard({ planId, active, primary, planName, planPrice, features, trialDuration, handleSubscribe }) {
 
   const onClick = () => {
     handleSubscribe({
       planId: planId,
       planName: planName,
-      planPrice: planPrice
+      planPrice: planPrice,
+      trialDuration: trialDuration
     })
   }
 

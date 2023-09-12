@@ -38,7 +38,7 @@ export default function CustomizePage() {
     darkMode: false,
     homeScreen: true,
     welcomeMessage: "Welcome to our store! Are there any products I could help you find?",
-    logoVisible: true,
+    avatarImageSrc: "default_v1.png"
   });
 
   const authFetch = useAuthenticatedFetch()
