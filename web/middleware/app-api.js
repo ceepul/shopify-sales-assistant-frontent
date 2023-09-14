@@ -63,6 +63,10 @@ export default function applyAppApiEndpoints(app) {
     res.status(200).send(res.locals.shopify.session);
   });
 
+  app.get("/api/chat-widget-id", async (req, res) => {
+    res.status(200).send(process.env.SHOPIFY_CHAT_WIDGET_ID);
+  })
+
   /*
     Expect body to contain
     planName: string

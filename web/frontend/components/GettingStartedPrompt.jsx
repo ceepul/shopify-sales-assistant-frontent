@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Text,
   ButtonGroup,
@@ -10,6 +10,7 @@ import {
   AppExtensionMinor,
   CancelMinor
 } from '@shopify/polaris-icons';
+import { useAuthenticatedFetch } from "@shopify/app-bridge-react";
 import './GettingStartedPrompt.css'
 
 export default function GettingStartedPrompt({ isActive, onClose, shop }) {
@@ -17,11 +18,27 @@ export default function GettingStartedPrompt({ isActive, onClose, shop }) {
   const [showConfirmClose, setShowConfirmClose] = useState(false);
   const [showConfirmSkip, setShowConfirmSkip] = useState(false);
   const [nextPageDisabled, setNextPageDisabled] = useState(true)
+  const [uuid, setUuid] = useState(null);
 
-  // TODO!: Use ENV*** not hard code. Test link after app embed deployment!
-  const uuid = process.env.PINECONE_API_KEY
+  const authFetch = useAuthenticatedFetch();
+
+  const fetchUUID = async () => {
+    const uuid = await authFetch("/api/chat-widget-id", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }).then((response) => response.text());
+    return uuid;
+  }
+
+  useEffect(() => {
+    fetchUUID()
+      .then((uuid) => {
+        setUuid(uuid);
+      }) 
+  }, []);
+
   const appEmbedLink = `
-    https://${shop}/admin/themes/current/editor?context=apps&template={template}&activateAppId=413a2e29-7e30-4a16-a578-7cf277fd216d/app-embed
+    https://${shop}/admin/themes/current/editor?context=apps&template={template}&activateAppId=${uuid}/app-embed
   `;
 
   const handleNext = () => {

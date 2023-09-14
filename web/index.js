@@ -185,6 +185,7 @@ app.use(express.json());
 applyAppApiEndpoints(app);
 
 app.use(shopify.cspHeaders());
+
 app.use(serveStatic(STATIC_PATH, { index: false }));
 
 app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {

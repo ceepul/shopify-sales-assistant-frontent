@@ -1,3 +1,33 @@
-# This file stores configurations for your Shopify app.
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-scopes = "write_products, read_discounts"
+name = "ShopMate"
+client_id = "00b9d7b9050ab1573a521a60dc8cebfe"
+application_url = "https://wn-console-recordings-situated.trycloudflare.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_products"
+use_legacy_install_flow = true
+
+[auth]
+redirect_urls = [
+  "https://wn-console-recordings-situated.trycloudflare.com/auth/callback",
+  "https://wn-console-recordings-situated.trycloudflare.com/auth/shopify/callback",
+  "https://wn-console-recordings-situated.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2023-07"
+
+  [webhooks.privacy_compliance]
+  customer_deletion_url = "https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/webhooks/customers/redact"
+  customer_data_request_url = "https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/webhooks/customers/data-request"
+  shop_deletion_url = "https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/webhooks/shop/redact"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "ceepul-dev-store.myshopify.com"
