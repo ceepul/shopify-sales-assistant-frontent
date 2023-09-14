@@ -2,11 +2,16 @@ import { useNavigate, useAuthenticatedFetch, TitleBar, Loading } from "@shopify/
 import {
   AlphaCard,
   Banner,
+  Icon,
   Layout,
   Page,
   SkeletonBodyText,
   Text
 } from "@shopify/polaris";
+import {
+  ChatMajor,
+  CalendarMajor
+} from '@shopify/polaris-icons';
 import { useState, useEffect } from "react";
 import PlaceholderStat from "../components/PlaceholderStat";
 import MessagesChart from "../components/MessagesChart";
@@ -14,6 +19,9 @@ import RecommendationEventsChart from "../components/RecommendationEventsChart";
 import ProductStatsTable from "../components/ProductStatsTable";
 import GettingStartedPrompt from "../components/GettingStartedPrompt";
 import SubscriptionStatusBanner from "../components/SubscriptionStatusBanner";
+import StatCardSmall from "../components/StatCardSmall";
+import PlaceholderStatSmall from "../components/PlaceHolderStatSmall";
+import ProductViewsCardSmall from "../components/ProductViewsCardSmall";
 
 export default function HomePage() {
     const navigate = useNavigate();
@@ -131,9 +139,31 @@ export default function HomePage() {
       }
     }, [shop]);
 
+    function formatDateToMonthDay(dateString) {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      
+      const parts = dateString.split('-');
+      const date = new Date(parts[0], parts[1] - 1, parts[2]);  // Subtracting 1 from month since months are 0-indexed in JS Date
+      
+      const month = months[date.getMonth()];
+      const day = String(date.getDate()).padStart(2, '0');  // This ensures the day is always two digits
+  
+      return `${month} ${day}`;
+    }
+
     const loadingMarkup = isLoading ? (
         <Layout>
           <Loading />
+          <Layout.Section oneThird>
+            <PlaceholderStatSmall />
+          </Layout.Section>
+          <Layout.Section oneThird>
+            <PlaceholderStatSmall />
+          </Layout.Section>
+          <Layout.Section oneThird>
+            <PlaceholderStatSmall />
+          </Layout.Section>
+
           <Layout.Section oneHalf>
               <PlaceholderStat />
           </Layout.Section>
@@ -168,12 +198,53 @@ export default function HomePage() {
               {shopData && 
               <SubscriptionStatusBanner 
                   firstInstallDate={shopData.firstInstallDate}
+                  subscriptionId={shopData.planId}
                   subscriptionStatus={shopData.subscriptionStatus}
                   subscriptionStartDate={shopData.subscriptionStartDate}
                   subscriptionEndDate={shopData.subscriptionEndDate}
-                  allowedMessages={10}
+                  allowedMessages={currentPlanDetails?.messagesPerMonth}
                   messagesThisBillingPeriod={shopData.messagesThisBillingPeriod}
               />}
+            </Layout.Section>
+
+            <Layout.Section oneThird>
+              <StatCardSmall 
+                heading={'Messages'}
+                headingData={
+                  <div style={{display: 'flex', alignItems: 'baseline', gap: '0.25rem'}}>
+                    <Text variant="heading2xl">{shopData?.messagesThisBillingPeriod}</Text>
+                    <Text variant="bodyMd">{currentPlanDetails?.messagesPerMonth && `/${currentPlanDetails.messagesPerMonth}`}</Text>
+                  </div>
+                }
+                subHeading={'This usage cycle'}
+                badgeStatus={
+                  !currentPlanDetails ? 'info' : (
+                  shopData?.messagesThisBillingPeriod / currentPlanDetails?.messagesPerMonth < 0.8 ? 'info' : 
+                  shopData?.messagesThisBillingPeriod / currentPlanDetails?.messagesPerMonth < 1 ? 'warning' : 'critical')
+                }
+                badgeData={currentPlanDetails && 
+                  `${shopData?.messagesThisBillingPeriod / currentPlanDetails?.messagesPerMonth}%`
+                }
+                icon={<Icon source={ChatMajor} color="subdued"/>}
+              />
+            </Layout.Section>
+
+            <Layout.Section oneThird>
+              <ProductViewsCardSmall shop={shop} subscriptionStartDate={shopData?.subscriptionStartDate}/>
+            </Layout.Section>
+
+            <Layout.Section oneThird>
+              <StatCardSmall 
+                heading={'Current Period'}
+                headingData={
+                    <Text variant="headingXl">
+                      {shopData && `${formatDateToMonthDay(shopData?.subscriptionStartDate)} - ${formatDateToMonthDay(shopData?.subscriptionEndDate)}`}
+                    </Text>}
+                subHeading = {
+                  `${Math.ceil((new Date(shopData?.subscriptionEndDate) - new Date()) / (1000 * 60 * 60 * 24))} days remaining in this usage cycle`
+                }
+                icon={<Icon source={CalendarMajor} color="base"/>}
+              />
             </Layout.Section>
 
             {/*Two column stats section*/}
@@ -182,24 +253,6 @@ export default function HomePage() {
             </Layout.Section>
             <Layout.Section oneHalf>
                 <RecommendationEventsChart shop={shop} />
-            </Layout.Section>
-
-            <Layout.Section>
-              <AlphaCard>
-                <div style={{display: 'flex', flexDirection: 'column', gap: '0.75rem'}}>
-                    <Text variant="bodyLg">
-                      {`Messages remaining this billing cycle:`}
-                    </Text>
-                    {currentPlanDetails && shopData &&
-                      <div>
-                        <Text variant="bodyLg">
-                          <strong>{currentPlanDetails?.messagesPerMonth - shopData?.messagesThisBillingPeriod}</strong>{` /${currentPlanDetails?.messagesPerMonth}`}
-                        </Text>
-                        <Text variant="bodyMd">{`Your next billing cycle starts on ${shopData?.subscriptionEndDate}`}</Text>
-                      </div>
-                    }
-                </div>
-              </AlphaCard>
             </Layout.Section>
 
             {/*Full width stats section*/}

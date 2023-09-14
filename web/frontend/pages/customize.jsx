@@ -138,12 +138,13 @@ export default function CustomizePage() {
                 <Box minHeight="1rem"/>
                 <SkeletonBodyText />
                 <Box minHeight="1rem"/>
+
+                <Box minHeight="2rem" />
   
-                {/*<Box minHeight="2.5rem" />
-  
-                <Text variant="headingMd" as="h6">Dark Mode</Text>
-                <Box minHeight="0.5rem"/>
-                <SkeletonBodyText /> */}
+                <Text variant="headingMd" as="h6">Select Avatar</Text>
+                <Box minHeight="1rem"/>
+                <SkeletonBodyText />
+                <Box minHeight="1rem"/>
   
                 <Box minHeight="2.5rem" />
   

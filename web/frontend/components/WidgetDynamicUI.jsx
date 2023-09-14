@@ -27,7 +27,9 @@ export default function WidgetDynamicUI({preferences}) {
   }, [preferences]);
 
   useEffect(() => {
-    if (assistantName.length > 13) {
+    if (assistantName.length > 16) {
+      setAssistantNameFontSize('18px')
+    } else if (assistantName.length > 13) {
       setAssistantNameFontSize('20px')
     } else setAssistantNameFontSize('22px')
   }, [assistantName]);

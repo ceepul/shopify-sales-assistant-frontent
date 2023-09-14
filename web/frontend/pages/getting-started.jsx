@@ -87,17 +87,20 @@ export default function GettingStartedPage() {
         </Layout.Section>
 
         {/* Additional Resources */}
-        {/*<Layout.Section>
-          <AlphaCard title="Additional Resources" sectioned>
-            <Text variant="headingLg">Additional Resources</Text>
-            <Box minHeight="1rem"/>
-            <Text variant="headingMd">Learn More</Text>
-            <Box minHeight="0.5rem"/>
-              <p>
-                For more detailed information, visit our <Link url="https://example.com/documentation">documentation</Link> or <Link url="https://example.com/faq">FAQ</Link>.
-              </p>
-          </AlphaCard>
-        </Layout.Section>*/}
+        <Layout.Section>
+            <AlphaCard title="Additional Resources" sectioned>
+                <Text variant="headingLg">Need Help?</Text>
+                <Box minHeight="1rem" />
+                
+                <Text variant="headingMd">Support</Text>
+                <Box minHeight="0.5rem" />
+                
+                <Text>
+                    Our dedicated team is always ready to assist. For any queries, please email us at: support@shopmateapp.com.
+                </Text>
+                <Box minHeight="0.5rem" />
+            </AlphaCard>
+        </Layout.Section>
       </Layout>
     </Page>
   );

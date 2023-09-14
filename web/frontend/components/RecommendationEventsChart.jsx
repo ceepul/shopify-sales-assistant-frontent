@@ -77,7 +77,6 @@ export default function RecommendationEventsChart({ shop }) {
         setError({ status: false, title: "", body: "" });
   
       } catch (error) {
-        console.error('There was an error fetching recommendation data:', error);
         setError({
           status: true, 
           title: "Could not load recommendations", 

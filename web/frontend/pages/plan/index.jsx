@@ -11,9 +11,12 @@ import {
   Modal,
   Button,
   TextField,
-  VerticalStack
+  VerticalStack,
+  Frame,
+  Spinner,
+  Toast
 } from "@shopify/polaris";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import PricingCard from '../../components/PricingCard'
 
 export default function PlanPage() {
@@ -40,10 +43,17 @@ export default function PlanPage() {
     company: '',
     message: '',
   });
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false)
+  const [formSubmitionError, setFormSubmitionError] = useState(false)
   const [formNameError, setFormNameError] = useState(null)
   const [formEmailError, setFormEmailError] = useState(null)
   const [formCompanyError, setFormCompanyError] = useState(null)
   const [formMessageError, setFormMessageError] = useState(null)
+
+  const [toastActive, setToastActive] = useState(false);
+  const toggleToast = useCallback(() => {
+    setToastActive((active) => !active)
+  }, []);
 
   const handleFormInputChange = (field) => (value) => {
     setFormData((prevData) => ({
@@ -88,7 +98,7 @@ export default function PlanPage() {
     return true;
   };
   
-  const handleContactFormSubmit = () => {
+  const handleContactFormSubmit = async () => {
     const isValidName = validateFormName(formData.name)
     const isValidEmail = validateFormEmail(formData.email)
     const isValidCompany = validateFormCompany(formData.company)
@@ -96,17 +106,40 @@ export default function PlanPage() {
 
     if (!isValidName || !isValidEmail || !isValidCompany || !isValidMessage) return;
 
-    // Handle form submission. For now, simply log the formData.
+    // Handle form submission
     console.log(formData);
-  
-    // After submission, close the modal and clear the form fields.
-    setShowContactUsModal(false);
-    setFormData({
-      name: '',
-      email: '',
-      company: '',
-      message: '',
-    });
+    try {
+      setIsFormSubmitting(true);
+      setFormSubmitionError(false);
+      const body = {
+        shop: shop,
+        name: formData.name,
+        email: formData.email,
+        company: formData.company,
+        message: formData.message,
+      }
+
+      const response = await fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/email/request-custom-plan", {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        setFormSubmitionError(true);
+        setIsFormSubmitting(false);
+        return
+      }
+
+      setFormData({ name: '', email: '', company: '', message: '' });
+      setShowContactUsModal(false);
+      setIsFormSubmitting(false);
+      toggleToast();
+
+    } catch (error) {
+      setFormSubmitionError(true);
+      setIsFormSubmitting(false);
+    }
   };
 
   const fetchPlanDetails = async () => {
@@ -366,7 +399,10 @@ export default function PlanPage() {
   
               <Modal
                 open={showContactUsModal}
-                onClose={() => setShowContactUsModal(false)}
+                onClose={() => {
+                  setShowContactUsModal(false);
+                  setFormSubmitionError(false);
+                }}
                 title="Request a Custom Plan"
                 primaryAction={{
                   content: 'Send Request',
@@ -375,48 +411,70 @@ export default function PlanPage() {
                 secondaryActions={[
                   {
                     content: 'Cancel',
-                    onAction: () => setShowContactUsModal(false),
+                    onAction: () => {
+                      setShowContactUsModal(false);
+                      setFormSubmitionError(false);
+                    },
                   },
                 ]}
               >
                 <Modal.Section>
-                  <VerticalStack gap='6'>
-                    <TextField
-                      label="Name"
-                      value={formData.name}
-                      placeholder="Name"
-                      onChange={handleFormInputChange('name')}
-                      required
-                      error={formNameError}
-                    />
-                    <TextField
-                      label="Email"
-                      type="email"
-                      value={formData.email}
-                      placeholder="Email"
-                      onChange={handleFormInputChange('email')}
-                      required
-                      error={formEmailError}
-                    />
-                    <TextField
-                      label="Company"
-                      value={formData.company}
-                      placeholder="Company"
-                      onChange={handleFormInputChange('company')}
-                      required
-                      error={formCompanyError}
-                    />
-                    <TextField
-                      label="Message"
-                      value={formData.message}
-                      placeholder="Tell us a bit about your company's needs..."
-                      onChange={handleFormInputChange('message')}
-                      multiline={3}
-                      error={formMessageError}
-                      helpText={`${formData.message.length}/3000 characters`} 
-                    />
-                    <Text variant="bodyMd">Our team will reach out to you within 2 business days to discuss a tailored solution for your business.</Text>
-                  </VerticalStack>
+                  {formSubmitionError && 
+                    <div>
+                      <Banner 
+                        title={'Failed to send request'} 
+                        onDismiss={() => {setFormSubmitionError(false)}}
+                        status="critical"
+                      >
+                          <p>{'We could not send your request. Please try again later.'}</p>
+                      </Banner>
+                      <Box minHeight="1rem"/>
+                    </div>
+                  }
+                  {isFormSubmitting && 
+                    <div style={{minHeight: '28rem', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                      <Spinner />
+                    </div>
+                  }
+                  {!isFormSubmitting && 
+                    <VerticalStack gap='6'>
+                      <TextField
+                        label="Name"
+                        value={formData.name}
+                        placeholder="Name"
+                        onChange={handleFormInputChange('name')}
+                        required
+                        error={formNameError}
+                      />
+                      <TextField
+                        label="Email"
+                        type="email"
+                        value={formData.email}
+                        placeholder="Email"
+                        onChange={handleFormInputChange('email')}
+                        required
+                        error={formEmailError}
+                      />
+                      <TextField
+                        label="Company"
+                        value={formData.company}
+                        placeholder="Company"
+                        onChange={handleFormInputChange('company')}
+                        required
+                        error={formCompanyError}
+                      />
+                      <TextField
+                        label="Message"
+                        value={formData.message}
+                        placeholder="Tell us a bit about your company's needs..."
+                        onChange={handleFormInputChange('message')}
+                        multiline={3}
+                        error={formMessageError}
+                        helpText={`${formData.message.length}/3000 characters`} 
+                      />
+                      <Text variant="bodyMd">Our team will reach out to you within 2 business days to discuss a tailored solution for your business.</Text>
+                    </VerticalStack>
+                  }
                 </Modal.Section>
               </Modal>
             </div>
@@ -442,31 +500,34 @@ export default function PlanPage() {
   ) : null
 
   return (
-    <Page fullWidth>
-      <TitleBar
-        title="Plan"
-        breadcrumbs={breadcrumbs}
-        primaryAction={{
-          content: "Plan Settings",
-          onAction: () => navigate("/plan/settings")
-        }}
-      />
-      {/* Error banner */}
-      {error.status === true && 
-        <>
-          <Banner 
-            title={error.title} 
-            onDismiss={() => {setError({status: false, title: "", body: ""})}}
-            status="critical"
-          >
-              <p>{error.body}</p>
-          </Banner>
-          <Box minHeight="1rem" />
-        </>
-      }
-      {loadingMarkup}
-      {pageMarkup}
-      {pageLoadErrorMarkup}
-    </Page>
+    <Frame>
+      <Page fullWidth>
+        <TitleBar
+          title="Plan"
+          breadcrumbs={breadcrumbs}
+          primaryAction={{
+            content: "Plan Settings",
+            onAction: () => navigate("/plan/settings")
+          }}
+        />
+        {toastActive && <Toast content="Request Sent" onDismiss={toggleToast} />}
+        {/* Error banner */}
+        {error.status === true && 
+          <>
+            <Banner 
+              title={error.title} 
+              onDismiss={() => {setError({status: false, title: "", body: ""})}}
+              status="critical"
+            >
+                <p>{error.body}</p>
+            </Banner>
+            <Box minHeight="1rem" />
+          </>
+        }
+        {loadingMarkup}
+        {pageMarkup}
+        {pageLoadErrorMarkup}
+      </Page>
+    </Frame>
   )
 }

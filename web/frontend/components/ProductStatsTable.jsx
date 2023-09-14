@@ -47,7 +47,6 @@ export default function ProductStatsTable({ shop }) {
         setError({ status: false, title: "", body: "" });
   
       } catch (error) {
-        console.error('There was an error fetching product data:', error);
         setError({
           status: true, 
           title: "Could not load products", 
@@ -153,7 +152,6 @@ const formatData = (products) => {
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <img 
           src={product.imageSrc ? product.imageSrc : null} 
-          alt={product.imageAlt ? product.imageAlt : null}
           style={{ width: '40px', height: '40px', marginRight: '10px' }} />
         {product.title}
       </div>,

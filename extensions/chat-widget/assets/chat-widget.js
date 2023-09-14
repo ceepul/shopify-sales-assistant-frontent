@@ -554,6 +554,9 @@ class ChatWidget extends HTMLElement {
         console.error('Failed to fetch shopping assistant preferences');
         return;  // Exit the function if no preferences are fetched
       }
+      if (preferences.overLimit) {
+        return; // Exit the funciton if shop is overlimit
+      }
 
       const closeIconURL = this.getAttribute('data-close-icon-url');
       const closeIconDarkURL = this.getAttribute('data-close-icon-dark-url');
@@ -788,6 +791,11 @@ class ChatBox extends HTMLDivElement {
       color: ${this.luminance > 0.7 ? '#2a2a2a' : '#ffffff'}
     `;
 
+    const assistantNameStyle = `
+      color: ${this.luminance > 0.7 ? '#2a2a2a' : '#ffffff'};
+      font-size: ${this.assistantName.length > 16 ? '18px' : this.assistantName.length > 13 ? '20px' : '22px'};
+    `;
+
     const poweredByNameStyle = `
       color: ${this.luminance > 0.7 ? '#2a2a2a' : this.accentColor}
     `;
@@ -802,7 +810,7 @@ class ChatBox extends HTMLDivElement {
         <div class="header-content">
           <img class="avatar" alt="Avatar" src="https://shopify-recommendation-app.s3.amazonaws.com/avatars/${this.avatarImageSrc}" />
           <div class='title-container'>
-            <div class="assistant-name" style="${textColorStyle}">${this.assistantName}</div>
+            <div class="assistant-name" style="${assistantNameStyle}">${this.assistantName}</div>
             <div class="assistant-subtitle" style="${textColorStyle}">AI Shopping Assistant</div>
           </div>
           <div class='info-icon-container'>

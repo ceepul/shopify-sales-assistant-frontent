@@ -5,24 +5,25 @@ CREATE TABLE subscription_plans (
     monthly_price DECIMAL(10, 2) NOT NULL,
     trial_duration INT NOT NULL,
     usage_price DECIMAL(10, 2),
-    messages_per_month INT,
+    messages_per_month INT NOT NULL,
+    faqs_allowed INT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month)
-VALUES (0, 'Free Trial', ARRAY['300 messages', 'Seamless integration', 'UI customization'], 0.00, 7, NULL, 300);
+INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month, faqs_allowed)
+VALUES (0, 'Free Trial', ARRAY['300 messages', 'Seamless integration', 'UI customization', '25 frequently asked questions'], 0.00, 7, NULL, 300, 25);
 
-INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month)
-VALUES (1, 'Basic', ARRAY['2000 messages per month', 'Seamless integration', 'UI customization'], 49.00, 7, NULL, 2000);
+INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month, faqs_allowed)
+VALUES (1, 'Basic', ARRAY['2000 messages per month', 'Seamless integration', 'UI customization', '25 frequently asked questions'], 49.00, 7, NULL, 2000, 25);
 
-INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month)
-VALUES (2, 'Entreprenuer', ARRAY['5000 messages per month', 'Seamless integration', 'UI customization'], 89.00, 7, NULL, 5000);
+INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month, faqs_allowed)
+VALUES (2, 'Entreprenuer', ARRAY['5000 messages per month', 'Seamless integration', 'UI customization', '100 frequently asked questions'], 89.00, 7, NULL, 5000, 100);
 
-INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month)
-VALUES (3, 'Scale', ARRAY['15000 messages per month', 'Seamless integration', 'UI customization', 'Remove Logo'], 219.00, 7, NULL, 15000);
+INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month, faqs_allowed)
+VALUES (3, 'Scale', ARRAY['15000 messages per month', 'Seamless integration', 'UI customization', '300 frequently asked questions'], 219.00, 7, NULL, 15000, 300);
 
-INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month)
-VALUES (4, 'Enterprise', ARRAY['40000 messages per month', 'Seamless integration', 'UI customization', 'Remove Logo'], 449.00, 7, 0.01, 40000);
+INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month, faqs_allowed)
+VALUES (4, 'Enterprise', ARRAY['40000 messages per month', 'Seamless integration', 'UI customization', '1000 frequently asked questions'], 449.00, 0, 0.01, 40000, 1000);
 
 CREATE TABLE shops (
     id SERIAL PRIMARY KEY,
@@ -33,10 +34,10 @@ CREATE TABLE shops (
     first_install_date DATE,
     plan_id INTEGER, 
     graphql_plan_id VARCHAR(255),
-    subscription_start_date DATE,
-    subscription_end_date DATE,
+    subscription_start_date DATE DEFAULT CURRENT_DATE,
+    subscription_end_date DATE DEFAULT (CURRENT_DATE + INTERVAL '7 days'),
     subscription_status VARCHAR(50),
-    subscription_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+    subscription_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     messages_this_billing_period INTEGER,
     pinecone_db_index VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -54,6 +55,7 @@ CREATE TABLE shop_preferences (
     welcome_message TEXT,
     home_screen BOOLEAN DEFAULT FALSE,
     over_limit BOOLEAN DEFAULT FALSE,
+    hide_logo BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (shop) REFERENCES shops(shop) ON DELETE CASCADE
 );

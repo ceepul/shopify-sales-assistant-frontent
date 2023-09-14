@@ -22,7 +22,6 @@ export default function PlanSettingsPage() {
   const authFetch = useAuthenticatedFetch();
   const navigate = useNavigate();
 
-  const [planDetails, setPlanDetails] = useState(null)
   const [currentPlanDetails, setCurrentPlanDetails] = useState(null)
 
   const [shop, setShop] = useState('')
@@ -38,26 +37,6 @@ export default function PlanSettingsPage() {
   const [modalLoading, setModalLoading] = useState(false);
   const [planCancelled, setPlanCancelled] = useState(false);
 
-  const fetchPlanDetails = async () => {
-    try {
-      const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/plans`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      })  
-      if (!response.ok) {
-        setPageLoadError(true)
-        return null;
-      }
-
-      setPageLoadError(false)
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      setPageLoadError(true)
-      return null;
-    }
-  }
-
   const fetchShop = async () => {
     const shop = await authFetch("/api/shop", {
       method: "GET",
@@ -65,6 +44,34 @@ export default function PlanSettingsPage() {
     }).then((response) => response.text());
 
     return shop
+  }
+
+  const fetchCurrentPlanDetails = async () => {
+    try {
+      const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/current-plan?shop=${shop}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })  
+      if (!response.ok) {
+        setError({ 
+          status: true, 
+          title: "Failed to get current plan data", 
+          body: "Please try again later." 
+        })
+        return null;
+      }
+
+      setError({ status: false, title: "", body: "" })
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      setError({ 
+        status: true, 
+        title: "Failed to get current plan data", 
+        body: "Please try again later." 
+      })
+      return null;
+    }
   }
 
   const fetchShopData = async () => {
@@ -109,24 +116,17 @@ export default function PlanSettingsPage() {
           body: "Please try again later." 
         })
       });  
-
-    fetchPlanDetails().then((data) => {
-      setPlanDetails(data)
-      setIsLoading(false);
-    })
   }, []);
 
   useEffect(() => {
-    if (shop && planDetails) { // Only run if shop is not an empty string
-      fetchShopData(shop).then(res => {
+    if (shop) { // Only run if shop is not an empty string
+      fetchShopData().then(res => {
         setShopData(res);
-
-        let plan = planDetails?.find(plan => plan.planId === res?.planId)
-        if (!plan) {
-          plan = planDetails?.find(plan => plan.planId === 0)
-        }
-        setCurrentPlanDetails(plan)
       });
+      fetchCurrentPlanDetails().then(res => {
+        setCurrentPlanDetails(res);
+      })
+      setIsLoading(false)
     }
   }, [shop]);
 
@@ -160,6 +160,7 @@ export default function PlanSettingsPage() {
 
       setError({ status: false, title: "", body: "" })
       await delay(1500);
+
       setPlanCancelled(true)
       setModalLoading(false);
       
@@ -264,8 +265,18 @@ export default function PlanSettingsPage() {
             <Box minHeight="1rem"/>
   
             <Text variant="bodyLg" as="p">Plan Status:</Text>
-            <Text>{shopData?.subscriptionStatus}</Text>
+            <Text>{planCancelled ? 'CANCELLED' : shopData?.subscriptionStatus}</Text>
             <Box minHeight="1rem"/>
+
+            {shopData?.subscriptionStatus === 'TRIAL' || shopData?.subscriptionStatus === 'ACTIVE' &&
+              <div>
+                <Text variant="bodyLg" as="p">{
+                  shopData?.subscriptionStatus === 'TRIAL' ? 'Trial End Date:' : 'Subscription Renews:'
+                }</Text>
+                <Text>{shopData?.subscriptionEndDate}</Text>
+                <Box minHeight="1rem"/>
+              </div>
+            }
   
             <Text variant="bodyLg" as="p">Price:</Text>
             <Text>${currentPlanDetails?.monthlyPrice}</Text>
@@ -279,9 +290,9 @@ export default function PlanSettingsPage() {
               <>
                 <Text variant="bodyLg" as="p">Price after included messages:</Text>
                 <Text>${currentPlanDetails.usagePrice} /message</Text>
+                <Box minHeight="1rem"/>
               </>
             }
-            <Box minHeight="1rem"/>
   
             <Text variant="bodyLg" as="p">Features: </Text>
             {currentPlanDetails?.features?.map((feature, index) => {

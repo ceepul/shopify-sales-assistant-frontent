@@ -77,7 +77,6 @@ export default function MessagesChart({ shop }) {
         setError({ status: false, title: "", body: "" });
   
       } catch (error) {
-        console.error('There was an error fetching message data:', error);
         setError({
           status: true, 
           title: "Could not load messages", 
