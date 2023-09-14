@@ -210,7 +210,7 @@ export default function HomePage() {
             <Layout.Section oneThird>
               <StatCardSmall 
                 heading={'Messages'}
-                headingData={
+                headingData={shopData && currentPlanDetails &&
                   <div style={{display: 'flex', alignItems: 'baseline', gap: '0.25rem'}}>
                     <Text variant="heading2xl">{shopData?.messagesThisBillingPeriod}</Text>
                     <Text variant="bodyMd">{currentPlanDetails?.messagesPerMonth && `/${currentPlanDetails.messagesPerMonth}`}</Text>
@@ -225,7 +225,6 @@ export default function HomePage() {
                 badgeData={currentPlanDetails && 
                   `${shopData?.messagesThisBillingPeriod / currentPlanDetails?.messagesPerMonth}%`
                 }
-                icon={<Icon source={ChatMajor} color="subdued"/>}
               />
             </Layout.Section>
 
@@ -236,14 +235,13 @@ export default function HomePage() {
             <Layout.Section oneThird>
               <StatCardSmall 
                 heading={'Current Period'}
-                headingData={
+                headingData={shopData &&
                     <Text variant="headingXl">
-                      {shopData && `${formatDateToMonthDay(shopData?.subscriptionStartDate)} - ${formatDateToMonthDay(shopData?.subscriptionEndDate)}`}
+                      {`${formatDateToMonthDay(shopData?.subscriptionStartDate)} - ${formatDateToMonthDay(shopData?.subscriptionEndDate)}`}
                     </Text>}
-                subHeading = {
+                subHeading = {shopData &&
                   `${Math.ceil((new Date(shopData?.subscriptionEndDate) - new Date()) / (1000 * 60 * 60 * 24))} days remaining in this usage cycle`
                 }
-                icon={<Icon source={CalendarMajor} color="base"/>}
               />
             </Layout.Section>
 

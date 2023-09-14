@@ -107,7 +107,6 @@ export default function PlanPage() {
     if (!isValidName || !isValidEmail || !isValidCompany || !isValidMessage) return;
 
     // Handle form submission
-    console.log(formData);
     try {
       setIsFormSubmitting(true);
       setFormSubmitionError(false);
