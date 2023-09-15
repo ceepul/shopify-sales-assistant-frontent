@@ -37,6 +37,12 @@ export default function HomePage() {
       title: "",
       body: "",
     });
+    const [isSubscriptionStatusBannerVisible, setIsSubscriptionStatusBannerVisible] = useState(true);
+
+    const handleSubscriptionStatusBannerDismiss = () => {
+      setIsSubscriptionStatusBannerVisible(false);
+      sessionStorage.setItem('bannerDismissed', 'true');
+    };
 
     const fetchShop = async () => {
       const shop = await authFetch("/api/shop", {
@@ -105,6 +111,9 @@ export default function HomePage() {
 
     useEffect(() => {
       setIsLoading(true);
+      if (sessionStorage.getItem('bannerDismissed')) {
+        setIsSubscriptionStatusBannerVisible(false);
+      }
       fetchShop()
         .then((shop) => {
           setShop(shop);
@@ -194,9 +203,10 @@ export default function HomePage() {
               </Layout.Section>
             }
 
-            <Layout.Section fullWidth>
+            {isSubscriptionStatusBannerVisible && <Layout.Section fullWidth>
               {shopData && 
               <SubscriptionStatusBanner 
+                  onDismiss={handleSubscriptionStatusBannerDismiss}
                   firstInstallDate={shopData.firstInstallDate}
                   subscriptionId={shopData.planId}
                   subscriptionStatus={shopData.subscriptionStatus}
@@ -205,7 +215,7 @@ export default function HomePage() {
                   allowedMessages={currentPlanDetails?.messagesPerMonth}
                   messagesThisBillingPeriod={shopData.messagesThisBillingPeriod}
               />}
-            </Layout.Section>
+            </Layout.Section>}
 
             <Layout.Section oneThird>
               <StatCardSmall 
@@ -223,7 +233,7 @@ export default function HomePage() {
                   shopData?.messagesThisBillingPeriod / currentPlanDetails?.messagesPerMonth < 1 ? 'warning' : 'critical')
                 }
                 badgeData={currentPlanDetails && 
-                  `${shopData?.messagesThisBillingPeriod / currentPlanDetails?.messagesPerMonth}%`
+                  `${shopData?.messagesThisBillingPeriod / currentPlanDetails?.messagesPerMonth * 100}%`
                 }
               />
             </Layout.Section>
@@ -268,10 +278,6 @@ export default function HomePage() {
               content: "Customize Assistant",
               onAction: () => navigate("/customize"),
               }}
-              secondaryActions={[{
-                content: "Change Plan",
-                onAction: () => navigate("/plan")
-              }]}
           />
             {loadingMarkup}
             {connectedMarkup}

@@ -60,6 +60,22 @@ export default function PlanPage() {
       ...prevData,
       [field]: value,
     }));
+    switch (field) {
+      case 'name':
+        setFormNameError(false);
+        break;
+      case 'email':
+        setFormEmailError(false);
+        break;
+      case 'company':
+        setFormCompanyError(false);
+        break;
+      case 'message':
+        setFormMessageError(false);
+        break;
+      default:
+        break;
+    }
   };
 
   const validateFormName = (value) => {
@@ -223,14 +239,6 @@ export default function PlanPage() {
     if (shop) { // Only run if shop is not an empty string
       fetchShopData(shop).then(res => {
         setShopData(res);
-        if (res) {
-          // Update so they are no longer a first time user
-          const response = fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/firsttimeuser", {
-            method: "PATCH",
-            body: JSON.stringify({ shop: shop, firstTimeUser: false }),
-            headers: { "Content-Type": "application/json" },
-          });
-        }
       });
     }
   }, [shop]);
@@ -289,38 +297,41 @@ export default function PlanPage() {
   }
 
   const loadingMarkup = isLoading ? (
-      <Layout>
-        <Loading />
-        <Layout.Section fullWidth>
-          <AlphaCard>
-            <SkeletonBodyText lines={3} />
-          </AlphaCard>
-        </Layout.Section>
-        <Layout.Section oneThird>
-          <AlphaCard>
-            <SkeletonDisplayText />
-            <Box minHeight="4rem"/>
-            <SkeletonBodyText lines={3} />
-            <Box minHeight="10rem"/>
-          </AlphaCard>
-        </Layout.Section>
-        <Layout.Section oneThird>
-          <AlphaCard>
-            <SkeletonDisplayText />
-            <Box minHeight="4rem"/>
-            <SkeletonBodyText lines={3} />
-            <Box minHeight="10rem"/>
-          </AlphaCard>
-        </Layout.Section>
-        <Layout.Section oneThird>
-          <AlphaCard>
-            <SkeletonDisplayText />
-            <Box minHeight="4rem"/>
-            <SkeletonBodyText lines={3} />
-            <Box minHeight="10rem"/>
-          </AlphaCard>
-        </Layout.Section>
-      </Layout>
+      <AlphaCard padding='8'>
+        <Layout>
+          <Loading />
+          <Layout.Section fullWidth>
+            <div style={{display: 'flex', justifyContent: 'center'}}>
+              <SkeletonDisplayText />
+              <SkeletonBodyText />
+            </div>
+          </Layout.Section>
+          <Layout.Section oneThird>
+            <AlphaCard>
+              <SkeletonDisplayText />
+              <Box minHeight="4rem"/>
+              <SkeletonBodyText lines={3} />
+              <Box minHeight="10rem"/>
+            </AlphaCard>
+          </Layout.Section>
+          <Layout.Section oneThird>
+            <AlphaCard>
+              <SkeletonDisplayText />
+              <Box minHeight="4rem"/>
+              <SkeletonBodyText lines={3} />
+              <Box minHeight="10rem"/>
+            </AlphaCard>
+          </Layout.Section>
+          <Layout.Section oneThird>
+            <AlphaCard>
+              <SkeletonDisplayText />
+              <Box minHeight="4rem"/>
+              <SkeletonBodyText lines={3} />
+              <Box minHeight="10rem"/>
+            </AlphaCard>
+          </Layout.Section>
+        </Layout>
+      </AlphaCard>
   ) : null
 
   const pageMarkup = !isLoading && !pageLoadError ? (

@@ -32,7 +32,6 @@ export default function PlanSettingsPage() {
     title: "",
     body: "",
   });
-  const [pageLoadError, setPageLoadError] = useState(false)
   const [showCancelPlanModal, setShowCancelPlanModal] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
   const [planCancelled, setPlanCancelled] = useState(false);
@@ -228,32 +227,29 @@ export default function PlanSettingsPage() {
   const loadingMarkup = isLoading ? (
       <Layout>
         <Loading />
-        <Layout.Section fullWidth>
+        <Layout.Section primary>
           <SkeletonDisplayText />
-          <Box minHeight="1rem"/>
+          <Box minHeight="0.75rem"/>
           <AlphaCard>
+            <SkeletonDisplayText />
+            <Box minHeight="1rem"/>
             <SkeletonBodyText lines={4} />
+            <Box minHeight="6rem"/>
+          </AlphaCard>
+        </Layout.Section>
+        <Layout.Section secondary> 
+          <Box minHeight="2.75rem"/>
+          <AlphaCard>
+            <SkeletonDisplayText />
+            <Box minHeight="1rem"/>
+            <SkeletonBodyText lines={4}/>
+            <Box minHeight="6rem"/>
           </AlphaCard>
         </Layout.Section>
       </Layout>
   ) : null
 
-  const pageLoadErrorMarkup = !isLoading && pageLoadError ? (
-    <AlphaCard>
-      <div style={{margin: "40px", display: "flex", flexDirection: "column", alignItems: "center", gap: "4rem"}}>
-        <div style={{display: "flex", flexDirection: "column", alignItems: "center", gap: "0.75rem"}}>
-          <Text variant="headingXl" as="h3">
-            There was an error loading your plan settings
-          </Text>
-          <Text variant="bodyLg" as="p">
-            Please try again later.
-          </Text>
-        </div>
-      </div>
-    </AlphaCard>
-  ) : null
-
-  const pageMarkup = !isLoading && !pageLoadError ? (
+  const pageMarkup = !isLoading ? (
     <Layout>
       <Layout.Section primary>
         <div style={{paddingInline: '1rem'}}>
@@ -356,7 +352,6 @@ export default function PlanSettingsPage() {
       }
       {loadingMarkup}
       {pageMarkup}
-      {pageLoadErrorMarkup}
       {cancelModalMarkup}
     </Page>
   )

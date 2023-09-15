@@ -11,16 +11,18 @@ import {
 import { useNavigate, TitleBar } from "@shopify/app-bridge-react";
 
 export default function GettingStartedPage() {
+  const breadcrumbs = [{ content: "ShopMate", url: "/" }];
   const navigate = useNavigate();
 
   return (
     <Page>
       <TitleBar
         title="Getting Started"
-        primaryAction={{
-          content: "Go to Dashboard",
+        breadcrumbs={breadcrumbs}
+      /*primaryAction={{
+          content: "Contact Support",
           onAction: () => navigate("/"),
-        }}
+        }} */
       />
 
       <Layout>

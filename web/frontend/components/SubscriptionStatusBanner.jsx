@@ -1,6 +1,7 @@
 import { Banner } from "@shopify/polaris";
 
 export default function SubscriptionStatusBanner({
+  onDismiss,
   firstInstallDate, 
   subscriptionId,
   subscriptionStatus,
@@ -23,6 +24,7 @@ export default function SubscriptionStatusBanner({
     if (subscriptionStatus === 'FROZEN') {
       return (
         <Banner
+          onDismiss={onDismiss}
           title="Your subscription has expired and has no days remaining."
           status="critical"
           action={{ content: 'Upgrade Now', url: '/plan' }}
@@ -35,6 +37,7 @@ export default function SubscriptionStatusBanner({
     if (daysLeftInTrial <= 0) {
       return (
         <Banner
+          onDismiss={onDismiss}
           title="Your free trial has ended."
           status="warning"
           action={{ content: 'Upgrade Now', url: '/plan' }}
@@ -46,6 +49,7 @@ export default function SubscriptionStatusBanner({
     if (messagesThisBillingPeriod > allowedMessages) {
       return (
         <Banner
+          onDismiss={onDismiss}
           title="You have exceeded the number of messages allowed in your free trial."
           status="critical"
           action={{ content: 'Upgrade Now', url: '/plan' }}
@@ -57,6 +61,7 @@ export default function SubscriptionStatusBanner({
     if (messagesThisBillingPeriod > allowedMessages * 0.8) {
       return (
         <Banner
+          onDismiss={onDismiss}
           title="You've used more than 80% of messages allowed in your free trial."
           status="warning"
           action={{ content: 'Upgrade Now', url: '/plan' }}
@@ -67,6 +72,7 @@ export default function SubscriptionStatusBanner({
     } else {
       return (
         <Banner
+          onDismiss={onDismiss}
           title={`You are on a free trial with ${daysLeftInTrial} days left.`}
           status="info"
           action={{ content: 'Upgrade Now', url: '/plan' }}
@@ -79,6 +85,7 @@ export default function SubscriptionStatusBanner({
     if (messagesThisBillingPeriod > allowedMessages) {
       return (
         <Banner
+          onDismiss={onDismiss}
           title="You have exceeded your message cap for this billing period."
           status="critical"
           action={{ content: 'Upgrade Now', url: '/plan' }}
@@ -90,6 +97,7 @@ export default function SubscriptionStatusBanner({
     if (messagesThisBillingPeriod > allowedMessages * 0.8) {
       return (
         <Banner
+          onDismiss={onDismiss}
           title="You've used more than 80% of your messages this month."
           status="warning"
           action={{ content: 'Upgrade Now', url: '/plan' }}
