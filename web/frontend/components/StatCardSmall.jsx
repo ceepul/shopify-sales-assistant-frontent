@@ -7,7 +7,15 @@ import {
 } from "@shopify/polaris";
 
 
-export default function StatCardSmall({ heading, headingData, subHeading, badgeStatus, badgeData }) {
+export default function StatCardSmall({ loading, heading, headingData, subHeading, badgeStatus, badgeData }) {
+  const loadingMarkup = (
+    <AlphaCard>
+      <div style={{minHeight: '4.75rem', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+        <Spinner />
+      </div>
+    </AlphaCard>
+  )
+
   const markup = heading && headingData && subHeading ? (
     <AlphaCard>
       <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem'}}>
@@ -22,10 +30,10 @@ export default function StatCardSmall({ heading, headingData, subHeading, badgeS
   ) : (
     <AlphaCard>
       <div style={{minHeight: '4.75rem', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-        <Spinner />
+        <Text>Could not load statistic.</Text>
       </div>
     </AlphaCard>
   )
 
-  return markup
+  return loading ? loadingMarkup : markup;
 }

@@ -219,6 +219,7 @@ export default function HomePage() {
 
             <Layout.Section oneThird>
               <StatCardSmall 
+                loading={isLoading}
                 heading={'Messages'}
                 headingData={shopData && currentPlanDetails &&
                   <div style={{display: 'flex', alignItems: 'baseline', gap: '0.25rem'}}>
@@ -244,6 +245,7 @@ export default function HomePage() {
 
             <Layout.Section oneThird>
               <StatCardSmall 
+                loading={isLoading}
                 heading={'Current Period'}
                 headingData={shopData &&
                     <Text variant="headingXl">

@@ -16,12 +16,13 @@ import {
   Frame,
   Toast
 } from "@shopify/polaris";
-import { TitleBar, Loading, ContextualSaveBar } from "@shopify/app-bridge-react"
-import { useState, useCallback } from "react";
+import { TitleBar, Loading, ContextualSaveBar, useAuthenticatedFetch } from "@shopify/app-bridge-react"
+import { useState, useCallback, useEffect } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import FAQTableRow from "../components/FAQTableRow";
 export default function SetupPage() {
   const breadcrumbs = [{ content: "ShopMate", url: "/" }];
+  const authFetch = useAuthenticatedFetch();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,10 +32,15 @@ export default function SetupPage() {
     title: "",
     body: "",
   });
+
+  const [shop, setShop] = useState('');
+  const [currentPlanDetails, setCurrentPlanDetails] = useState(null);
+  const [maxFaqsError, setMaxFaqsError] = useState(false);
+
   const [faqs, setFaqs] = useState([]);
   const [deletedFaqs, setDeletedFaqs] = useState([]);
   const [showFAQModal, setShowFAQModal] = useState(false);
-  const [activeFAQ, setActiveFAQ] = useState({});
+  const [activeFAQ, setActiveFAQ] = useState({id: '', status: 'INITIAL', question: "", answer: ""});
   const [storeInfo, setStoreInfo] = useState({edited: false, error: null, content: ''});
   const [shippingPolicy, setShippingPolicy] = useState({edited: false, error: null, content: ''});
   const [returnPolicy, setReturnPolicy] = useState({edited: false, error: null, content: ''});
@@ -49,6 +55,82 @@ export default function SetupPage() {
     setToastActive((active) => !active);
   }, []);
 
+  const fetchShop = async () => {
+    const shop = await authFetch("/api/shop", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }).then((response) => response.text());
+    return shop
+  }
+
+  const fetchCurrentPlanDetails = async () => {
+    try {
+      const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/current-plan?shop=${shop}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })  
+      if (!response.ok) {
+        setError({ status: true, title: "Failed to load data", body: "Please try again later." })
+        return null;
+      }
+
+      setError({ status: false, title: "", body: "" })
+      const data = await response.json();
+      return data;
+
+    } catch (error) {
+      setError({ status: true, title: "Failed to load data", body: "Please try again later." })
+      return null;
+    }
+  }
+
+  const fetchAndSetSetupData = async () => {
+    setMaxFaqsError(false);
+    try {
+      const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/setup?shop=${shop}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })  
+      if (!response.ok) {
+        setError({ status: true, title: "Failed to load data", body: "Please try again later." })
+        return null;
+      }
+
+      setError({ status: false, title: "", body: "" })
+
+      const data = await response.json();
+      console.log(data)
+      setStoreInfo({edited: false, error: null, content: data.storeInfo ? data.storeInfo : "" })
+      setShippingPolicy({edited: false, error: null, content: data.shippingPolicy ? data.shippingPolicy : "" })
+      setReturnPolicy({edited: false, error: null, content: data.returnPolicy ? data.returnPolicy : "" })
+      const faqsWithStatus = data.faqs.map(faq => ({
+        ...faq,
+        status: 'UNCHANGED'
+      }));
+      setFaqs(faqsWithStatus);
+    
+      return true;
+      
+    } catch (error) {
+      setError({ status: true, title: "Failed to load data", body: "Please try again later." })
+      return null;
+    }
+  }
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchShop().then(shop => setShop(shop))
+      .catch(err => setError({ status: true, title: "Failed to get current plan data", body: "Please try again later." }));  
+  }, []);
+
+  useEffect(() => {
+    if (shop) { // Only run if shop is not an empty string
+      fetchCurrentPlanDetails().then(res => {setCurrentPlanDetails(res);});
+      fetchAndSetSetupData();
+      setIsLoading(false)
+    }
+  }, [shop]);
+
   const handleStoreInfoChange= (value) => {
     let error = null;
     if (value.length > 300) error = "Store info cannot exceed 300 characters."
@@ -60,19 +142,42 @@ export default function SetupPage() {
     setIsDirty(true);
   };
 
-  const getFAQId = () => {
-    return uuidv4();
-  }
+  const handleShippingPolicyChange = (value) => {
+    let error = null;
+    if (value.length > 10000) error = "Shipping Policy cannot exceed 10000 characters."
+    setShippingPolicy({
+      edited: true, 
+      error: error,
+      content: value
+    });
+    setIsDirty(true);
+  };
+
+  const handleReturnPolicyChange= (value) => {
+    let error = null;
+    if (value.length > 10000) error = "Return Policy cannot exceed 10000 characters."
+    setReturnPolicy({
+      edited: true, 
+      error: error,
+      content: value
+    });
+    setIsDirty(true);
+  };
 
   const handleFAQEdit = (id) => {
     const faqMatch = faqs.find(faq => faq.id === id);
     setActiveFAQ(faqMatch);
+    setMaxFaqsError(false);
     setShowFAQModal(true);
   };
 
   const handleFAQAdd = () => {
-    const id = getFAQId();
-  
+    if (faqs.length >= currentPlanDetails?.faqsAllowed) {
+      setMaxFaqsError(true);
+      return;
+    }
+
+    const id = uuidv4();
     const newFAQ = {
       id: id,
       status: "NEW",
@@ -89,17 +194,11 @@ export default function SetupPage() {
   const handleFAQSave = () => {
     if (activeFAQ.questionError || activeFAQ.answerError) return;
     if (activeFAQ.question.length === 0) {
-      setActiveFAQ(prev => ({
-        ...prev,
-        questionError: 'Question cannot be blank'
-      }))
+      setActiveFAQ(prev => ({ ...prev, questionError: 'Question cannot be blank' }))
       return;
     }
     if (activeFAQ.answer.length === 0) {
-      setActiveFAQ(prev => ({
-        ...prev,
-        answerError: 'Question cannot be blank'
-      }))
+      setActiveFAQ(prev => ({ ...prev, answerError: 'Question cannot be blank' }))
       return;
     }
 
@@ -126,12 +225,15 @@ export default function SetupPage() {
       }];
     });
     setShowFAQModal(false);
+    setIsDirty(true);
   }
 
   const handleFAQDelete = () => {
     if (!activeFAQ.newThisSession) setDeletedFaqs(prev => ([...prev, activeFAQ.id]))
     setFaqs(prev => prev.filter(faq => faq.id !== activeFAQ.id));
+    setMaxFaqsError(false);
     setShowFAQModal(false);
+    setIsDirty(true);
     toggleToast("FAQ Deleted");
   }
 
@@ -151,40 +253,61 @@ export default function SetupPage() {
     }));
   }  
 
-  const handleShippingPolicyChange = (value) => {
-    let error = null;
-    if (value.length > 10000) error = "Shipping Policy cannot exceed 10000 characters."
-    setShippingPolicy({
-      edited: true, 
-      error: error,
-      content: value
-    });
-    setIsDirty(true);
-  };
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    if (shippingPolicy.error || returnPolicy.error || storeInfo.error) {
+      setError({ status: true, title: "Could not save", body: "Fix all errors in form and try again." })
+      setIsDirty(false);
+      return
+    }
 
-  const handleReturnPolicyChange= (value) => {
-    let error = null;
-    if (value.length > 10000) error = "Return Policy cannot exceed 10000 characters."
-    setReturnPolicy({
-      edited: true, 
-      error: error,
-      content: value
-    });
-    setIsDirty(true);
-  };
+    const updatedFaqs = faqs.filter((faq) => faq.status === 'UPDATED');
 
-  const handleSubmit = () => {
+    const data = {
+      storeInfo: storeInfo.edited ? storeInfo.content : null,
+      shippingPolicy: shippingPolicy.edited ? shippingPolicy.content : null,
+      returnPolicy: returnPolicy.edited ? returnPolicy.content : null,
+      updatedFaqs: updatedFaqs,
+      deletedFaqs: deletedFaqs
+    }
 
+    try {
+      const response = await fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/setup", {
+        method: "POST",
+        body: JSON.stringify({ shop, data }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        setError({ status: true, title: "Could not update", body: "There was a problem updating your store data. Please try again later." })
+        setIsSubmitting(false)
+        return
+      }
+
+      setError({ status: false, title: "", body: ""})
+      setIsSubmitting(false);
+      setIsDirty(false);
+      toggleToast("Store Updated");
+      
+    } catch (error) {
+      setError({ status: true, title: "Could not update", body: "There was a problem updating your store data. Please try again later." })
+      setIsSubmitting(false)
+    }
   }
 
   const handleReset = () => {
-
+    if (shop) {
+      setIsLoading(true);
+      fetchAndSetSetupData();
+      setIsLoading(false);
+    }
+    setIsDirty(false);
   }
 
   const faqRows = (!faqs || faqs.length === 0) ? (
       <div style={{ padding: '3rem', display: "flex", flexDirection: 'column', gap: '1rem', alignItems: 'center', textAlign: 'center'}}>
         <Text variant="headingLg">No FAQs</Text>
-        <Text>Get started by adding an FAQ so ShopMate can answer specific store related question</Text>
+        <Text>Get started by adding an FAQ so ShopMate can answer specific store related questions</Text>
       </div>
     ) : (
       faqs.map(faq => (
@@ -197,12 +320,15 @@ export default function SetupPage() {
     );
 
   const loadingMarkup = isLoading ? (
-    <Layout>
-      <Layout.Section>
-        <SkeletonDisplayText />
-        <SkeletonBodyText />
-      </Layout.Section>
-    </Layout>
+    <div>
+      <Loading/>
+      <Layout>
+        <Layout.Section>
+          <SkeletonDisplayText />
+          <SkeletonBodyText />
+        </Layout.Section>
+      </Layout>
+    </div>
   ) : null;
 
   const modalMarkup = showFAQModal ? (
@@ -297,7 +423,7 @@ export default function SetupPage() {
 
         <Layout.AnnotatedSection
           id="faqs"
-          title="FAQs"
+          title={currentPlanDetails ? `FAQs (${faqs.length}/${currentPlanDetails.faqsAllowed})` : 'FAQs'}
           description="Add common questions and their answers to enable your AI Assistant to address store-related inquiries effectively."
         >
           <AlphaCard padding={0}>
@@ -305,6 +431,17 @@ export default function SetupPage() {
               <Text variant="bodyLg">Questions</Text>
               <Button primary size='slim' onClick={handleFAQAdd}>Add FAQ</Button>
             </div>
+            {maxFaqsError && 
+              <div style={{paddingInline: '1rem', marginBottom: '1rem'}}>
+                <Banner 
+                  title="Max FAQs Reached" 
+                  onDismiss={() => setMaxFaqsError(false)} 
+                  action={{content: 'Upgrade Now', url: '/plan'}}
+                  status="warning">
+                  <p>You have reached the maximum number of FAQs allowed for your plan. Upgrade now to add more.</p>
+                </Banner>
+              </div>
+            }
             <Divider />
               {faqRows}
           </AlphaCard>
