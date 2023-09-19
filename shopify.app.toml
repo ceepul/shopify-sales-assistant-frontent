@@ -2,7 +2,7 @@
 
 name = "ShopMate"
 client_id = "00b9d7b9050ab1573a521a60dc8cebfe"
-application_url = "https://hollow-boom-fantastic-hammer.trycloudflare.com"
+application_url = "https://ellis-purpose-catherine-promises.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -12,9 +12,9 @@ use_legacy_install_flow = true
 
 [auth]
 redirect_urls = [
-  "https://hollow-boom-fantastic-hammer.trycloudflare.com/auth/callback",
-  "https://hollow-boom-fantastic-hammer.trycloudflare.com/auth/shopify/callback",
-  "https://hollow-boom-fantastic-hammer.trycloudflare.com/api/auth/callback"
+  "https://ellis-purpose-catherine-promises.trycloudflare.com/auth/callback",
+  "https://ellis-purpose-catherine-promises.trycloudflare.com/auth/shopify/callback",
+  "https://ellis-purpose-catherine-promises.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

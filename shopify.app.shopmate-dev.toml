@@ -1,0 +1,28 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "ShopMate Dev"
+client_id = "c8acbeffc4d6770cc205892ee94f8cb3"
+application_url = "https://restored-martial-doubt-respect.trycloudflare.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_products"
+use_legacy_install_flow = true
+
+[auth]
+redirect_urls = [
+  "https://restored-martial-doubt-respect.trycloudflare.com/auth/callback",
+  "https://restored-martial-doubt-respect.trycloudflare.com/auth/shopify/callback",
+  "https://restored-martial-doubt-respect.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2023-07"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "ceepul-dev-store.myshopify.com"

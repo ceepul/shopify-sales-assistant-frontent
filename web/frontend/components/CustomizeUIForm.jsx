@@ -110,18 +110,18 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
     } else {
       setAssistantNameError(null)
     }
-    setPreferences({
-      ...preferences,
+    setPreferences(prev => ({
+      ...prev,
       assistantName: value
-    });
+    }));
     setDirty(true);
   };
 
   const handleChangeColourPicker = (value) => {
-    setPreferences({
-      ...preferences,
+    setPreferences(prev => ({
+      ...prev,
       accentColour: value
-    });
+    }));
     setDirty(true);
   };
 
@@ -147,18 +147,18 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
   };
 
   const handleChangeWelcomeMessage = (value) => {
-    setPreferences({
-      ...preferences,
+    setPreferences(prev => ({
+      ...prev,
       welcomeMessage: value
-    });
+    }));
     setDirty(true);
   };
 
   const handleChangeAvatar = (value) => {
-    setPreferences({
-      ...preferences,
+    setPreferences(prev => ({
+      ...prev,
       avatarImageSrc: value
-    });
+    }));
     setDirty(true);
   }
 

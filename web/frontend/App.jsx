@@ -27,6 +27,10 @@ export default function App() {
                   destination: "/customize",
                 },
                 {
+                  label: "Setup",
+                  destination: "/setup",
+                },
+                {
                   label: "Plan",
                   destination: "/plan",
                 },

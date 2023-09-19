@@ -1,0 +1,72 @@
+.tableRow {
+  min-height: 3rem;
+  display: flex;
+  flex-shrink: 1;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.text-content {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Hide the buttons by default on desktop */
+.button-container {
+  margin-left: 1rem;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s; /* Add transition for opacity change */
+}
+
+/* Show the buttons when the row is hovered, but only on desktop */
+.tableRow:hover .button-container {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* xs styles */
+@media (max-width: 30.6225em) {
+  .text-content {
+    max-width: 20rem;
+  }
+  .button-container {
+    display: none;
+  }
+}
+
+/* sm styles */
+@media (min-width: 30.625em) and (max-width: 47.9975em) {
+  .text-content {
+    max-width: 26rem;
+  }
+  .button-container {
+    display: none;
+  }
+}
+
+/* md styles */
+@media (min-width: 48em) and (max-width: 64.9975em) {
+  .text-content {
+    max-width: 40rem;
+  }
+  .button-container {
+    display: none;
+  }
+}
+
+/* lg styles */
+@media (min-width: 65em) and (max-width: 89.9975em) {
+  .text-content {
+    max-width: 500px;
+  }
+}
+
+/* xl styles */
+@media (min-width: 90em) {
+  .text-content {
+    max-width: 650px;
+  }
+}

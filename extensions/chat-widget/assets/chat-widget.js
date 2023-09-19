@@ -618,7 +618,7 @@ class ChatWidget extends HTMLElement {
 
   async fetchPreferences(shop) {
     try {
-      const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/preferences?shop=${shop}`, {
+      const response = await fetch(`https://y143kaik7d.execute-api.us-east-1.amazonaws.com/shop/preferences?shop=${shop}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" }
       });
@@ -888,21 +888,17 @@ class ChatBox extends HTMLDivElement {
 
     if(this.position === 'left') {
         if (windowWidth < 524) {
-            console.log('left, center')
             this.style.left = `${transformValue}px`;
             this.style.right = 'auto';
         } else {
-            console.log('left')
             this.style.left = '50px';
             this.style.right = 'auto';
         }
     } else {
         if (windowWidth < 524) {
-            console.log('right, center')
             this.style.right = `${transformValue}px`;
             this.style.left = 'auto';
         } else {
-            console.log('right')
             this.style.right = '50px';
             this.style.left = 'auto';
         }
@@ -1046,7 +1042,7 @@ class ChatBox extends HTMLDivElement {
   }
 
   async addProductViewEvent(productId) {
-    fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/events/productView`, {
+    fetch(`https://y143kaik7d.execute-api.us-east-1.amazonaws.com/events/product-view`, {
       method: "POST",
       body: JSON.stringify({ shop: this.shop, productId: productId }),
       headers: { "Content-Type": "application/json" }
@@ -1083,7 +1079,7 @@ class ChatBox extends HTMLDivElement {
     const trimmedMessages = this.messages.slice(-9);
 
     try {
-      const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/message`, {
+      const response = await fetch(`https://y143kaik7d.execute-api.us-east-1.amazonaws.com/messages/default`, {
         method: "POST",
         body: JSON.stringify({ shop: this.shop, messages: trimmedMessages }),
         headers: { "Content-Type": "application/json" }
@@ -1100,7 +1096,7 @@ class ChatBox extends HTMLDivElement {
 
       if (jsonRes.fetchProducts) { // Check if fetchProducts is true
         this.showLoading();
-        const productResponse = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/productMessage`, {
+        const productResponse = await fetch(`https://y143kaik7d.execute-api.us-east-1.amazonaws.com/messages/product`, {
           method: "POST",
           body: JSON.stringify({ shop: this.shop, query: jsonRes.content }), // Include the shop and the content from the previous response
           headers: { "Content-Type": "application/json" }

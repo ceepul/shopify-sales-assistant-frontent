@@ -12,6 +12,7 @@ import {
 } from '@shopify/polaris-icons';
 import { useAuthenticatedFetch } from "@shopify/app-bridge-react";
 import './GettingStartedPrompt.css'
+import { homeTrophy, handShake, embedSS } from '../assets/index';
 
 export default function GettingStartedPrompt({ isActive, onClose, shop }) {
   const [step, setStep] = useState(0);
@@ -76,7 +77,7 @@ export default function GettingStartedPrompt({ isActive, onClose, shop }) {
   const steps = [
     (
       <div className="modal-content">
-        <img className="step-icon" src="../assets/handshake.png" alt="Handshake Icon" />
+        <img className="step-icon" src={handShake} alt="Handshake Icon" />
         <p variant='headingXl' className="step-title">Welcome to Shop Mate!</p>
         <p className="step-description">We're thrilled to have you on board. Let's get your AI shopping assistant set up in just a few easy steps.</p>
         <div className='step-button'>
@@ -91,7 +92,7 @@ export default function GettingStartedPrompt({ isActive, onClose, shop }) {
     ),
     (
       <div className="modal-content">
-        <img className="step-image" src="../assets/embed-ss.png" alt="Web screen shot of app embedding" />
+        <img className="step-image" src={embedSS} alt="Web screen shot of app embedding" />
         <p className="step-title">Activate Your AI Assistant</p>
         <p className="step-description">To let the AI shopping assistant start helping your customers, you'll first need to enable the app embed on your store.</p>
         
@@ -123,7 +124,7 @@ export default function GettingStartedPrompt({ isActive, onClose, shop }) {
     ),
     (
       <div className="modal-content">
-        <img className="step-icon" src="../assets/home-trophy.png" alt="Trophy Icon" />
+        <img className="step-icon" src={homeTrophy} alt="Trophy Icon" />
         <p className="step-title">You're all set!</p>
         <p className="step-description">The AI shopping assistant is ready to use!.</p>
         <p className="step-description step-space">Next, select a plan to continue using your shopping assistant after the free trial has expired.</p>

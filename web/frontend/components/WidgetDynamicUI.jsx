@@ -1,5 +1,13 @@
 import './Widget.css';
 import { useEffect, useState } from 'react';
+import { 
+  infoCircle, 
+  infoCircleDark,
+  downChevron,
+  downChevronDark,
+  capabilitiesIcon,
+  sendB
+} from "../assets/index"
 
 export default function WidgetDynamicUI({preferences}) {
 
@@ -86,13 +94,13 @@ export default function WidgetDynamicUI({preferences}) {
     color: calculateLuminance(accentRgb) > 0.7 ? '#2a2a2a' : accentColour,
   };
 
-  const circleIconPath = calculateLuminance(accentRgb) > 0.7 ? "../assets/info-circle-dark.svg" : "../assets/info-circle.svg"
-  const closeIconPath = calculateLuminance(accentRgb) > 0.7 ? "../assets/down-chevron-dark.svg" : "../assets/down-chevron.svg"
+  const circleIconPath = calculateLuminance(accentRgb) > 0.7 ? infoCircleDark : infoCircle
+  const closeIconPath = calculateLuminance(accentRgb) > 0.7 ? downChevronDark : downChevron
 
   const emptyMarkup = (
     <div className="body-container">
       <div className="capabilities-container">
-        <img className='capabilities-icon' alt="Checklist icon" src="../assets/capabilities1.svg" />
+        <img className='capabilities-icon' alt="Checklist icon" src={capabilitiesIcon} />
         <div className="capabilities-text">Capabilities</div>
       </div>
       <div className="example-container">
@@ -142,7 +150,7 @@ export default function WidgetDynamicUI({preferences}) {
         <div className="input-field">
           <div className="input-placeholder">Start typing...</div>
           <div className='send-button-container'>
-            <img className='send-button' alt="Send icon" src="../assets/send2.svg" />
+            <img className='send-button' alt="Send icon" src={sendB} />
           </div>
         </div>
         <div className="footer-divider"/>
@@ -155,4 +163,3 @@ export default function WidgetDynamicUI({preferences}) {
     </div>
   );
 }
-

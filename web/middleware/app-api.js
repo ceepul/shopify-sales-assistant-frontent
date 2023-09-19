@@ -79,7 +79,6 @@ export default function applyAppApiEndpoints(app) {
       const planName = req.body.planName
       const planPrice = req.body.planPrice
       const trialDays = req.body.trialDays
-      const relativeUrl = req.body.relativeUrl
 
       const shopDomain = res.locals.shopify.session.shop;
       const returnUrl = `https://${shopDomain}/admin/apps/chat-reccomendation-app-1/plan/confirmation`;

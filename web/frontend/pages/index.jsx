@@ -151,7 +151,7 @@ export default function HomePage() {
     function formatDateToMonthDay(dateString) {
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       
-      const parts = dateString.split('-');
+      const parts = dateString?.split('-');
       const date = new Date(parts[0], parts[1] - 1, parts[2]);  // Subtracting 1 from month since months are 0-indexed in JS Date
       
       const month = months[date.getMonth()];
