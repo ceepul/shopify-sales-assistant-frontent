@@ -2,7 +2,7 @@
 
 name = "ShopMate Dev"
 client_id = "c8acbeffc4d6770cc205892ee94f8cb3"
-application_url = "https://combines-eq-transit-discuss.trycloudflare.com"
+application_url = "https://serious-ranking-outsourcing-output.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -12,9 +12,9 @@ use_legacy_install_flow = true
 
 [auth]
 redirect_urls = [
-  "https://combines-eq-transit-discuss.trycloudflare.com/auth/callback",
-  "https://combines-eq-transit-discuss.trycloudflare.com/auth/shopify/callback",
-  "https://combines-eq-transit-discuss.trycloudflare.com/api/auth/callback"
+  "https://serious-ranking-outsourcing-output.trycloudflare.com/auth/callback",
+  "https://serious-ranking-outsourcing-output.trycloudflare.com/auth/shopify/callback",
+  "https://serious-ranking-outsourcing-output.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

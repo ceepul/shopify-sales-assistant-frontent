@@ -234,7 +234,7 @@ export default function HomePage() {
                   shopData?.messagesThisBillingPeriod / currentPlanDetails?.messagesPerMonth < 1 ? 'warning' : 'critical')
                 }
                 badgeData={currentPlanDetails && 
-                  `${shopData?.messagesThisBillingPeriod / currentPlanDetails?.messagesPerMonth * 100}%`
+                  `${(shopData?.messagesThisBillingPeriod / currentPlanDetails?.messagesPerMonth * 100).toFixed(2)}%`
                 }
               />
             </Layout.Section>

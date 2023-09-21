@@ -74,7 +74,6 @@ export default function SetupPage() {
         return null;
       }
 
-      setError({ status: false, title: "", body: "" })
       const data = await response.json();
       return data;
 
@@ -95,8 +94,6 @@ export default function SetupPage() {
         setError({ status: true, title: "Failed to load data", body: "Please try again later." })
         return null;
       }
-
-      setError({ status: false, title: "", body: "" })
 
       const data = await response.json();
       console.log(data)
@@ -125,6 +122,8 @@ export default function SetupPage() {
 
   useEffect(() => {
     if (shop) { // Only run if shop is not an empty string
+      setIsLoading(true);
+      setError({ status: false, title: "", body: "" })
       fetchCurrentPlanDetails().then(res => {setCurrentPlanDetails(res);});
       fetchAndSetSetupData();
       setIsLoading(false)
@@ -251,7 +250,7 @@ export default function SetupPage() {
       [field]: value,
       ...errorUpdate
     }));
-  }  
+  } 
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -285,6 +284,18 @@ export default function SetupPage() {
       }
 
       setError({ status: false, title: "", body: ""})
+
+      // Update data to saved state
+      setStoreInfo(prev => ({...prev, edited: false}))
+      setShippingPolicy(prev => ({...prev, edited: false}));
+      setReturnPolicy(prev => ({...prev, edited: false}));
+      setDeletedFaqs([])
+      const faqsSavedStatus = faqs.map(faq => ({
+        ...faq,
+        status: 'UNCHANGED'
+      }));
+      setFaqs(faqsSavedStatus);
+
       setIsSubmitting(false);
       setIsDirty(false);
       toggleToast("Store Updated");
@@ -297,6 +308,7 @@ export default function SetupPage() {
 
   const handleReset = () => {
     if (shop) {
+      setError({ status: false, title: "", body: "" })
       setIsLoading(true);
       fetchAndSetSetupData();
       setIsLoading(false);
