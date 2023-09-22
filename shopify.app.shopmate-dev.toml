@@ -2,7 +2,7 @@
 
 name = "ShopMate Dev"
 client_id = "c8acbeffc4d6770cc205892ee94f8cb3"
-application_url = "https://elvis-luis-formal-lives.trycloudflare.com"
+application_url = "https://union-orange-specs-harley.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -12,9 +12,9 @@ use_legacy_install_flow = true
 
 [auth]
 redirect_urls = [
-  "https://elvis-luis-formal-lives.trycloudflare.com/auth/callback",
-  "https://elvis-luis-formal-lives.trycloudflare.com/auth/shopify/callback",
-  "https://elvis-luis-formal-lives.trycloudflare.com/api/auth/callback"
+  "https://union-orange-specs-harley.trycloudflare.com/auth/callback",
+  "https://union-orange-specs-harley.trycloudflare.com/auth/shopify/callback",
+  "https://union-orange-specs-harley.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

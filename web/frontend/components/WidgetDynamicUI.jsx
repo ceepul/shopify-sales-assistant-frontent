@@ -69,7 +69,7 @@ export default function WidgetDynamicUI({preferences}) {
   } 
 
   const accentRgb = hexToRgb(accentColour);
-  const darkerAccentRgb = darkenRgb(accentRgb, 0.20); // Darken by 15%
+  const darkerAccentRgb = darkenRgb(accentRgb, 0.14); // Darken by 14%
 
   const headerBgMainStyle = {
     background: `linear-gradient(180deg, 

@@ -90,13 +90,14 @@ class ChatWidget extends HTMLElement {
           border: none;
           border-radius: 20px;
           width: 384px;
-          height: 600px;
+          height: 700px;
           bottom: 72px;
           right: 50px;
           background-color: #ffffff;
           overflow: hidden;
           transition: opacity 0.3s, transform 0.3s;
           opacity: 0;
+          pointer-events: none;
           transform: translateY(20px);
           box-shadow: 0 4px 8px rgba(128, 128, 128, 0.2);
         }
@@ -208,7 +209,7 @@ class ChatWidget extends HTMLElement {
           flex-direction: column;
           align-items: center;
           position: relative;
-          height: 364px;
+          height: 464px;
           padding-inline: 20px;
           overflow-y: scroll;
           scrollbar-width: none; /* For Firefox */
@@ -441,12 +442,11 @@ class ChatWidget extends HTMLElement {
         .chat-widget__product-container {
           display: flex;
           gap: 10px;
-          background-color: #f1f2f4;
           border-radius: 10px;
           align-self: flex-start;
           min-height: 238px;
           max-width: 90%;
-          padding: 10px;
+          padding: 4px;
           margin-bottom: 16px;
           overflow-x: scroll;
           overflow-y: hidden;
@@ -455,6 +455,7 @@ class ChatWidget extends HTMLElement {
         .chat-widget__product-card {
           background-color: #ffffff;
           border-radius: 6px;
+          box-shadow: 1px 1px 4px #999999;
           min-height: 210px;
           min-width: 156px;
           max-width: 156px;
@@ -555,6 +556,39 @@ class ChatWidget extends HTMLElement {
           50% { opacity: 1; }
           100% { opacity: 0; }
         }  
+
+        @media only screen and (max-width: 768px) {
+          .chat-widget {
+              bottom: 20px;
+              right: 20px;
+          }
+      
+          .chat-widget__toggle {
+              bottom: 20px;
+              right: 20px;
+              top: auto;
+              left: auto; 
+          }
+      
+          .chat-widget__box {
+              pointer-events: auto;
+              width: 100vw;
+              height: 100vh;
+              bottom: -20px;
+              right: -20px;
+              border-radius: 0px;
+          }
+
+          .chat-widget__header-background-round {
+            width: 200vw;
+            left: -50vw;
+            border-radius: 100vw/66px;
+          }
+
+          .chat-widget__body-container {
+            height: 72%;
+          }
+      }      
 
       </style>
       <div id="chat-widget" class="chat-widget"></div>
@@ -674,6 +708,8 @@ class ChatToggle extends HTMLElement  {
     
     // Add event listener to the instance itself.
     this.addEventListener('click', this.boundToggleChatBox);
+
+    window.addEventListener('requestChatBoxClose', this.boundToggleChatBox);
   }
 
   connectedCallback() {
@@ -761,6 +797,7 @@ class ChatToggle extends HTMLElement  {
       this.updateIcon(false); // update icon before starting the close animation
       chatBox.style.opacity = '0';
       chatBox.style.transform = 'translateY(20px)';
+      chatBox.style.pointerEvents = 'none';
       setTimeout(() => { 
         chatBox.style.display = 'none';
       }, 300);
@@ -772,6 +809,7 @@ class ChatToggle extends HTMLElement  {
       setTimeout(() => { 
         chatBox.style.opacity = '1';
         chatBox.style.transform = 'translateY(0px)';
+        chatBox.style.pointerEvents = 'auto';
       }, 50);
       sessionStorage.setItem('isChatBoxOpen', JSON.stringify(true));
     }
@@ -974,24 +1012,29 @@ class ChatBox extends HTMLElement  {
   /* Other Functions */
   updatePosition() {
     const windowWidth = window.innerWidth;
-    const transformValue = -20 + (windowWidth - 384) / 2
+    if (windowWidth >= 768) {
+      const transformValue = -20 + (windowWidth - 384) / 2
 
-    if(this.position === 'left') {
-        if (windowWidth < 524) {
-            this.style.left = `${transformValue}px`;
-            this.style.right = 'auto';
-        } else {
-            this.style.left = '50px';
-            this.style.right = 'auto';
-        }
+      if(this.position === 'left') {
+          if (windowWidth < 524) {
+              this.style.left = `${transformValue}px`;
+              this.style.right = 'auto';
+          } else {
+              this.style.left = '50px';
+              this.style.right = 'auto';
+          }
+      } else {
+          if (windowWidth < 524) {
+              this.style.right = `${transformValue}px`;
+              this.style.left = 'auto';
+          } else {
+              this.style.right = '50px';
+              this.style.left = 'auto';
+          }
+      }
     } else {
-        if (windowWidth < 524) {
-            this.style.right = `${transformValue}px`;
-            this.style.left = 'auto';
-        } else {
-            this.style.right = '50px';
-            this.style.left = 'auto';
-        }
+      this.style.left = 'auto';
+      this.style.right = '-20px';
     }
   }
 
@@ -1092,7 +1135,12 @@ class ChatBox extends HTMLElement  {
       link.addEventListener('click', (e) => {
         const productId = e.currentTarget.getAttribute('data-product-id');
         this.addProductViewEvent(productId);
-        sessionStorage.setItem('isChatBoxOpen', JSON.stringify(false))
+
+        // Dispatch an event to request the chat box to toggle/close.
+        let closeRequestEvent = new Event('requestChatBoxClose');
+        window.dispatchEvent(closeRequestEvent);
+
+        sessionStorage.setItem('isChatBoxOpen', JSON.stringify(false));
       });
     });
 
@@ -1182,8 +1230,10 @@ class ChatBox extends HTMLElement  {
       }
       const jsonRes = await response.json();
       this.hideLoading();
-      this.addMessage(jsonRes.role, jsonRes.content);
-
+      jsonRes.forEach(message => {
+        this.addMessage(message.role, message.content);
+      });
+    
       if (jsonRes.fetchProducts) { // Check if fetchProducts is true
         this.showLoading();
         const productResponse = await fetch(`https://y143kaik7d.execute-api.us-east-1.amazonaws.com/messages/product`, {
