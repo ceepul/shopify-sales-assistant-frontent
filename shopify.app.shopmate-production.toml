@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 name = "ShopMate"
-client_id = "00b9d7b9050ab1573a521a60dc8cebfe"
-application_url = "https://ellis-purpose-catherine-promises.trycloudflare.com"
+client_id = "5f758a7af89249a49fc6348ed6bd4666"
+application_url = "https://listings-pushed-pulled-commodities.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -12,9 +12,9 @@ use_legacy_install_flow = true
 
 [auth]
 redirect_urls = [
-  "https://ellis-purpose-catherine-promises.trycloudflare.com/auth/callback",
-  "https://ellis-purpose-catherine-promises.trycloudflare.com/auth/shopify/callback",
-  "https://ellis-purpose-catherine-promises.trycloudflare.com/api/auth/callback"
+  "https://listings-pushed-pulled-commodities.trycloudflare.com/auth/callback",
+  "https://listings-pushed-pulled-commodities.trycloudflare.com/auth/shopify/callback",
+  "https://listings-pushed-pulled-commodities.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
@@ -29,5 +29,5 @@ api_version = "2023-07"
 embedded = false
 
 [build]
-automatically_update_urls_on_dev = false
+automatically_update_urls_on_dev = true
 dev_store_url = "ceepul-dev-store.myshopify.com"

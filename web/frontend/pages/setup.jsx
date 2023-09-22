@@ -124,9 +124,8 @@ export default function SetupPage() {
     if (shop) { // Only run if shop is not an empty string
       setIsLoading(true);
       setError({ status: false, title: "", body: "" })
-      fetchCurrentPlanDetails().then(res => {setCurrentPlanDetails(res);});
-      fetchAndSetSetupData();
-      setIsLoading(false)
+      fetchCurrentPlanDetails().then(res => { setCurrentPlanDetails(res);});
+      fetchAndSetSetupData().then(setIsLoading(false));
     }
   }, [shop]);
 
@@ -335,10 +334,42 @@ export default function SetupPage() {
     <div>
       <Loading/>
       <Layout>
-        <Layout.Section>
-          <SkeletonDisplayText />
-          <SkeletonBodyText />
-        </Layout.Section>
+        <Layout.AnnotatedSection
+          id="loadingFaqs"
+          title={currentPlanDetails ? `FAQs (${faqs.length}/${currentPlanDetails.faqsAllowed})` : 'FAQs'}
+          description="Add common questions and their answers to enable your AI Assistant to address store-related inquiries effectively."
+        >
+          <AlphaCard>
+            <SkeletonDisplayText />
+            <Box minHeight="2rem" />
+            <SkeletonBodyText lines={3} />
+            <Box minHeight="5rem" />
+          </AlphaCard>
+        </Layout.AnnotatedSection>
+        <Layout.AnnotatedSection
+          id="loadingShippingPolicy"
+          title="Shipping Policy"
+          description="Add a shipping policy to enable your AI Assistant to assist customers with shipping related questions."
+        >
+          <AlphaCard>
+            <SkeletonDisplayText />
+            <Box minHeight="2rem" />
+            <SkeletonBodyText lines={3} />
+            <Box minHeight="5rem" />
+          </AlphaCard>
+        </Layout.AnnotatedSection>
+        <Layout.AnnotatedSection
+          id="loadingReturnPolicy"
+          title="Return Policy"
+          description="Add a return policy to help your AI Assistant to assist customers with questions about returns."
+        >
+          <AlphaCard>
+            <SkeletonDisplayText />
+            <Box minHeight="2rem" />
+            <SkeletonBodyText lines={3} />
+            <Box minHeight="5rem" />
+          </AlphaCard>
+        </Layout.AnnotatedSection>
       </Layout>
     </div>
   ) : null;
@@ -413,7 +444,7 @@ export default function SetupPage() {
           fullWidth
         />
 
-        <Layout.AnnotatedSection
+        {/* <Layout.AnnotatedSection
           id="storeInfo"
           title="Store Info"
           description="Add general information about your store such as the types of products your store sells"
@@ -431,7 +462,7 @@ export default function SetupPage() {
             >
             </TextField>
           </AlphaCard>
-        </Layout.AnnotatedSection>
+        </Layout.AnnotatedSection> */}
 
         <Layout.AnnotatedSection
           id="faqs"

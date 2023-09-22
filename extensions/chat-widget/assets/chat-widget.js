@@ -571,9 +571,8 @@ class ChatWidget extends HTMLElement {
           }
       
           .chat-widget__box {
-              pointer-events: auto;
               width: 100vw;
-              height: 100vh;
+              height: 90vh;
               bottom: -20px;
               right: -20px;
               border-radius: 0px;
@@ -586,7 +585,7 @@ class ChatWidget extends HTMLElement {
           }
 
           .chat-widget__body-container {
-            height: 72%;
+            height: 62%;
           }
       }      
 
@@ -861,8 +860,10 @@ class ChatBox extends HTMLElement  {
     }
 
     // Check session storage for open / closed state and set styling accordingly
+    console.log(`Checking session storage`)
     if (sessionStorage.getItem('isChatBoxOpen') === 'true') {
       this.style.display = 'block';
+      this.style.pointerEvents = 'auto';
       setTimeout(() => { 
         this.style.opacity = '1'; 
         this.style.transform = 'translateY(0px)';
