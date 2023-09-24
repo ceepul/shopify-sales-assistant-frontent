@@ -10,6 +10,8 @@ import {
 import { TitleBar, useNavigate, useAuthenticatedFetch } from "@shopify/app-bridge-react"
 import { useLocation } from 'react-router-dom'
 import { useEffect, useState } from "react";
+import { homeTrophy } from "../../assets";
+
 
 export default function ConfirmationPage() {
   const breadcrumbs = [{ content: "ShopMate", url: "/" }, { content: "Plan", url: "/plan" }];
@@ -51,7 +53,7 @@ export default function ConfirmationPage() {
   const successMarkup = !isLoading ? (
     <AlphaCard padding='8'>
       <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-        <img width='160' src="../assets/home-trophy.png" alt="Trophy Icon" />
+        <img width='160' src={homeTrophy} alt="Trophy Icon" />
         <Text variant="headingXl">Success!</Text>
         <Box minHeight="1rem"/>
         <Text variant="bodyMd">Your current plan has been updated.</Text>

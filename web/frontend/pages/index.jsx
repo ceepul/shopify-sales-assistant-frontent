@@ -2,17 +2,14 @@ import { useNavigate, useAuthenticatedFetch, TitleBar, Loading } from "@shopify/
 import {
   AlphaCard,
   Banner,
-  Icon,
   Layout,
   Page,
   SkeletonBodyText,
   Text
 } from "@shopify/polaris";
-import {
-  ChatMajor,
-  CalendarMajor
-} from '@shopify/polaris-icons';
 import { useState, useEffect } from "react";
+import { useAppState } from "../contexts/AppStateContext";
+
 import PlaceholderStat from "../components/PlaceholderStat";
 import MessagesChart from "../components/MessagesChart";
 import RecommendationEventsChart from "../components/RecommendationEventsChart";
@@ -37,11 +34,10 @@ export default function HomePage() {
       title: "",
       body: "",
     });
-    const [isSubscriptionStatusBannerVisible, setIsSubscriptionStatusBannerVisible] = useState(true);
+    const { showSubscriptionBanner, setShowSubscriptionBanner } = useAppState();
 
     const handleSubscriptionStatusBannerDismiss = () => {
-      setIsSubscriptionStatusBannerVisible(false);
-      sessionStorage.setItem('bannerDismissed', 'true');
+      setShowSubscriptionBanner(false);
     };
 
     const fetchShop = async () => {
@@ -49,7 +45,7 @@ export default function HomePage() {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       }).then((response) => response.text());
-
+      
       return shop
     }
 
@@ -111,9 +107,6 @@ export default function HomePage() {
 
     useEffect(() => {
       setIsLoading(true);
-      if (sessionStorage.getItem('bannerDismissed')) {
-        setIsSubscriptionStatusBannerVisible(false);
-      }
       fetchShop()
         .then((shop) => {
           setShop(shop);
@@ -203,7 +196,7 @@ export default function HomePage() {
               </Layout.Section>
             }
 
-            {isSubscriptionStatusBannerVisible && <Layout.Section fullWidth>
+            {showSubscriptionBanner && <Layout.Section fullWidth>
               {shopData && 
               <SubscriptionStatusBanner 
                   onDismiss={handleSubscriptionStatusBannerDismiss}

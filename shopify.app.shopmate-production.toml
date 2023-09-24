@@ -2,7 +2,7 @@
 
 name = "ShopMate"
 client_id = "5f758a7af89249a49fc6348ed6bd4666"
-application_url = "https://listings-pushed-pulled-commodities.trycloudflare.com"
+application_url = "https://shopmate.fly.dev"
 embedded = true
 
 [access_scopes]
@@ -11,11 +11,7 @@ scopes = "read_products"
 use_legacy_install_flow = true
 
 [auth]
-redirect_urls = [
-  "https://listings-pushed-pulled-commodities.trycloudflare.com/auth/callback",
-  "https://listings-pushed-pulled-commodities.trycloudflare.com/auth/shopify/callback",
-  "https://listings-pushed-pulled-commodities.trycloudflare.com/api/auth/callback"
-]
+redirect_urls = [ "https://shopmate.fly.dev/api/auth/callback" ]
 
 [webhooks]
 api_version = "2023-07"
@@ -29,5 +25,5 @@ api_version = "2023-07"
 embedded = false
 
 [build]
-automatically_update_urls_on_dev = true
+automatically_update_urls_on_dev = false
 dev_store_url = "ceepul-dev-store.myshopify.com"

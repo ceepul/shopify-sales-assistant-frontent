@@ -2,7 +2,7 @@
 
 name = "ShopMate Dev"
 client_id = "c8acbeffc4d6770cc205892ee94f8cb3"
-application_url = "https://m-cambridge-jurisdiction-contracts.trycloudflare.com"
+application_url = "https://infinite-nitrogen-portland-room.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -12,9 +12,9 @@ use_legacy_install_flow = true
 
 [auth]
 redirect_urls = [
-  "https://m-cambridge-jurisdiction-contracts.trycloudflare.com/auth/callback",
-  "https://m-cambridge-jurisdiction-contracts.trycloudflare.com/auth/shopify/callback",
-  "https://m-cambridge-jurisdiction-contracts.trycloudflare.com/api/auth/callback"
+  "https://infinite-nitrogen-portland-room.trycloudflare.com/auth/callback",
+  "https://infinite-nitrogen-portland-room.trycloudflare.com/auth/shopify/callback",
+  "https://infinite-nitrogen-portland-room.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

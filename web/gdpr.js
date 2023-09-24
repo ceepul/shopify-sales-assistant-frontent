@@ -86,22 +86,22 @@ export default {
 
   APP_UNINSTALLED: {
     deliveryMethod: DeliveryMethod.EventBridge,
-    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/48101949441/shopify-recommendation-app'
+    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/62132846593/shopify-recommendation-app'
   },
 
   PRODUCTS_CREATE: {
     deliveryMethod: DeliveryMethod.EventBridge,
-    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/48101949441/shopify-recommendation-app'
+    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/62132846593/shopify-recommendation-app'
   },
 
   PRODUCTS_DELETE: {
     deliveryMethod: DeliveryMethod.EventBridge,
-    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/48101949441/shopify-recommendation-app'
+    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/62132846593/shopify-recommendation-app'
   },
 
   PRODUCTS_UPDATE: {
     deliveryMethod: DeliveryMethod.EventBridge,
-    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/48101949441/shopify-recommendation-app'
+    arn: 'arn:aws:events:us-east-1::event-source/aws.partner/shopify.com/62132846593/shopify-recommendation-app'
   },
 
   APP_SUBSCRIPTIONS_UPDATE: {

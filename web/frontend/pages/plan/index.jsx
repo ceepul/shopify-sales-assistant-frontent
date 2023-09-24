@@ -387,7 +387,7 @@ export default function PlanPage() {
             </div>
           </Layout.Section>
 
-          {/* Request Custom Plan Section */}
+          {/* Request Custom Plan Section
           <Layout.Section>
             <div style={{
                 position: 'relative',
@@ -489,6 +489,7 @@ export default function PlanPage() {
               </Modal>
             </div>
           </Layout.Section>
+          */}
         </Layout>
       </div>
     </AlphaCard>

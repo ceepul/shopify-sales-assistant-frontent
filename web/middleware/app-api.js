@@ -81,7 +81,7 @@ export default function applyAppApiEndpoints(app) {
       const trialDays = req.body.trialDays
 
       const shopDomain = res.locals.shopify.session.shop;
-      const returnUrl = `https://${shopDomain}/admin/apps/chat-reccomendation-app-1/plan/confirmation`;
+      const returnUrl = `https://${shopDomain}/admin/apps/shopmate-3/plan/confirmation`;
       console.log(returnUrl)
 
       // Send a graphQL request to generate charge
