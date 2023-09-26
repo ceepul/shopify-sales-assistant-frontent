@@ -116,16 +116,23 @@ export default function SetupPage() {
 
   useEffect(() => {
     setIsLoading(true);
-    fetchShop().then(shop => setShop(shop))
-      .catch(err => setError({ status: true, title: "Failed to get current plan data", body: "Please try again later." }));  
+    fetchShop()
+      .then(shop => setShop(shop))
+      .catch(() => setError({ status: true, title: "Failed to load data", body: "Please try again later." }))
+      .finally(() => setIsLoading(false)); 
   }, []);
 
   useEffect(() => {
     if (shop) { // Only run if shop is not an empty string
       setIsLoading(true);
-      setError({ status: false, title: "", body: "" })
-      fetchCurrentPlanDetails().then(res => { setCurrentPlanDetails(res);});
-      fetchAndSetSetupData().then(setIsLoading(false));
+      setError({ status: false, title: "", body: "" });
+  
+      Promise.all([
+        fetchCurrentPlanDetails().then(res => setCurrentPlanDetails(res)),
+        fetchAndSetSetupData()
+      ])
+      .catch(error)
+      .finally(() => setIsLoading(false));
     }
   }, [shop]);
 

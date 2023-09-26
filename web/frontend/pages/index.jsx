@@ -107,37 +107,56 @@ export default function HomePage() {
 
     useEffect(() => {
       setIsLoading(true);
-      fetchShop()
-        .then((shop) => {
-          setShop(shop);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          setError({
-            status: true, 
-            title: "Could not fetch shop",
-            body: "We are having trouble loading your store's information. Please try again later."
-          })
-          setIsLoading(false);
-        });  
+      const loadShop = async () => {
+          try {
+              const shopValue = await fetchShop();
+              setShop(shopValue);
+          } catch (err) {
+              setError({
+                  status: true,
+                  title: "Failed to get shop details",
+                  body: "We are having trouble loading your store's information. Please try again later."
+              });
+          } finally {
+              setIsLoading(false);
+          }
+      };
+  
+      loadShop();
     }, []);
 
     useEffect(() => {
-      if (shop) { // Only run if shop is not an empty string
-        fetchShopData(shop).then(data => {
-          setShopData(data);
-          if (data.firstTimeUser) {
-            // Update so they are no longer a first time user
-            const response = fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/firsttimeuser", {
-              method: "PATCH",
-              body: JSON.stringify({ shop: shop, firstTimeUser: false }),
-              headers: { "Content-Type": "application/json" },
+      if (shop) {
+        setIsLoading(true);
+
+        const fetchData = async () => {
+          try {
+            const shopDataResponse = fetchShopData(shop);
+            const currentPlanDetailsResponse = fetchCurrentPlanDetails(shop);
+
+            const [shopData, currentPlanDetails] = await Promise.all([shopDataResponse, currentPlanDetailsResponse]);
+
+            setShopData(shopData);
+            setCurrentPlanDetails(currentPlanDetails);
+
+            if (shopData.firstTimeUser) {
+              await fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/firsttimeuser", {
+                method: "PATCH",
+                body: JSON.stringify({ shop: shop, firstTimeUser: false }),
+                headers: { "Content-Type": "application/json" },
+              });
+            }
+          } catch (error) {
+            setError({
+              status: true,
+              title: "Failed to get shop details",
+              body: "We are having trouble loading your store's details. Please try again later."
             });
+          } finally {
+              setIsLoading(false);
           }
-        });
-        fetchCurrentPlanDetails(shop).then(data => {
-          setCurrentPlanDetails(data)
-        });
+        };
+        fetchData();
       }
     }, [shop]);
 

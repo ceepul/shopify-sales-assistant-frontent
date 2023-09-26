@@ -39,7 +39,7 @@ export default function GettingStartedPrompt({ isActive, onClose, shop }) {
   }, []);
 
   const appEmbedLink = `
-    https://${shop}/admin/themes/current/editor?context=apps&template={template}&activateAppId=${uuid}/app-embed
+    https://${shop}/admin/themes/current/editor?context=apps&activateAppId=${uuid}/app-embed
   `;
 
   const handleNext = () => {

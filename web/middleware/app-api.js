@@ -12,7 +12,6 @@ const SUBSCRIBE_MUTATION = `
       appSubscriptionCreate(
         name: $name
         returnUrl: $returnUrl
-        test: true
         trialDays: $trialDays
         lineItems: [{
           plan: {

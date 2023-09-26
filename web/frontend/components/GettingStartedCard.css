@@ -1,0 +1,42 @@
+.border-wrapper {
+  width: 100%;
+  display: inline-block; /* so the div wraps around the button */
+  background: linear-gradient(to bottom right, #e00af3, #7735e6); /* Top left to bottom right gradient */
+  padding: 1px; /* This determines the border width */
+  border-radius: 10px; /* Same border radius as your button */
+  transition: transform 0.2s; /* Optional hover effect */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.border-wrapper:hover {
+  transform: scale(1.03);
+}
+
+.button-card {
+  width: 100%;
+  min-height: 25vh;
+  background: #ffffff; 
+  padding: 15px;
+  border-radius: 9px; /* A bit smaller than the wrapper to make the border visible */
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden; 
+  transition: transform 0.2s;
+}
+
+.card-title {
+  color: #7735e6;
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.card-body {
+  color: #333;
+  font-size: 1.15em;
+}

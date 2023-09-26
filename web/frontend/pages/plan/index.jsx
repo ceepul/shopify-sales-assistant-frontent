@@ -342,7 +342,7 @@ export default function PlanPage() {
             Find the right plan for your business
           </Text>
           <Text variant="bodyLg" as="p">
-            Start with a 14-day free trial. Cancel at anytime.
+            Start with a 7-day free trial. Cancel at anytime.
           </Text>
         </div>
         <Layout>

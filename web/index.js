@@ -12,6 +12,7 @@ import { formatProductsAsVectors } from "./helpers/format-data.js";
 import { PineconeDB } from "./pinecone-db.js";
 
 import GDPRWebhookHandlers from "./gdpr.js";
+import { error } from "console";
 
 
 const PORT = parseInt(
@@ -46,6 +47,11 @@ app.get(
         headers: { "Content-Type": "application/json" }
       })
 
+      if (!storeTokenResponse.ok) {
+        console.error("Error storing token.")
+        throw new Error(`API response status: ${storeTokenResponse.status}`);
+      }
+
       console.log("Token stored successfully")
 
       // Initialize graphQL client
@@ -78,6 +84,7 @@ app.get(
 
       } catch (error) {
         console.error("Error fetching contact data:", error);
+        throw new Error(`Failed to retrieve shop information.`);
       }
   
       // Create shop in aws database
@@ -86,6 +93,11 @@ app.get(
         body: JSON.stringify({ shop, shopName, contactEmail }),
         headers: { "Content-Type": "application/json" }
       })
+
+      if (!createShopResponse.ok) {
+        console.error(`Failed to create shop for shop: ${shop}`)
+        throw new Error(`Failed to initialize shop.`);
+      }
 
       console.log("Shop Created successfully")
   
@@ -163,8 +175,8 @@ app.get(
       console.log("Success!")
       next();
     } catch (error) {
-      console.error(`Failed to initialize app: ${error.message}`);
-      res.status(500).send(error.message);
+      console.error(`Failed to initialize app: ${error}`);
+      res.status(500).send(`Failed to initialize app. Please try again.`);
     }
   },
 
