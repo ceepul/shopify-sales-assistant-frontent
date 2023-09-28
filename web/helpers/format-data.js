@@ -3,7 +3,10 @@ import { embed } from "../openai.js"
 // Accepts an array of product objects
 export async function formatProductsAsVectors(req, res, productData, shopURL) {
     // Add missing productData error handling here
-    if (!productData) console.log("NO DATA");
+    if (!productData) {
+      console.error("No data")
+      return
+    };
 
     const formattedData = productData.map((product) => {
         return (
@@ -24,7 +27,6 @@ export async function formatProductsAsVectors(req, res, productData, shopURL) {
                 type: "product",
                 ...product.priceRangeV2.maxVariantPrice.amount && { maxPrice: product.priceRangeV2.maxVariantPrice.amount },
                 ...product.priceRangeV2.minVariantPrice.amount && { minPrice: product.priceRangeV2.minVariantPrice.amount },
-                ...product.priceRangeV2.minVariantPrice.currencyCode && { currencyCode: product.priceRangeV2.minVariantPrice.currencyCode },
                 ...product.status && { status: product.status }
             }
         }

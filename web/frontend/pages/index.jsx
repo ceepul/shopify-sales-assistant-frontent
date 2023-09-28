@@ -288,10 +288,16 @@ export default function HomePage() {
         <Page>
           <TitleBar
               title="ShopMate"
-              primaryAction={{
-              content: "Customize Assistant",
-              onAction: () => navigate("/customize"),
-              }}
+              secondaryActions={[
+                {
+                  content: "Customize Assistant",
+                  onAction: () => navigate("/customize"),
+                },
+                {
+                  content: "Setup Knowledge",
+                  onAction: () => navigate("/setup"),
+                }
+              ]}
           />
             {loadingMarkup}
             {connectedMarkup}

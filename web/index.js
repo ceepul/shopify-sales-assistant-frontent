@@ -64,6 +64,9 @@ app.get(
           shop {
             name
             contactEmail
+            currencyFormats {
+              moneyWithCurrencyFormat
+            }
           }
         }
       `;
@@ -81,6 +84,7 @@ app.get(
         const data = contactData?.body?.data.shop;
         shopName = data.name;
         contactEmail = data.contactEmail;
+        console.log(`moneyWithCurrencyFormat: ${data.currencyFormats.moneyWithCurrencyFormat}`)
 
       } catch (error) {
         console.error("Error fetching contact data:", error);
@@ -96,81 +100,26 @@ app.get(
 
       if (!createShopResponse.ok) {
         console.error(`Failed to create shop for shop: ${shop}`)
+        console.log(JSON.stringify(createShopResponse))
         throw new Error(`Failed to initialize shop.`);
       }
 
       console.log("Shop Created successfully")
   
-      // Connect all the store's products to database 50 at a time
-      let hasNextPage = true;
-      let cursor = null;
-
-      while (hasNextPage) {
-        const PRODUCTS_QUERY = `
-          {
-            products(first: 50${cursor ? `, after: "${cursor}"` : ""}) {
-              pageInfo {
-                hasNextPage
-                endCursor
-              }
-              nodes {
-                id
-                handle
-                title
-                description(truncateAt: 1500)
-                status
-                tags
-                featuredImage {
-                  altText
-                  src
-                }
-                priceRangeV2 {
-                  maxVariantPrice {
-                    amount
-                  }
-                  minVariantPrice {
-                    amount
-                    currencyCode
-                  }
-                }
-                options {
-                  name
-                  values
-                }
-              }
-            }
-          }
-        `;
-
-        const productData = await client.query({
-          data: {
-            query: PRODUCTS_QUERY,
-          },
-        });
-
-        const newProducts = productData.body.data.products.nodes;
-
-        // Make a POST request to your API with the new products
-        const postProductsResponse = await fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/products", {
-          method: "POST",
-          body: JSON.stringify({ shop: shop, products: newProducts }),
-          headers: { "Content-Type": "application/json" }
-        });
-
-        // Check the response status and throw an error if the request was unsuccessful
-        if (!postProductsResponse.ok) {
-          throw new Error(`API response status: ${postProductsResponse.status}`);
-        }
-
-        // Format products as vectors
-        const vectorArray = await formatProductsAsVectors(req, res, newProducts, shop)
-
-        // Upsert vectorArray into PineconeDB
-        const upsertResponse = await PineconeDB.upsert(vectorArray, shop)
-        // Update hasNextPage and cursor for next iteration
-        hasNextPage = productData.body.data.products.pageInfo.hasNextPage;
-        cursor = productData.body.data.products.pageInfo.endCursor;
+      // Notify backend to sync products
+      const syncProductsRequest = await fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/shop/sync-products", {
+        method: "POST",
+        body: JSON.stringify({ shop: shop }),
+        headers: { "Content-Type": "application/json" }
+      })
+      
+      if (!syncProductsRequest.ok) {
+        console.error(`Failed to product sync for shop: ${shop}`)
+        console.log(JSON.stringify(syncProductsRequest))
+        throw new Error(`Failed to initialize shop.`);
       }
+
+      console.log("Sync Products Initialized")
   
       console.log("Success!")
       next();
