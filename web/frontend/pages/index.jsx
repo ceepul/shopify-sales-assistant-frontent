@@ -2,11 +2,15 @@ import { useNavigate, useAuthenticatedFetch, TitleBar, Loading } from "@shopify/
 import {
   AlphaCard,
   Banner,
+  Icon,
   Layout,
   Page,
   SkeletonBodyText,
   Text
 } from "@shopify/polaris";
+import {
+  CalendarTimeMinor
+} from '@shopify/polaris-icons';
 import { useState, useEffect } from "react";
 import { useAppState } from "../contexts/AppStateContext";
 
@@ -266,6 +270,7 @@ export default function HomePage() {
                 subHeading = {shopData &&
                   `${Math.ceil((new Date(shopData?.subscriptionEndDate) - new Date()) / (1000 * 60 * 60 * 24))} days remaining in this usage cycle`
                 }
+                icon={<Icon source={CalendarTimeMinor} color="base"/>}
               />
             </Layout.Section>
 

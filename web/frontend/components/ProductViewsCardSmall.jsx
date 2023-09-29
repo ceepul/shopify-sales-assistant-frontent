@@ -2,9 +2,13 @@ import {
   AlphaCard,
   Box,
   Text,
-  Spinner
+  Spinner,
+  Icon
 } from "@shopify/polaris";
 import { useState, useEffect } from "react";
+import {
+  ViewMinor
+} from '@shopify/polaris-icons';
 
 export default function ProductViewsCardSmall({ shop, subscriptionStartDate }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -72,7 +76,10 @@ export default function ProductViewsCardSmall({ shop, subscriptionStartDate }) {
 
   const cardMarkup = (!isLoading && !error.status) ? (
     <div>
-      <Text variant="bodyLg">Product Views</Text>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+        <Text variant="bodyLg">Product Views</Text>
+        <div><Icon source={ViewMinor} color="base"/></div>
+      </div>
       <Box minHeight="0.5rem"/>
       <div style={{ display: 'flex', alignItems: 'end', gap: '0.5rem'}}>
         <Text variant="heading2xl">{totalProductViews}</Text>

@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
 import {
   Layout,
   Page,
   AlphaCard,
   Text,
-  Link,
   List,
   Box
 } from "@shopify/polaris";
@@ -28,55 +26,8 @@ export default function GettingStartedPage() {
 
       <div style ={{margin: '12px'}}>
         <Layout>
-          <Layout.Section>
-            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '6px'}}>
-              <div style={{fontWeight: '600', fontSize: '1.25rem'}}>
-                <span>Getting Started with </span>
-                <span style={{
-                  background: 'linear-gradient(to bottom right, #e00af3, #7735e6)',
-                  webkitBackgroundClip: 'text',
-                  backgroundClip: 'text',
-                  color: 'transparent',
-                }}>ShopMate</span>
-              </div>
-              <Text>Explore tips and tricks to optimize your experience. From installation and customization to support, we've got you covered.</Text>
-            </div>
-            <Box minHeight="1rem"/>
-          </Layout.Section>
-
-          <Layout.Section oneHalf>
-            <GettingStartedCard 
-              title="Installation Guide"
-              body="Learn how to add the AI Assistant to your storefront"
-              onClick={() => navigate("/getting-started/installation")}
-            />
-          </Layout.Section>
-          
-          <Layout.Section oneHalf>
-            <GettingStartedCard 
-              title="Customization"
-              body="Information on customizing your AI Assistant"
-              onClick={() => console.log("Card 1 clicked")}
-            />
-          </Layout.Section>
   
-          <Layout.Section oneHalf>
-            <GettingStartedCard 
-              title="Setup"
-              body="Learn how to add custom knowledge to your Assistant"
-              onClick={() => console.log("Card 1 clicked")}
-            />
-          </Layout.Section>
-  
-          <Layout.Section oneHalf>
-            <GettingStartedCard 
-              title="Support"
-              body="How to contact us"
-              onClick={() => console.log("Card 1 clicked")}
-            />
-          </Layout.Section>
-  
-          {/* How to Install
+          {/* How to Install */}
           <Layout.Section>
             <AlphaCard>
               <Text variant="headingLg">How to Install the Chatbot</Text>
@@ -150,7 +101,6 @@ export default function GettingStartedPage() {
                   <Box minHeight="0.5rem" />
               </AlphaCard>
           </Layout.Section>
-          */}
         </Layout>
       </div>
     </Page>
