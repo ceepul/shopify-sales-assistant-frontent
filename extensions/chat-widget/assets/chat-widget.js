@@ -1,5 +1,3 @@
-console.log("Script Loaded")
-
 function hexToRgb(hex) {
   // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
   var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
@@ -335,12 +333,17 @@ class ChatWidget extends HTMLElement {
         .chat-widget__send-button-container:hover {
           background-color: rgba(128, 128, 128, 0.1);
         }
+
+        .chat-widget__send-button-container.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }     
         
         .chat-widget__send-button {
           object-fit: cover;
           height: 32px;
           width: 32px;
-        }      
+        }   
         
         .chat-widget__footer-divider {
           width: 90%;
@@ -373,12 +376,17 @@ class ChatWidget extends HTMLElement {
         
         .chat-widget__powered-by-name {
           color: #008bf5;
+          text-decoration: none;
           font-family: "Open Sans", Helvetica;
           font-size: 10px;
           font-weight: 600;
           letter-spacing: 0;
           line-height: 22px;
           white-space: nowrap;
+        }
+
+        .chat-widget__powered-by-name a:hover {
+          text-decoration: underline;
         }
 
         .chat-widget__character-count-container {
@@ -395,6 +403,10 @@ class ChatWidget extends HTMLElement {
           font-size: 10px;
           font-weight: 400;
           line-height: 22px;
+        }
+
+        .chat-widget__character-count-text.highlight {
+          color: #E00000;
         }
 
         .chat-widget__first-message {
@@ -697,8 +709,6 @@ class ChatWidget extends HTMLElement {
 }
 customElements.define('chat-widget', ChatWidget);
 
-
-
 class ChatToggle extends HTMLElement  {
   constructor() {
     super();
@@ -783,8 +793,7 @@ class ChatToggle extends HTMLElement  {
         `;
       }
     }
-  }
-    
+  }   
 
   toggleChatBox() {
     const chatBox = this.getRootNode().querySelector('.chat-widget__box');
@@ -803,6 +812,8 @@ class ChatToggle extends HTMLElement  {
       sessionStorage.setItem('isChatBoxOpen', JSON.stringify(false));
 
     } else {
+      document.dispatchEvent(new CustomEvent('setupWebsocket')); // Dispatch an event to setup the websocket
+       
       chatBox.style.display = 'block';
       this.updateIcon(true);
       setTimeout(() => { 
@@ -826,6 +837,10 @@ class ChatBox extends HTMLElement  {
     this.boundInputEvent = this.handleInputEvent.bind(this);
     this.boundSendButtonClick = this.handleSendButtonClick.bind(this);
     this.boundKeyDownEvent = this.handleKeyDownEvent.bind(this);
+    this.boundSetupWebSocket = this.setupWebSocket.bind(this);
+
+    this.websocket = null;
+    this.messageBuffer = [];
   }
 
   connectedCallback() {
@@ -862,6 +877,7 @@ class ChatBox extends HTMLElement  {
     // Check session storage for open / closed state and set styling accordingly
     console.log(`Checking session storage`)
     if (sessionStorage.getItem('isChatBoxOpen') === 'true') {
+      this.setupWebSocket();
       this.style.display = 'block';
       this.style.pointerEvents = 'auto';
       setTimeout(() => { 
@@ -930,7 +946,9 @@ class ChatBox extends HTMLElement  {
         </div>
         <div class="chat-widget__powered-by-container">
           <div class="chat-widget__powered-by-text">Powered by</div>
-          <div class="chat-widget__powered-by-name" style="${poweredByNameStyle}">ShopMate</div>
+          <div class="chat-widget__powered-by-name" style="${poweredByNameStyle}">
+            <a href="https://apps.shopify.com/shopmate-1" target="_blank" style="${poweredByNameStyle}">ShopMate</a>
+          </div>
         </div>
       </div>
     `;
@@ -952,6 +970,8 @@ class ChatBox extends HTMLElement  {
 
     const sendButton = this.querySelector('#send-button');
     sendButton.addEventListener('click', this.boundSendButtonClick);
+
+    document.addEventListener('setupWebsocket', this.boundSetupWebSocket); // Websocket event listner
   }
 
   disconnectedCallback() {
@@ -977,7 +997,9 @@ class ChatBox extends HTMLElement  {
       sendButton.removeEventListener('click', this.boundSendButtonClick);
     }
 
+    this.closeWebSocket();
     window.removeEventListener('resize', this.boundUpdatePosition);
+    document.removeEventListener('setupWebsocket', this.boundSetupWebSocket);
   }
 
   /* Event handlers */
@@ -994,23 +1016,180 @@ class ChatBox extends HTMLElement  {
     let charCount = e.target.value.length;
     const charCountText = this.querySelector('.chat-widget__character-count-text');
     charCountText.textContent = `${charCount}/200`;
-    const sendButton = this.querySelector('#send-button');
-    sendButton.disabled = charCount > 200;
+    if(charCount > 200) {
+      charCountText.classList.add('highlight');
+    } else {
+      charCountText.classList.remove('highlight');
+    }
   }
 
   handleSendButtonClick(e) {
     e.preventDefault();
-    this.handleSubmit();
-  }
+    const sendButton = document.getElementById('send-button');
+    // Only submit if the button is not disabled:
+    if (!sendButton.disabled) {
+      this.handleSubmit();
+    }
+  }  
 
   handleKeyDownEvent(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      this.handleSubmit();
+      const sendButton = document.getElementById('send-button');
+      console.log(`Send button disable state: ${sendButton.disabled}`)
+
+      // Only submit if the button is not disabled:
+      if (!sendButton.disabled) {
+        this.handleSubmit();
+      }
+    }
+  }  
+
+  /* Other Functions */
+  setupWebSocket() {
+    console.log("Setting up websocket.")
+    if (!this.websocket || this.websocket.readyState !== WebSocket.OPEN) {
+      const connectionId = JSON.parse(sessionStorage.getItem('websocketConnectionId'));
+      const webSocketUrl = `wss://4af0m2aw8b.execute-api.us-east-1.amazonaws.com/production?shop=${this.shop}${connectionId ? `&connectionId=${connectionId}` : ''}`;
+      this.websocket = new WebSocket(webSocketUrl);
+      
+      this.nextIndex = 0;
+      this.lastIndex = null;
+
+      this.messageHandlers = {
+        stream: (payload) => {
+          const data = payload.data;
+          console.log(data.content, data.index)
+
+          // If it is the first message, add a new message, check if there's anything in the buffer
+          if (data.index === 0 || data.index === null || data.index === undefined) {
+            this.addMessage(data.role, data.content);
+            this.nextIndex = 1;
+            this.checkBufferForNextMessage();
+            return;
+          }
+          
+          if (data.finish_reason){ // If it's the last message, set the final index
+            console.log("FINAL INDEX IS:", data.index)
+            this.lastIndex = data.index;
+            this.checkBufferForNextMessage();
+            return;
+          } 
+
+          /* If not first and not last */
+          if (data.index === this.nextIndex) { // If this is the next segment to be added
+            const lastMessage = this.messages[this.messages.length - 1]; // Get the last message
+            lastMessage.content = `${lastMessage.content}${data.content}` // Add the new chunk to the last message
+            this.nextIndex++;
+            this.checkBufferForNextMessage();
+          } else { // If not the next segment, buffer it for later.
+            this.messageBuffer.push(data);
+          }
+
+          this.renderMessages();
+        },
+        message: (payload) => {
+          console.log('Handle products...')
+          const data = payload.data;
+          this.addMessage(data.role, data.content);
+          this.renderMessages();
+        },
+        sendConnectionId: (payload) => {
+          sessionStorage.setItem('websocketConnectionId', JSON.stringify(payload.data.connectionId));
+        },
+        finish: (payload) => {
+          sessionStorage.setItem('messages', JSON.stringify(this.messages));
+          this.nextIndex = 0;
+          this.lastIndex = null;
+          this.messageBuffer = [];
+          this.setDisableSendButton(false);
+        }
+      };
+
+      this.checkBufferForNextMessage = () => {
+        let foundIndex = null;
+
+        for (let i = 0; i < this.messageBuffer.length; i++) {
+          if (this.messageBuffer[i].index === this.nextIndex) {
+            const lastMessage = this.messages[this.messages.length - 1];
+            lastMessage.content = `${lastMessage.content}${this.messageBuffer[i].content}`; 
+            this.nextIndex++;
+            foundIndex = i;
+            break;
+          }
+        }
+
+        if (foundIndex !== null) {
+          this.messageBuffer.splice(foundIndex, 1); // Remove the used message from the buffer
+          this.checkBufferForNextMessage(); // Check again after removing a message from buffer
+        }
+
+        this.renderMessages();
+      };
+
+      this.handleOpen = (event) => {
+        this.websocket.send(JSON.stringify({ 
+          action: 'getConnectionId',
+        }));
+      };
+
+      // Handle incoming messages
+      this.handleMessage = (event) => {
+        const dataFromServer = JSON.parse(event.data);
+        if (this.isLoading) this.hideLoading(); 
+
+        const actionType = dataFromServer.action;
+        console.log(`Action type: ${actionType}`)
+        if (typeof this.messageHandlers[actionType] === 'function') {
+          this.messageHandlers[actionType](dataFromServer);
+        } else {
+          console.warn("No handler found for action type:", actionType);
+        }
+      };
+    
+      // Handle possible errors
+      this.handleError = (event) => {
+        console.error('WebSocket error:', event);
+        this.setDisableSendButton(false);
+        this.closeWebSocket(); // Close the websocket on error if not already closed
+        this.websocket = null; // Reset the websocket instance to null
+      };
+    
+      // Handle socket closure
+      this.handleClose = (event) => {
+        console.log('WebSocket closed:', event);
+        this.removeWebsocketEventListeners();
+        this.websocket = null;
+      };
+
+      // Add event listeners
+      this.websocket.addEventListener('open', this.handleOpen);
+      this.websocket.addEventListener('message', this.handleMessage);
+      this.websocket.addEventListener('error', this.handleError);
+      this.websocket.addEventListener('close', this.handleClose);
+    } else {
+      console.log('WebSocket is already open, not reconnecting.');
     }
   }
 
-  /* Other Functions */
+  removeWebsocketEventListeners() {
+    // Check if the websocket exists and is not null
+    if(this.websocket) {
+      // Remove the event listeners
+      this.websocket.removeEventListener('open', this.handleOpen);
+      this.websocket.removeEventListener('message', this.handleMessage);
+      this.websocket.removeEventListener('error', this.handleError);
+      this.websocket.removeEventListener('close', this.handleClose);
+    }
+  }
+
+  closeWebSocket() {
+    this.removeWebsocketEventListeners();
+    if (this.websocket) {
+      this.websocket.close();
+    }
+  }  
+  
   updatePosition() {
     const windowWidth = window.innerWidth;
     if (windowWidth >= 768) {
@@ -1171,14 +1350,23 @@ class ChatBox extends HTMLElement  {
     if (this.isLoading) {
       this.isLoading = false;
       const bodyContainer = this.querySelector('.chat-widget__body-container');
-      console.log(bodyContainer)
       const loadingElement = bodyContainer.querySelector('.chat-widget__loading-animation');
-      console.log(loadingElement)
       if (loadingElement) {
         loadingElement.remove();
       }
     }
   }
+
+  setDisableSendButton = (disable) => {
+    const sendButton = document.getElementById('send-button');
+    sendButton.disabled = disable;
+    
+    if (disable) {
+      sendButton.classList.add('disabled');
+    } else {
+      sendButton.classList.remove('disabled');
+    }
+  };
 
   async addProductViewEvent(productId) {
     fetch(`https://y143kaik7d.execute-api.us-east-1.amazonaws.com/events/product-view`, {
@@ -1201,11 +1389,11 @@ class ChatBox extends HTMLElement  {
 
     // Check if the text is empty
     if (text === '') {
-      console.log('Input is empty. Message not sent.');
       return; // Exit the function early if the message is empty
     }
   
-    this.addMessage('user', text); // Add the user's message to the message array
+    this.setDisableSendButton(true);
+    this.addMessage('user', text);
 
     this.showHomeScreen = false;  // Don't show the homescreen, show the messages instead
     this.renderMessages();
@@ -1214,52 +1402,26 @@ class ChatBox extends HTMLElement  {
     input.value = '';
     charCountText.textContent = '0/200';
 
-    // Send only the 9 most recent messages to the message API
-    const trimmedMessages = this.messages.slice(-9);
+    if (!this.websocket || this.websocket.readyState !== WebSocket.OPEN) {
+      // Initialize WebSocket connection if it's not already connected
+      this.setupWebSocket();
+      // Optional: Wait for connection to be established if needed
+      while(this.websocket.readyState !== WebSocket.OPEN) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      console.log('websocket connection succesfull')
+    }
 
     try {
-      const response = await fetch(`https://y143kaik7d.execute-api.us-east-1.amazonaws.com/messages/default`, {
-        method: "POST",
-        body: JSON.stringify({ shop: this.shop, messages: trimmedMessages }),
-        headers: { "Content-Type": "application/json" }
-      })
-
-      if (!response.ok) {
-        console.error("There was an error sending the message");
-        this.hideLoading();
-        return;
-      }
-      const jsonRes = await response.json();
-      this.hideLoading();
-      jsonRes.forEach(message => {
-        this.addMessage(message.role, message.content);
-      });
-    
-      if (jsonRes.fetchProducts) { // Check if fetchProducts is true
-        this.showLoading();
-        const productResponse = await fetch(`https://y143kaik7d.execute-api.us-east-1.amazonaws.com/messages/product`, {
-          method: "POST",
-          body: JSON.stringify({ shop: this.shop, query: jsonRes.content }), // Include the shop and the content from the previous response
-          headers: { "Content-Type": "application/json" }
-        });
-
-        if (!productResponse.ok) {
-          console.error("There was an error sending the product message");
-          this.hideLoading();
-          return;
-        }
-
-        const productJsonRes = await productResponse.json();
-        this.hideLoading();
-
-        if (productJsonRes.content) {
-          this.addMessage(productJsonRes.role, productJsonRes.content);
-        }
-      }
-
+      // Send the message through the WebSocket
+      this.websocket.send(JSON.stringify({ 
+        action: 'sendMessage',
+        shop: this.shop, 
+        messages: this.messages.slice(-9) // Only send the 9 most recent messages
+      }));
     } catch (error) {
       console.error('Error sending message: ', error);
-    }
+    }    
   }
 }
 customElements.define('chat-box', ChatBox);
