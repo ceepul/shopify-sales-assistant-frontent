@@ -28,6 +28,11 @@ class ChatWidget extends HTMLElement {
     super();
   }
 
+  setVHProperty() {
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  }
+
   connectedCallback() {
     this.innerHTML = `
       <style>
@@ -41,6 +46,11 @@ class ChatWidget extends HTMLElement {
         
         /* Element: Toggle Button */
         .chat-widget__toggle {
+          display: flex;
+          align-items: center;
+        }
+
+        .chat-widget__toggle-button {
             width: 64px;
             height: 64px;
             border-radius: 50%;
@@ -55,12 +65,11 @@ class ChatWidget extends HTMLElement {
             box-shadow: 0px 0px 4px #616161;
         }
         
-        /* Element: Toggle Button Icon */
         .chat-widget__toggle-icon {
           width: 38px;
           height: 38px;
           transition: transform 0.2s ease, opacity 0.10s ease;
-          opacity: 1; /* Fully visible by default */
+          opacity: 1;
         }
         
         .chat-widget__toggle-icon--rotate {
@@ -68,15 +77,14 @@ class ChatWidget extends HTMLElement {
         }
         
         .chat-widget__toggle-icon--fade {
-            opacity: 0; /* Fully transparent */
+            opacity: 0;
         }
 
-        /* Pseudo-classes for the Toggle Button using BEM */
-        .chat-widget__toggle:hover {
+        .chat-widget__toggle-button:hover {
             transform: scale(1.10);
         }
         
-        .chat-widget__toggle:active {
+        .chat-widget__toggle-button:active {
             transform: scale(0.95);
         }      
 
@@ -104,10 +112,11 @@ class ChatWidget extends HTMLElement {
           display: flex;
           justify-content: center;
           border: 0px none;
-          height: 128px;
+          height: 124px;
           width: 100%;
           top: 0;
           overflow: hidden;
+          position: relative;
         }
         
         .chat-widget__header-background-round {
@@ -115,16 +124,16 @@ class ChatWidget extends HTMLElement {
           background-color: #47afff;
           border-radius: 396px/66px;
           box-shadow: 0px 0px 4px #8b8680;
-          height: 128px;
-          left:-204px;
+          height: 116px;
+          left:-60%;
           position: absolute;
-          width: 792px;
+          width: 220%;
         }
         
         .chat-widget__header-background-main {
           z-index: 1;
           background: linear-gradient(180deg, rgb(0, 139, 245) 0%, rgb(71, 175, 255) 100%);
-          height: 120px;
+          height: 106px;
           position: relative;
           width: 100%;
         }
@@ -135,13 +144,13 @@ class ChatWidget extends HTMLElement {
           align-items: center;
           height: 68px;
           position: absolute;
-          top: 34px;
-          width: 342px;
+          top: 24px;
+          width: 88%;
         }
         
         .chat-widget__avatar {
-          width: 68px;
-          height: 68px;
+          width: 64px;
+          height: 64px;
         }
         
         .chat-widget__title-container {
@@ -170,7 +179,7 @@ class ChatWidget extends HTMLElement {
           white-space: nowrap;
         }
         
-        .chat-widget__info-icon-container {
+        .chat-widget__trash-icon-container {
           position: absolute;
           padding: 8px;
           display: flex;
@@ -192,7 +201,7 @@ class ChatWidget extends HTMLElement {
           border-radius: 8px;
         }
         
-        .chat-widget__info-icon-container:hover, .chat-widget__close-icon-container:hover {
+        .chat-widget__trash-icon-container:hover, .chat-widget__close-icon-container:hover {
           background-color: rgba(128, 128, 128, 0.15);
         }
         
@@ -219,62 +228,53 @@ class ChatWidget extends HTMLElement {
           display: none;
         }
 
-        .chat-widget__capabilities-container {
+        .chat-widget__confirm-clear-container {
+          height: 100%;
           display: flex;
           flex-direction: column;
+          justify-content: center;
           align-items: center;
-          margin-top: 40px;
-          margin-bottom: 16px;
+          padding: 20px;
+          text-align: center;
         }
         
-        .chat-widget__capabilities-icon {
-          height: 64px;
-          width: 64px;
+        .chat-widget__confirm-clear-text {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #333;
+        }
+        .chat-widget__button-clear,
+        .chat-widget__button-cancel {
+            width: 30%;
+            max-width: 100px;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
         }
         
-        .chat-widget__capabilities-text {
-          color: #969caa80;
-          font-family: "Open Sans", Helvetica;
-          font-size: 18px;
-          font-weight: 600;
-          letter-spacing: -0.01em;
-          margin: 0;
-          margin-top: 12px;
-          white-space: nowrap;
+        .chat-widget__button-clear {
+            background-color: #e44d26;
+            color: #fff;
         }
         
-        .chat-widget__example-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin-top: 16px;
-          background-color: #d9d9d933;
-          border-radius: 10px;
-          position: relative;
-          width: 332px;
-          padding: 8px;
+        .chat-widget__button-clear:hover {
+            background-color: #b8371e;
+            color: #fff;
         }
         
-        .chat-widget__example-heading {
-          color: #969caab2;
-          font-family: "Open Sans", Helvetica;
-          font-size: 12px;
-          font-weight: 400;
-          line-height: 22px;
-          white-space: nowrap;
-          margin: 0;
+        .chat-widget__button-cancel {
+            background-color: #ddd;
+            color: #333;
         }
         
-        .chat-widget__example-text {
-          color: #969caa80;
-          font-family: "Open Sans", Helvetica;
-          font-size: 12px;
-          font-weight: 400;
-          line-height: 22px;
-          letter-spacing: 0.01em;
-          white-space: nowrap;
-          margin: 0;
-        }
+        .chat-widget__button-cancel:hover {
+            background-color: #ccc;
+            color: #222;
+        }      
         
         .chat-widget__footer-container {
           background-color: #ffffff;
@@ -421,6 +421,33 @@ class ChatWidget extends HTMLElement {
           max-width: 85%;
           margin-bottom: 20px;
         }
+
+        .chat-widget__animated-message {
+          background-color: #f1f2f4;
+          border-radius: 10px 10px 0px 10px;
+          align-self: flex-end;
+          padding: 10px;
+          margin-right: 20px;
+          margin-bottom: 16px;
+        }
+
+        #animatedMessage {
+          opacity: 0;
+          transform: translateY(30px);
+          animation: fadeInUp 1s forwards;
+          animation-delay: 3s;
+        }        
+
+        @keyframes fadeInUp {
+          0% {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }    
         
         .chat-widget__user-message {
           background-color: #47afffce;
@@ -453,15 +480,12 @@ class ChatWidget extends HTMLElement {
         
         .chat-widget__product-container {
           display: flex;
+          flex-wrap: wrap;
           gap: 10px;
-          border-radius: 10px;
           align-self: flex-start;
-          min-height: 238px;
           max-width: 90%;
           padding: 4px;
           margin-bottom: 16px;
-          overflow-x: scroll;
-          overflow-y: hidden;
         }
         
         .chat-widget__product-card {
@@ -469,19 +493,26 @@ class ChatWidget extends HTMLElement {
           border-radius: 6px;
           box-shadow: 1px 1px 4px #999999;
           min-height: 210px;
-          min-width: 156px;
-          max-width: 156px;
+          flex: 1 1 140px;  /* Grow, shrink, base width */
+          max-width: 140px;  /* Optional: Max width */
           padding: 8px;
           display: flex;
           flex-direction: column;
         }
         
+        
+        .chat-widget__product-link:only-child .chat-widget__product-card {
+          max-width: 70%;
+          flex-grow: 1;
+        }
+        
+        
         .chat-widget__product-image {
           display: flex;
           justify-content: center;
           margin: auto;
-          max-height: 140px;
-          max-width: 140px;
+          max-height: 100%;
+          max-width: 100%;
           border-radius: 4px;
         }
         
@@ -571,34 +602,29 @@ class ChatWidget extends HTMLElement {
 
         @media only screen and (max-width: 768px) {
           .chat-widget {
-              bottom: 20px;
-              right: 20px;
+            bottom: 20px;
+            right: 20px;
           }
-      
+        
           .chat-widget__toggle {
-              bottom: 20px;
-              right: 20px;
-              top: auto;
-              left: auto; 
+            bottom: 20px;
+            right: 20px;
+            top: auto;
+            left: auto;
           }
-      
+        
           .chat-widget__box {
-              width: 100vw;
-              height: 90vh;
-              bottom: -20px;
-              right: -20px;
-              border-radius: 0px;
+            width: 100vw;
+            height: calc(var(--vh, 1vh) * 100);
+            bottom: -20px;
+            right: 0;
+            border-radius: 0;
           }
-
-          .chat-widget__header-background-round {
-            width: 200vw;
-            left: -50vw;
-            border-radius: 100vw/66px;
-          }
-
+        
           .chat-widget__body-container {
-            height: 62%;
+            height: calc((var(--vh, 1vh) * 100) - 248px);
           }
+        }
       }      
 
       </style>
@@ -615,7 +641,7 @@ class ChatWidget extends HTMLElement {
 
     preferencesPromise.then(preferences => {
       if (!preferences) {
-        console.error('Failed to fetch shopping assistant preferences');
+        console.warn('Failed to fetch shopping assistant preferences');
         return;  // Exit the function if no preferences are fetched
       }
       if (preferences.overLimit) {
@@ -624,8 +650,8 @@ class ChatWidget extends HTMLElement {
 
       const closeIconURL = this.getAttribute('data-close-icon-url');
       const closeIconDarkURL = this.getAttribute('data-close-icon-dark-url');
-      const infoIconURL = this.getAttribute('data-info-icon-url');
-      const infoIconDarkURL = this.getAttribute('data-info-icon-dark-url');
+      const trashIconURL = this.getAttribute('data-trash-icon-url');
+      const trashIconDarkURL = this.getAttribute('data-trash-icon-dark-url');
       const sendIconURL = this.getAttribute('data-send-icon-url');
       const capabilitiesIconURL = this.getAttribute('data-capabilities-icon-url');
       const xIconURL = this.getAttribute('data-x-icon-url');
@@ -656,6 +682,7 @@ class ChatWidget extends HTMLElement {
       toggle.setAttribute('data-x-icon-dark-url', xIconDarkURL);
       toggle.setAttribute('data-chat-icon-url', chatIconURL);
       toggle.setAttribute('data-chat-icon-dark-url', chatIconDarkURL);
+      toggle.setAttribute('data-toggle-text', 'Anything I can help you find? 😊') // TODO: Update to use variable.
 
       // Create the ChatBox element using the custom constructor
       const box = document.createElement('chat-box');
@@ -666,11 +693,10 @@ class ChatWidget extends HTMLElement {
       box.setAttribute('data-position', position);
       box.setAttribute('data-accent-color', preferences.accentColour);
       box.setAttribute('data-assistant-name', preferences.assistantName);
-      box.setAttribute('data-home-screen', preferences.homeScreen);
       box.setAttribute('data-welcome-message', preferences.welcomeMessage);
       box.setAttribute('data-avatar-image-src', preferences.avatarImageSrc);
-      box.setAttribute('data-info-icon-url', infoIconURL);
-      box.setAttribute('data-info-icon-dark-url', infoIconDarkURL);
+      box.setAttribute('data-trash-icon-url', trashIconURL);
+      box.setAttribute('data-trash-icon-dark-url', trashIconDarkURL);
       box.setAttribute('data-close-icon-url', closeIconURL);
       box.setAttribute('data-close-icon-dark-url', closeIconDarkURL);
       box.setAttribute('data-send-icon-url', sendIconURL);
@@ -678,10 +704,17 @@ class ChatWidget extends HTMLElement {
 
       widget.append(toggle, box);
 
-
     }).catch(error => {
       console.error(`Error in processing preferences:`, error);
     });
+
+    this.setVHProperty();
+    window.addEventListener('resize', this.setVHProperty);
+  }
+
+  disconnectedCallback() {
+    // Remove the event listener to avoid potential memory leaks
+    window.removeEventListener('resize', this.setVHProperty);
   }
 
   async fetchPreferences(shop) {
@@ -724,9 +757,8 @@ class ChatToggle extends HTMLElement  {
   connectedCallback() {
     // Initialize from attributes, these are set when the element is added to the DOM
     this.autoOpen = this.getAttribute('data-auto-open') === 'true';
-    const accentColor = this.getAttribute('data-accent-color');
-    this.style.backgroundColor = accentColor;
-    this.accentRgb = hexToRgb(accentColor);
+    this.accentColor = this.getAttribute('data-accent-color');
+    this.accentRgb = hexToRgb(this.accentColor);
     this.luminance = calculateLuminance(this.accentRgb);
 
     const xIconURL = this.getAttribute('data-x-icon-url');
@@ -735,6 +767,7 @@ class ChatToggle extends HTMLElement  {
     const chatIconDarkURL = this.getAttribute('data-chat-icon-dark-url');
     this.xIconURL = this.luminance > 0.7 ? xIconDarkURL : xIconURL;
     this.chatIconURL = this.luminance > 0.7 ? chatIconDarkURL : chatIconURL;
+    this.toggleText = this.getAttribute('data-toggle-text');
 
     window.addEventListener('chatBoxClosed', this.boundToggleChatBox);
 
@@ -785,12 +818,27 @@ class ChatToggle extends HTMLElement  {
       // Fallback for if there's no icon element.
       if (isChatBoxOpen) {
         this.innerHTML = `
-          <img class="chat-widget__toggle-icon" alt="Toggle Icon" src="${this.xIconURL}" />
+          <div class="chat-widget__toggle-button">
+            <img class="chat-widget__toggle-icon" alt="Toggle Icon" src="${this.xIconURL}" />
+          </div>
         `;
       } else {
-        this.innerHTML = `
-          <img class="chat-widget__toggle-icon" alt="Toggle Icon" src="${this.chatIconURL}" />
-        `;
+          const ctaText = sessionStorage.getItem('hasBeenOpened') === 'true' ? `` : `
+            <div class="chat-widget__animated-message" id="animatedMessage">
+              <p class="chat-widget__assistant-text">${this.toggleText}</p>
+            </div>
+          `;
+          this.innerHTML = `
+            ${ctaText}
+            <div class="chat-widget__toggle-button">
+              <img class="chat-widget__toggle-icon" alt="Toggle Icon" src="${this.chatIconURL}" />
+            </div>
+          `;
+      }
+
+      const toggleButton = this.querySelector('.chat-widget__toggle-button');
+      if (toggleButton) {
+          toggleButton.style.backgroundColor = this.accentColor;
       }
     }
   }   
@@ -813,6 +861,16 @@ class ChatToggle extends HTMLElement  {
 
     } else {
       document.dispatchEvent(new CustomEvent('setupWebsocket')); // Dispatch an event to setup the websocket
+
+      // Remove the text since the chat has now been opened
+      sessionStorage.setItem('hasBeenOpened', 'true');
+      const animatedMessage = document.getElementById('animatedMessage');
+      if (animatedMessage) {
+          animatedMessage.style.animation = 'fadeInUp 0.4as reverse forwards';
+          setTimeout(() => {
+            animatedMessage.remove();
+        }, 400);
+      }
        
       chatBox.style.display = 'block';
       this.updateIcon(true);
@@ -832,7 +890,7 @@ class ChatBox extends HTMLElement  {
     super();
     // Binding event handlers to this
     this.boundUpdatePosition = this.updatePosition.bind(this);
-    this.boundInfoIconClick = this.handleInfoIconClick.bind(this);
+    this.boundTrashIconClick = this.handleTrashIconClick.bind(this);
     this.boundCloseIconClick = this.handleCloseIconClick.bind(this);
     this.boundInputEvent = this.handleInputEvent.bind(this);
     this.boundSendButtonClick = this.handleSendButtonClick.bind(this);
@@ -857,10 +915,10 @@ class ChatBox extends HTMLElement  {
     this.accentRgb = hexToRgb(this.accentColor);
     this.darkerAccentRgb = darkenRgb(this.accentRgb, 0.14);
     this.luminance = calculateLuminance(this.accentRgb);
-    this.infoIconURL = this.luminance > 0.7 ? this.getAttribute('data-info-icon-dark-url') : this.getAttribute('data-info-icon-url');
+    this.trashIconURL = this.luminance > 0.7 ? this.getAttribute('data-trash-icon-dark-url') : this.getAttribute('data-trash-icon-url');
     this.closeIconURL = this.luminance > 0.7 ? this.getAttribute('data-close-icon-dark-url') : this.getAttribute('data-close-icon-url');
-    this.showHomeScreen = this.getAttribute('data-home-screen') === 'true';
-
+    
+    this.showClearChatScreen = false;
     this.messages = [];
     this.isLoading = false;
 
@@ -870,12 +928,11 @@ class ChatBox extends HTMLElement  {
     // Load previous messages from local storage if they exist
     if (sessionStorage.getItem('messages')) {
       this.messages = JSON.parse(sessionStorage.getItem('messages'));
-    } else if (!this.showHomeScreen) {
+    } else {
       this.messages.push({ role: "assistant", content: this.welcomeMessage })
     }
 
     // Check session storage for open / closed state and set styling accordingly
-    console.log(`Checking session storage`)
     if (sessionStorage.getItem('isChatBoxOpen') === 'true') {
       this.setupWebSocket();
       this.style.display = 'block';
@@ -909,7 +966,7 @@ class ChatBox extends HTMLElement  {
       color: ${this.luminance > 0.7 ? '#2a2a2a' : this.accentColor}
     `;
 
-    const infoIconPath = `${this.infoIconURL}`
+    const trashIconPath = `${this.trashIconURL}`
     const closeIconPath = `${this.closeIconURL}`
 
     this.innerHTML = `
@@ -922,8 +979,8 @@ class ChatBox extends HTMLElement  {
             <div class="chat-widget__assistant-name" style="${assistantNameStyle}">${this.assistantName}</div>
             <div class="chat-widget__assistant-subtitle" style="${textColorStyle}">AI Shopping Assistant</div>
           </div>
-          <div class='chat-widget__info-icon-container'>
-            <img class='chat-widget__header-icon' alt="Info icon" src="${infoIconPath}"/>
+          <div class='chat-widget__trash-icon-container'>
+            <img class='chat-widget__header-icon' alt="Info icon" src="${trashIconPath}"/>
           </div>
           <div class='chat-widget__close-icon-container'>
             <img class='chat-widget__header-icon' alt="Close icon" src="${closeIconPath}"/>
@@ -958,8 +1015,8 @@ class ChatBox extends HTMLElement  {
     /* Add event listeners */
     window.addEventListener('resize', this.boundUpdatePosition);
 
-    const infoIcon = this.querySelector('.chat-widget__info-icon-container');
-    infoIcon.addEventListener('click', this.boundInfoIconClick);
+    const trashIcon = this.querySelector('.chat-widget__trash-icon-container');
+    trashIcon.addEventListener('click', this.boundTrashIconClick);
 
     const closeIcon = this.querySelector('.chat-widget__close-icon-container');
     closeIcon.addEventListener('click', this.boundCloseIconClick);
@@ -976,9 +1033,9 @@ class ChatBox extends HTMLElement  {
 
   disconnectedCallback() {
     /* Remove event listeners */
-    const infoIcon = this.querySelector('.chat-widget__info-icon-container');
-    if (infoIcon) {
-      infoIcon.removeEventListener('click', this.boundInfoIconClick);
+    const trashIcon = this.querySelector('.chat-widget__trash-icon-container');
+    if (trashIcon) {
+      trashIcon.removeEventListener('click', this.boundtrashIconClick);
     }
 
     const closeIcon = this.querySelector('.chat-widget__close-icon-container');
@@ -1003,8 +1060,8 @@ class ChatBox extends HTMLElement  {
   }
 
   /* Event handlers */
-  handleInfoIconClick() {
-    this.showHomeScreen = !this.showHomeScreen;
+  handleTrashIconClick() {
+    this.showClearChatScreen = !this.showClearChatScreen;
     this.renderMessages();
   }
 
@@ -1036,8 +1093,6 @@ class ChatBox extends HTMLElement  {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       const sendButton = document.getElementById('send-button');
-      console.log(`Send button disable state: ${sendButton.disabled}`)
-
       // Only submit if the button is not disabled:
       if (!sendButton.disabled) {
         this.handleSubmit();
@@ -1047,7 +1102,6 @@ class ChatBox extends HTMLElement  {
 
   /* Other Functions */
   setupWebSocket() {
-    console.log("Setting up websocket.")
     if (!this.websocket || this.websocket.readyState !== WebSocket.OPEN) {
       const connectionId = JSON.parse(sessionStorage.getItem('websocketConnectionId'));
       const webSocketUrl = `wss://4af0m2aw8b.execute-api.us-east-1.amazonaws.com/production?shop=${this.shop}${connectionId ? `&connectionId=${connectionId}` : ''}`;
@@ -1059,8 +1113,6 @@ class ChatBox extends HTMLElement  {
       this.messageHandlers = {
         stream: (payload) => {
           const data = payload.data;
-          console.log(data.content, data.index)
-
           // If it is the first message, add a new message, check if there's anything in the buffer
           if (data.index === 0 || data.index === null || data.index === undefined) {
             this.addMessage(data.role, data.content);
@@ -1070,7 +1122,6 @@ class ChatBox extends HTMLElement  {
           }
           
           if (data.finish_reason){ // If it's the last message, set the final index
-            console.log("FINAL INDEX IS:", data.index)
             this.lastIndex = data.index;
             this.checkBufferForNextMessage();
             return;
@@ -1078,21 +1129,19 @@ class ChatBox extends HTMLElement  {
 
           /* If not first and not last */
           if (data.index === this.nextIndex) { // If this is the next segment to be added
-            const lastMessage = this.messages[this.messages.length - 1]; // Get the last message
-            lastMessage.content = `${lastMessage.content}${data.content}` // Add the new chunk to the last message
+            const lastAssistantMessage = this.messages.slice().reverse().find(msg => msg.role === 'assistant');
+            lastAssistantMessage.content = `${lastAssistantMessage.content}${data.content}` // Add the new chunk to the last message
             this.nextIndex++;
             this.checkBufferForNextMessage();
           } else { // If not the next segment, buffer it for later.
             this.messageBuffer.push(data);
           }
 
-          this.renderMessages();
+          this.renderMessages(false);
         },
         message: (payload) => {
-          console.log('Handle products...')
           const data = payload.data;
           this.addMessage(data.role, data.content);
-          this.renderMessages();
         },
         sendConnectionId: (payload) => {
           sessionStorage.setItem('websocketConnectionId', JSON.stringify(payload.data.connectionId));
@@ -1111,8 +1160,8 @@ class ChatBox extends HTMLElement  {
 
         for (let i = 0; i < this.messageBuffer.length; i++) {
           if (this.messageBuffer[i].index === this.nextIndex) {
-            const lastMessage = this.messages[this.messages.length - 1];
-            lastMessage.content = `${lastMessage.content}${this.messageBuffer[i].content}`; 
+            const lastAssistantMessage = this.messages.slice().reverse().find(msg => msg.role === 'assistant');
+            lastAssistantMessage.content = `${lastAssistantMessage.content}${this.messageBuffer[i].content}`; 
             this.nextIndex++;
             foundIndex = i;
             break;
@@ -1124,7 +1173,7 @@ class ChatBox extends HTMLElement  {
           this.checkBufferForNextMessage(); // Check again after removing a message from buffer
         }
 
-        this.renderMessages();
+        this.renderMessages(false);
       };
 
       this.handleOpen = (event) => {
@@ -1139,7 +1188,6 @@ class ChatBox extends HTMLElement  {
         if (this.isLoading) this.hideLoading(); 
 
         const actionType = dataFromServer.action;
-        console.log(`Action type: ${actionType}`)
         if (typeof this.messageHandlers[actionType] === 'function') {
           this.messageHandlers[actionType](dataFromServer);
         } else {
@@ -1157,7 +1205,6 @@ class ChatBox extends HTMLElement  {
     
       // Handle socket closure
       this.handleClose = (event) => {
-        console.log('WebSocket closed:', event);
         this.removeWebsocketEventListeners();
         this.websocket = null;
       };
@@ -1167,8 +1214,6 @@ class ChatBox extends HTMLElement  {
       this.websocket.addEventListener('message', this.handleMessage);
       this.websocket.addEventListener('error', this.handleError);
       this.websocket.addEventListener('close', this.handleClose);
-    } else {
-      console.log('WebSocket is already open, not reconnecting.');
     }
   }
 
@@ -1231,34 +1276,53 @@ class ChatBox extends HTMLElement  {
     this.renderMessages();
   }
 
-  renderMessages() {
+  renderMessages(updateAll = true) {
     const bodyContainer = this.querySelector('.chat-widget__body-container');
-    bodyContainer.innerHTML = '';
-
-    if (this.messages.length === 0 || this.showHomeScreen) {
-      // Show the empty state markup
+  
+    if (this.showClearChatScreen) {
+      // Show the confirm clear markup
       bodyContainer.innerHTML = `
-        <div class="chat-widget__capabilities-container">
-          <img class="chat-widget__capabilities-icon" alt="Capabilities icon" src="${this.capabilitiesIconURL}" />
-          <div class="chat-widget__capabilities-text">Capabilities</div>
-        </div>
-        <div class="chat-widget__example-container">
-            <p class="chat-widget__example-heading">Find exactly what your looking for</p>
-            <p class="chat-widget__example-text">“Show me low-top white shoes”</p>
-        </div>
-        <div class="chat-widget__example-container">
-            <div class="chat-widget__example-heading">Get smart product recommendations</div>
-            <p class="chat-widget__example-text">“I need a top I can wear to a semi-formal event on a hot</p>
-            <p class="chat-widget__example-text"> summer day and that will go with my beige pants”</p>
-        </div>
+          <div class="chat-widget__confirm-clear-container">
+              <p class="chat-widget__confirm-clear-text">Are you sure you want to clear the chat?</p>
+              <button id="clearChatBtn" class="chat-widget__button-clear">Clear</button>
+              <button id="cancelClearChatBtn" class="chat-widget__button-cancel">Cancel</button>
+          </div>
       `;
+  
+      // Event listener for the clear button
+      document.getElementById('clearChatBtn').addEventListener('click', () => {
+          this.messages = [{ role: "assistant", content: this.welcomeMessage }];
+          sessionStorage.setItem('messages', JSON.stringify(this.messages));
+          this.showClearChatScreen = false;
+          this.renderMessages();
+      });
+  
+      // Event listener for the cancel button
+      document.getElementById('cancelClearChatBtn').addEventListener('click', () => {
+          this.showClearChatScreen = false; 
+          this.renderMessages();
+      });
     } else {
       // Display messages
-      this.messages.forEach((message, index) => {
-        this.appendMessage(message.role, message.content, index);
-      });
+      if (updateAll) {
+        // Re-render all messages
+        bodyContainer.innerHTML = '';
+        this.messages.forEach((message, index) => {
+          this.appendMessage(message.role, message.content, index);
+        });
+      } else {
+        // Remove the last message
+        const lastMessageElement = bodyContainer.lastElementChild;
+        if (lastMessageElement) {
+          lastMessageElement.remove();
+        }
+        // Append only the last message
+        const lastMessageIndex = this.messages.length - 1;
+        const lastMessage = this.messages[lastMessageIndex];
+        this.appendMessage(lastMessage.role, lastMessage.content, lastMessageIndex);
+      }
     }
-  }
+  }  
 
   appendMessage(role, content, index) {
     const bodyContainer = this.querySelector('.chat-widget__body-container');
@@ -1383,7 +1447,6 @@ class ChatBox extends HTMLElement  {
 
     // Check if the text exceeds 200 characters
     if (text.length > 200) {
-      console.log('Message is too long. Not sent.');
       return; // Exit the function early if the message is too long
     }
 
@@ -1395,7 +1458,7 @@ class ChatBox extends HTMLElement  {
     this.setDisableSendButton(true);
     this.addMessage('user', text);
 
-    this.showHomeScreen = false;  // Don't show the homescreen, show the messages instead
+    this.showClearChatScreen = false;  // Don't show the homescreen, show the messages instead
     this.renderMessages();
     this.showLoading(); // Show the ... animation
 
@@ -1409,7 +1472,6 @@ class ChatBox extends HTMLElement  {
       while(this.websocket.readyState !== WebSocket.OPEN) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-      console.log('websocket connection succesfull')
     }
 
     try {

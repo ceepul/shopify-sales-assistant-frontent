@@ -27,6 +27,8 @@
     "@shopify/react-hooks": "^3.0.5",
     "@vitejs/plugin-react": "1.2.0",
     "chart.js": "^4.4.0",
+    "date-fns": "^2.30.0",
+    "date-fns-tz": "^2.0.0",
     "dayjs": "^1.11.8",
     "i18next": "^22.4.11",
     "i18next-resources-to-backend": "^1.1.3",

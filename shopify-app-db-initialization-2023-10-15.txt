@@ -14,16 +14,16 @@ INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, tri
 VALUES (0, 'Free Trial', ARRAY['300 messages', 'Seamless integration', 'UI customization', '25 frequently asked questions'], 0.00, 7, NULL, 300, 25);
 
 INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month, faqs_allowed)
-VALUES (1, 'Basic', ARRAY['2000 messages per month', 'Seamless integration', 'UI customization', '25 frequently asked questions'], 49.00, 7, NULL, 2000, 25);
+VALUES (1, 'Basic', ARRAY['1000 messages per month', '25 frequently asked questions', 'Shipping Policy Knowledge', 'Return Policy Knowledge', 'UI customization'], 39.00, 7, NULL, 1000, 25);
 
 INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month, faqs_allowed)
-VALUES (2, 'Entreprenuer', ARRAY['5000 messages per month', 'Seamless integration', 'UI customization', '100 frequently asked questions'], 89.00, 7, NULL, 5000, 100);
+VALUES (2, 'Pro', ARRAY['2500 messages per month', '70 frequently asked questions', 'Shipping Policy Knowledge', 'Return Policy Knowledge', 'UI customization'], 69.00, 7, NULL, 2500, 70);
 
 INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month, faqs_allowed)
-VALUES (3, 'Scale', ARRAY['15000 messages per month', 'Seamless integration', 'UI customization', '300 frequently asked questions'], 219.00, 7, NULL, 15000, 300);
+VALUES (3, 'Scale', ARRAY['7500 messages per month', '200 frequently asked questions', 'Shipping Policy Knowledge', 'Return Policy Knowledge', 'UI customization'], 179.00, 7, NULL, 7500, 200);
 
 INSERT INTO subscription_plans (plan_id, plan_name, features, monthly_price, trial_duration, usage_price, messages_per_month, faqs_allowed)
-VALUES (4, 'Enterprise', ARRAY['40000 messages per month', 'Seamless integration', 'UI customization', '1000 frequently asked questions'], 449.00, 0, 0.01, 40000, 1000);
+VALUES (4, 'Enterprise', ARRAY['15000 messages per month', '1000 frequently asked questions', 'Shipping Policy Knowledge', 'Return Policy Knowledge', 'UI customization'], 349.00, 0, 0.02, 15000, 1000);
 
 CREATE TABLE shops (
     id SERIAL PRIMARY KEY,
@@ -40,6 +40,7 @@ CREATE TABLE shops (
     subscription_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     messages_this_billing_period INTEGER,
     pinecone_db_index VARCHAR(255),
+    product_sync_status VARCHAR(255) DEFAULT 'NOT_SYNCED',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (plan_id) REFERENCES subscription_plans(plan_id)
 );
@@ -56,6 +57,7 @@ CREATE TABLE shop_preferences (
     home_screen BOOLEAN DEFAULT FALSE,
     over_limit BOOLEAN DEFAULT FALSE,
     hide_logo BOOLEAN DEFAULT FALSE,
+    currency_format VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (shop) REFERENCES shops(shop) ON DELETE CASCADE
 );
@@ -81,7 +83,23 @@ CREATE TABLE products (
 CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
     shop VARCHAR(255) NOT NULL,
+    message_text TEXT NOT NULL DEFAULT '',,
+    sender VARCHAR(50) NOT NULL DEFAULT '',
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (shop) REFERENCES shops(shop) ON DELETE CASCADE
+);
+
+CREATE TABLE sessions (
+    id SERIAL PRIMARY KEY,
+    connection_id VARCHAR(255) NOT NULL,
+    shop VARCHAR(255) NOT NULL,
+    session_start TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    session_end TIMESTAMP,
+    session_duration INTERVAL,
+    message_indexes BIGINT[],
+    recommendation_indexes BIGINT[],
+    product_view_ndexes BIGINT[],
+    add_to_cart_indexes BIGINT[],
     FOREIGN KEY (shop) REFERENCES shops(shop) ON DELETE CASCADE
 );
 

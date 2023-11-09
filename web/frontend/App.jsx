@@ -25,6 +25,10 @@ export default function App() {
               <NavigationMenu
                 navigationLinks={[
                   {
+                    label: "Chat History",
+                    destination: "/chat-history",
+                  },
+                  {
                     label: "Customize",
                     destination: "/customize",
                   },
@@ -37,8 +41,8 @@ export default function App() {
                     destination: "/plan",
                   },
                   {
-                    label: "Getting Started",
-                    destination: "/getting-started",
+                    label: "Contact Us",
+                    destination: "/contact-us",
                   },
                 ]}
               />

@@ -1,0 +1,18 @@
+.session-card:hover {
+  background-color: #F3F3F3;
+}
+
+.sidebar-container {
+  height: 95vh;
+}
+
+.sidebar-scroll {
+  overflow-y: auto;
+  max-height: 88%;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

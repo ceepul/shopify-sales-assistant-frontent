@@ -387,7 +387,7 @@ export default function PlanPage() {
             </div>
           </Layout.Section>
 
-          {/* Request Custom Plan Section
+          {/* Request Custom Plan Section */}
           <Layout.Section>
             <div style={{
                 position: 'relative',
@@ -399,7 +399,7 @@ export default function PlanPage() {
                 <div style={{ maxWidth: '600px' }}>
                   <Text>
                     We understand that every business is unique. If our available plans don't meet your requirements,
-                    let us know! We're here to tailor a custom plan just for you.
+                    let us know! We'll help to tailor a custom plan just for you.
                   </Text>
                 </div>
                 <Button onClick={() => setShowContactUsModal(true)}>
@@ -482,14 +482,13 @@ export default function PlanPage() {
                         error={formMessageError}
                         helpText={`${formData.message.length}/3000 characters`} 
                       />
-                      <Text variant="bodyMd">Our team will reach out to you within 2 business days to discuss a tailored solution for your business.</Text>
+                      <Text variant="bodyMd">Our team will reach out to you soon to discuss a tailored solution for your business.</Text>
                     </VerticalStack>
                   }
                 </Modal.Section>
               </Modal>
             </div>
           </Layout.Section>
-          */}
         </Layout>
       </div>
     </AlphaCard>
