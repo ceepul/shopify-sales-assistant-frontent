@@ -1,0 +1,11 @@
+.mobile-close-button {
+  padding: 8px;
+  margin: 0px;
+  border: none;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.mobile-close-button:active {
+  background-color: #f0f0f0;
+}

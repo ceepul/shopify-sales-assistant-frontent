@@ -2,7 +2,7 @@
 
 name = "ShopMate Dev"
 client_id = "c8acbeffc4d6770cc205892ee94f8cb3"
-application_url = "https://sciences-associates-probably-wages.trycloudflare.com"
+application_url = "https://beneath-extend-reproductive-began.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -12,10 +12,10 @@ use_legacy_install_flow = true
 
 [auth]
 redirect_urls = [
-  "https://sciences-associates-probably-wages.trycloudflare.com/auth/callback",
-  "https://sciences-associates-probably-wages.trycloudflare.com/auth/shopify/callback",
-  "https://sciences-associates-probably-wages.trycloudflare.com/api/auth/callback",
-  "https://sciences-associates-probably-wages.trycloudflare.com/.shopify/graphiql/auth/callback"
+  "https://beneath-extend-reproductive-began.trycloudflare.com/auth/callback",
+  "https://beneath-extend-reproductive-began.trycloudflare.com/auth/shopify/callback",
+  "https://beneath-extend-reproductive-began.trycloudflare.com/api/auth/callback",
+  "https://beneath-extend-reproductive-began.trycloudflare.com/.shopify/graphiql/auth/callback"
 ]
 
 [webhooks]

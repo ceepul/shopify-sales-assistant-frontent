@@ -31,14 +31,13 @@ export default function PlanPage() {
   const authFetch = useAuthenticatedFetch();
   const isMobile = useMediaQuery('(max-width: 768px)');
 
-  const [shop, setShop] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [listError, setListError] = useState(false);
-  const [detailError, setDetailError] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+
   const [sessions, setSessions] = useState([]);
   const [cursor, setCursor] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(true);
-  const [isFetching, setIsFetching] = useState(false);
   const [activeSession, setActiveSession] = useState(null);
 
   const [toastActive, setToastActive] = useState(false);
@@ -46,16 +45,30 @@ export default function PlanPage() {
     setToastActive((active) => !active)
   }, []);
 
-  const fetchSessions = async () => {
+  const fetchSessions = async (filters, sortAscending, clear) => {
     setIsFetching(true);
+    setListError(false);
+    if (clear) setSessions([]);
+
     const shop = await authFetch("/api/shop", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     }).then((response) => response.text());
-    const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/session/list?shop=${shop}${cursor ? `&cursor=${cursor}` : ``}`, {
+
+    let url = `https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/session/list?shop=${shop}`
+    url += !clear && cursor ? `&cursor=${cursor}` : ``;
+    url += sortAscending ? `&sortDirection=asc` : ``;
+    const urlFilters = filters ? filters.map(filter => {
+      return `&${filter}=true`
+    }) : ``;
+    url += urlFilters ? urlFilters.join(``) : ``;
+
+    const response = await fetch(url, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
+
+    console.log(response)
 
     if (!response.ok) {
       setListError(true)
@@ -65,11 +78,10 @@ export default function PlanPage() {
     
     const sessions = await response.json();
     if (sessions.length < 50) setHasNextPage(false);
-    setCursor(sessions[sessions.length - 1].id)
-    setSessions(prev => [
-      ...prev,
-      ...sessions
-    ]);
+    if (sessions.length > 0 && sessions[sessions.length - 1].id !== undefined) {
+      setCursor(sessions[sessions.length - 1].id);
+    }
+    setSessions(prev => [...prev, ...sessions]);
     setIsFetching(false);
     return;
   };
@@ -82,22 +94,30 @@ export default function PlanPage() {
     });
   }, []);
 
-  useEffect(() => {
-    console.log(activeSession)
-  }, [activeSession]);
-
   const mobileMarkup = isMobile ? (
-    <AlphaCard padding={"0px"}>
-      <ChatSessionList 
-        isLoading={isLoading}
-        error={listError}
-        sessions={sessions}
-        setActiveSession={setActiveSession}
-        hasNextPage={hasNextPage}
-        fetchSessions={fetchSessions}
-        isFetching={isFetching}
-      />
-    </AlphaCard>
+    activeSession === null ? (
+      <AlphaCard padding={"0px"}>
+        <ChatSessionList 
+          isLoading={isLoading}
+          error={listError}
+          sessions={sessions}
+          activeSession={activeSession}
+          setActiveSession={setActiveSession}
+          hasNextPage={hasNextPage}
+          fetchSessions={fetchSessions}
+          isFetching={isFetching}
+        />
+      </AlphaCard>
+    ) : (
+      <AlphaCard padding={"0px"}>
+        <ChatSessionDetail 
+          isLoading={isLoading}
+          activeSession={activeSession}
+          setActiveSession={setActiveSession}
+          isMobile
+        />
+      </AlphaCard>
+    )
   ) : null
 
   const desktopMarkup = !isMobile ? (
@@ -108,6 +128,7 @@ export default function PlanPage() {
             isLoading = {isLoading}
             error = {listError}
             sessions={sessions}
+            activeSession={activeSession}
             setActiveSession={setActiveSession}
             hasNextPage={hasNextPage}
             fetchSessions={fetchSessions}
@@ -117,10 +138,10 @@ export default function PlanPage() {
       </Layout.Section>
 
       <Layout.Section>
-        <AlphaCard>
+        <AlphaCard padding={"0px"}>
           <ChatSessionDetail 
-            isLoading = {isLoading}
-            error = {detailError}
+            isLoading={isLoading}
+            activeSession={activeSession}
           />
         </AlphaCard>
       </Layout.Section>

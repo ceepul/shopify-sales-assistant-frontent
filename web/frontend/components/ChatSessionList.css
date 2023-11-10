@@ -2,17 +2,34 @@
   background-color: #F3F3F3;
 }
 
+.active-session {
+  background-color: #F0F0F0;
+  pointer-events: none;
+}
+
 .sidebar-container {
   height: 95vh;
 }
 
 .sidebar-scroll {
   overflow-y: auto;
-  max-height: 88%;
+  max-height: 90%;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+.filter-button {
+  padding: 8px;
+  margin: 0px;
+  border: none;
+  border-radius: 4px;
+  background-color: #f4f4f4;
+}
+
+.filter-button:hover {
+  background-color: #e0e0e0;
 }

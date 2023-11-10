@@ -83,10 +83,12 @@ CREATE TABLE products (
 CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
     shop VARCHAR(255) NOT NULL,
+    session_id INTEGER,
     message_text TEXT NOT NULL DEFAULT '',,
     sender VARCHAR(50) NOT NULL DEFAULT '',
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (shop) REFERENCES shops(shop) ON DELETE CASCADE
+    FOREIGN KEY (shop) REFERENCES shops(shop) ON DELETE CASCADE,
+    FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
 );
 
 CREATE TABLE sessions (
@@ -96,10 +98,13 @@ CREATE TABLE sessions (
     session_start TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     session_end TIMESTAMP,
     session_duration INTERVAL,
-    message_indexes BIGINT[],
-    recommendation_indexes BIGINT[],
-    product_view_ndexes BIGINT[],
-    add_to_cart_indexes BIGINT[],
+    flagged BOOLEAN DEFAULT FALSE,
+    has_recommendation BOOLEAN DEFAULT FALSE,
+    has_product_view BOOLEAN DEFAULT FALSE,
+    has_add_to_cart BOOLEAN DEFAULT FALSE,
+    has_conversion BOOLEAN DEFAULT FALSE,
+    has_question_answered BOOLEAN DEFAULT FALSE,
+    session_text VARCHAR(64),
     FOREIGN KEY (shop) REFERENCES shops(shop) ON DELETE CASCADE
 );
 
@@ -109,6 +114,17 @@ CREATE TABLE recommendation_events (
     product_id VARCHAR(255) NOT NULL,
     recommended_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (shop) REFERENCES shops(shop) ON DELETE CASCADE
+);
+
+CREATE TABLE temp_recommendation_events (
+    id SERIAL PRIMARY KEY,
+    shop VARCHAR(255) NOT NULL,
+    session_id INTEGER NOT NULL,
+    product_ids VARCHAR(255)[] NOT NULL,
+    product_count INTEGER NOT NULL,
+    recommended_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (shop) REFERENCES shops(shop) ON DELETE CASCADE,
+    FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
 );
 
 CREATE TABLE product_view_events (
