@@ -1,0 +1,112 @@
+.recommendation-event-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.recommendation-event-text {
+  font-size: 20px;
+  font-weight: 600;
+  background: -webkit-linear-gradient(left, purple, pink);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.product-container-border {
+  padding: 2px;
+  background-color: pink;
+  border-radius: 10px;
+  max-width: 85%;
+  margin-bottom: 16px;
+}
+
+.chat-widget__product-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-self: flex-end;
+  padding: 8px;
+  background-color: white;
+  border-radius: 8px;
+}
+
+.chat-widget__product-card {
+  background-color: #ffffff;
+  border-radius: 6px;
+  box-shadow: 1px 1px 4px #999999;
+  min-height: 210px;
+  flex: 1 1 140px;  /* Grow, shrink, base width */
+  max-width: 300px;  /* Optional: Max width */
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/*
+.chat-widget__product-card:only-child {
+  max-width: 100%;
+  width: 200px;
+  flex-grow: 1;
+}
+*/
+
+.chat-widget__product-image {
+  display: flex;
+  justify-content: center;
+  margin: auto;
+  max-height: 100%;
+  max-width: 100%;
+  border-radius: 4px;
+}
+
+.chat-widget__product-title {
+  color: #000000cc;
+  font-family: "Open Sans", Helvetica;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -1%;
+  line-height: 18px;
+  white-space: normal;
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  display: -webkit-box; 
+  -webkit-line-clamp: 2; 
+  -webkit-box-orient: vertical;
+  margin-top: auto;
+}
+
+.chat-widget__product-action-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.chat-widget__product-price {
+  color: #2e3138cc;
+  font-family: "Open Sans", Helvetica;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  white-space: nowrap;
+  margin-top: auto; /* Pushes price to the bottom */
+}  
+
+.chat-widget__product-addToCart-button {
+  background-color: #47afffcc;
+  border-radius: 4px;
+  height: 20px;
+  width: 72px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chat-widget__product-addToCart-text {
+  font-family: "Open Sans", Helvetica;
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: 400;
+  white-space: nowrap;
+}

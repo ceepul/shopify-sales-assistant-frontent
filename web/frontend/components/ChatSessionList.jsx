@@ -96,10 +96,9 @@ export default function ChatSessionList({ isLoading, error, sessions, activeSess
     return (
       <div 
         key={session.id}
-        className={`session-card ${activeSession === session.id ? 'active-session' : ''}`}
         onClick={() => setActiveSession(session)}
       >
-        <div style={{padding: "12px"}}>
+        <div className={`session-card ${activeSession?.id === session.id ? 'active-session' : ''}`}>
           <div style={{display: "flex", justifyContent: "space-between"}}>
             <HorizontalStack>
               <Avatar name={JSON.stringify(session.id)}/>
@@ -118,7 +117,7 @@ export default function ChatSessionList({ isLoading, error, sessions, activeSess
             <Text truncate>
               {session.sessionTitle}
             </Text>
-            <div style={{minWidth: "20%", display: "flex", justifyContent: "flex-end"}}>
+            <div style={{minWidth: "25%", display: "flex", justifyContent: "flex-end"}}>
               <Text variant="bodySm">{formatSessionDate(session.sessionStart)}</Text>
             </div>
           </div>

@@ -1,3 +1,7 @@
+.session-card {
+  padding: 12px;
+}
+
 .session-card:hover {
   background-color: #F3F3F3;
 }
@@ -8,12 +12,12 @@
 }
 
 .sidebar-container {
-  height: 95vh;
+  height: 90vh;
 }
 
 .sidebar-scroll {
   overflow-y: auto;
-  max-height: 90%;
+  height: calc(100% - 68px);
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;

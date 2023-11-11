@@ -409,19 +409,6 @@ class ChatWidget extends HTMLElement {
           color: #E00000;
         }
 
-        .chat-widget__first-message {
-          margin-top: 32px;
-        }
-        
-        .chat-widget__assistant-message {
-          background-color: #f1f2f4;
-          border-radius: 10px 10px 10px 0px;
-          align-self: flex-start;
-          padding: 10px;
-          max-width: 85%;
-          margin-bottom: 20px;
-        }
-
         .chat-widget__animated-message {
           background-color: #f1f2f4;
           border-radius: 10px 10px 0px 10px;
@@ -448,6 +435,19 @@ class ChatWidget extends HTMLElement {
             transform: translateY(0);
           }
         }    
+
+        .chat-widget__first-message {
+          margin-top: 32px;
+        }
+
+        .chat-widget__assistant-message {
+          background-color: #f1f2f4;
+          border-radius: 10px 10px 10px 0px;
+          align-self: flex-start;
+          padding: 10px;
+          max-width: 85%;
+          margin-bottom: 20px;
+        }
         
         .chat-widget__user-message {
           background-color: #47afffce;
