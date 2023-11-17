@@ -11,12 +11,14 @@ import {
   Button,
   VerticalStack,
   useBreakpoints,
-  Badge
+  Badge,
+  SkeletonBodyText,
+  SkeletonDisplayText,
 } from "@shopify/polaris";
 import { ColorsMajor } from '@shopify/polaris-icons';
 import { HexColorPicker } from "react-colorful"
 
-export default function CustomizeUIForm({preferences, resetPreferences, setPreferences, setError, toggleToast}) {
+export default function CustomizeUIForm({isLoading, preferences, resetPreferences, setPreferences, setError, toggleToast}) {
   
   const [submitting, setSubmitting] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -24,8 +26,9 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
   const [colorInput, setColourInput] = useState("#47AFFF")
 
   const [assistantNameError, setAssistantNameError] = useState(null);
-  const [welcomeMessageError, setWelcomeMessageError] = useState(null);
   const [accentColourError, setAccentColourError] = useState(null);
+  const [greetingOneError, setGreetingOneError] = useState(null);
+  const [greetingTwoError, setGreetingTwoError] = useState(null);
 
   useEffect(() => {
     setColourInput(preferences.accentColour)
@@ -36,10 +39,9 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
   const onSubmit = async () => {
     setSubmitting(true);
     const isValidAssistantName = validateAssistantName(preferences.assistantName);
-    const isValidWelcomeMessage = validateWelcomeMessage(preferences.welcomeMessage);
     const isValidAccentColour = validateAccentColour(colorInput);
 
-    if (!isValidAssistantName || !isValidWelcomeMessage || !isValidAccentColour) {
+    if (!isValidAssistantName || !isValidAccentColour) {
       setSubmitting(false)
       return;
     }
@@ -57,16 +59,17 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
 
       const body = {
         shop: shop,
-        storeInfo: preferences.storeInfo,
         assistantName: preferences.assistantName,
         accentColour: colorInput,
-        darkMode: preferences.darkMode,
-        homeScreen: preferences.homeScreen,
-        welcomeMessage: preferences.welcomeMessage,
         avatarImageSrc: preferences.avatarImageSrc,
+        greetingLineOne: preferences.greetingLineOne,
+        greetingLineTwo: preferences.greetingLineTwo,
+        showSupportForm: preferences.showSupportForm,
+        showLauncherText: preferences.showLauncherText,
+        launcherText: preferences.launcherText,
       }
 
-      const response = await fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/preferences", {
+      const response = await fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/dev/preferences", {
         method: "PATCH",
         body: JSON.stringify(body),
         headers: { "Content-Type": "application/json" },
@@ -100,93 +103,59 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
   }
 
   const onReset = useCallback(() => {
+    setAccentColourError(null);
+    setAssistantNameError(null);
+    setGreetingOneError(null);
+    setGreetingTwoError(null);
     resetPreferences();
     setDirty(false);
   }, []);
 
-  const handleChangeAssistantName = (value) => {
-    if (value.length > 18) {
-      setAssistantNameError('Assistant name cannot be greater than 18 characters.')
-    } else {
-      setAssistantNameError(null)
+  const handleChangePreference = (key, value) => {
+    if ((key === 'assistantName' || key === 'greetingLineOne' || key === 'greetingLineTwo') && value.length > 30) {
+      if (key === 'assistantName') setAssistantNameError('Assistant name cannot be greater than 30 characters.');
+      if (key === 'greetingLineOne') setGreetingOneError('Greeting cannot be greater than 30 characters.');
+      if (key === 'greetingLineTwo') setGreetingTwoError('Greeting cannot be greater than 30 characters.');
+      return;
+    } else if (key === 'assistantName') {
+      setAssistantNameError(null);
+    } else if (key === 'greetingLineOne') {
+      setGreetingOneError(null);
+    } else if (key === 'greetingLineTwo') {
+      setGreetingTwoError(null);
     }
+  
+    if (key === 'accentColour') {
+      setColourInput(value);
+      setAccentColourError(false);
+    }
+  
     setPreferences(prev => ({
       ...prev,
-      assistantName: value
+      [key]: value
     }));
+  
     setDirty(true);
-  };
-
-  const handleChangeColourPicker = (value) => {
-    setPreferences(prev => ({
-      ...prev,
-      accentColour: value
-    }));
-    setDirty(true);
-  };
+  };  
 
   const handleChangeColourInput= (value) => {
     setColourInput(value);
+    setAccentColourError(false);
     setDirty(true);
   };
-
-  const handleToggleDarkMode = () => {
-    setPreferences((prev) => ({
-      ...prev,
-      darkMode: !prev.darkMode
-    }));
-    setDirty(true);
-  };
-
-  const handleToggleHomeScreen = () => {
-    setPreferences((prev) => ({
-      ...prev,
-      homeScreen: !prev.homeScreen
-    }));
-    setDirty(true);
-  };
-
-  const handleChangeWelcomeMessage = (value) => {
-    setPreferences(prev => ({
-      ...prev,
-      welcomeMessage: value
-    }));
-    setDirty(true);
-  };
-
-  const handleChangeAvatar = (value) => {
-    setPreferences(prev => ({
-      ...prev,
-      avatarImageSrc: value
-    }));
-    setDirty(true);
-  }
-
-  const handleColorPickerVisibility = () => {
-    setColorPickerVisible(prev => !prev)
-  }
 
   const validateAssistantName = (value) => {
     if (value.trim() === '') {
       setAssistantNameError('Assistant name cannot be blank.');
       return false;
-    } else if (value.length > 18) {
-      setAssistantNameError('Assistant name cannot be greater than 18 characters.')
+    } else if (value.length > 30) {
+      setAssistantNameError('Assistant name cannot be greater than 30 characters.')
       return false;
     }
     setAssistantNameError(null);
     return true;
   };
-  
-  const validateWelcomeMessage = (value) => {
-    if (value.trim() === '') {
-      setWelcomeMessageError('Welcome message cannot be blank.');
-      return false;
-    }
-    setWelcomeMessageError(null);
-    return true;
-  };
-  
+
   const validateAccentColour = (value) => {
     if (!/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)) {
       setAccentColourError('Invalid hex color');
@@ -267,86 +236,148 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
     );
   };
 
-  return (
-    <AlphaCard>
-      <Form onSubmit={onSubmit}>
-        <ContextualSaveBar
-          saveAction={{
-            label: "Save",
-            onAction: onSubmit,
-            loading: submitting,
-            disabled: submitting
-          }}
-          discardAction={{
-            label: "Discard",
-            onAction: onReset,
-            loading: submitting,
-            disabled: submitting
-          }}
-          visible={dirty}
-          fullWidth
-        />
-        <FormLayout>
-          <Text variant="headingMd" as="h6">
-            Assistant Name
-          </Text>
-          <TextField
-            value={preferences.assistantName}
-            onChange={handleChangeAssistantName}
-            label="Name"
-            labelHidden
-            error={assistantNameError}
-          />
-
-          <Box minHeight="0.5rem"/>
-
-          <Text variant="headingMd" as="h6">
-            Accent Color
-          </Text>
-
-          <HorizontalStack gap="4">
-            <Box
-              style={{
-                backgroundColor: preferences.accentColour,
-                borderRadius: 8,
-                minWidth: 35,
-                minHeight: 35,
-              }}
-            />
-            <TextField 
-              value={colorInput}
-              onChange={handleChangeColourInput}
-              label="Accent Color"
-              labelHidden
-              prefix="Hex"
-              error={accentColourError}
-            />
-            <Button 
-              icon={ColorsMajor}
-              outline
-              onClick={handleColorPickerVisibility}
-            />
-          </HorizontalStack>
-          {colorPickerVisible && 
-              <HexColorPicker 
-                color={preferences.accentColour}
-                onChange={handleChangeColourPicker}
-              />
-          }
-
-{/*           <Box minHeight="1rem"/>
-
-          <SettingToggle
-            enabled={preferences.darkMode}
-            handleToggle={handleToggleDarkMode}
-            title="Dark Mode"
-            description="Switch the app to Dark Mode for better readability in low light environments."
-          /> */}
-
+  if (isLoading) {
+    return (
+      <VerticalStack gap="2">
+        <SkeletonDisplayText />
+        <AlphaCard>
+          <SkeletonDisplayText />
           <Box minHeight="1rem"/>
+          <SkeletonBodyText lines={2}/>
+  
+          <Box minHeight="2.25rem" />
+          <SkeletonDisplayText />
+          <Box minHeight="1rem"/>
+          <SkeletonBodyText lines={2}/>
+  
+          <Box minHeight="2.5rem" />
+          <SkeletonDisplayText />
+          <Box minHeight="1rem"/>
+          <SkeletonBodyText lines={2}/>
 
+          <Box minHeight="2.5rem" />
+          <SkeletonDisplayText />
+          <Box minHeight="1rem"/>
+          <SkeletonBodyText lines={2}/>
+        </AlphaCard>
+
+        <Box minHeight="1.5rem"/>
+        <SkeletonDisplayText />
+        <AlphaCard>
+          <SkeletonDisplayText />
+          <Box minHeight="1.5rem"/>
+          <SkeletonBodyText lines={1}/>
+        </AlphaCard>
+
+        <Box minHeight="1.5rem"/>
+        <SkeletonDisplayText />
+        <AlphaCard>
+        <SkeletonDisplayText />
+          <Box minHeight="1.5rem"/>
+          <SkeletonBodyText lines={1}/>
+        </AlphaCard>
+        <Box minHeight="1rem" />
+      </VerticalStack>
+    )
+  }
+
+  return (
+    <Form onSubmit={onSubmit}>
+      <ContextualSaveBar
+        saveAction={{
+          label: "Save",
+          onAction: onSubmit,
+          loading: submitting,
+          disabled: submitting
+        }}
+        discardAction={{
+          label: "Discard",
+          onAction: onReset,
+          loading: submitting,
+          disabled: submitting
+        }}
+        visible={dirty}
+        fullWidth
+      />
+      <FormLayout>
+        <Text variant="headingLg" as="h5">Widget</Text>
+        <AlphaCard>
           <VerticalStack gap="4">
-            <Text variant="headingMd" as="h6">Select Avatar</Text>
+            <Text variant="headingMd" as="h6">
+              Greeting Line 1
+            </Text>
+            <TextField
+              value={preferences.greetingLineOne}
+              onChange={(value) => handleChangePreference('greetingLineOne', value)}
+              label="Greeting Line 1"
+              labelHidden
+              error={greetingOneError}
+            />
+  
+            <Box minHeight="0.25rem" />
+            <Text variant="headingMd" as="h6">
+              Greeting Line 2
+            </Text>
+            <TextField
+              value={preferences.greetingLineTwo}
+              onChange={(value) => handleChangePreference('greetingLineTwo', value)}
+              label="Greeting Line 2"
+              labelHidden
+              error={greetingTwoError}
+            />
+  
+            <Box minHeight="0.5rem"/>
+            <Text variant="headingMd" as="h6">Accent Color</Text>
+            <HorizontalStack gap="4">
+              <Box
+                style={{
+                  backgroundColor: preferences.accentColour,
+                  borderRadius: 8,
+                  minWidth: 35,
+                  minHeight: 35,
+                }}
+              />
+              <TextField 
+                value={colorInput}
+                onChange={handleChangeColourInput}
+                label="Accent Color"
+                labelHidden
+                prefix="Hex"
+                error={accentColourError}
+              />
+              <Button 
+                icon={ColorsMajor}
+                outline
+                onClick={() => setColorPickerVisible(prev => !prev)}
+              />
+            </HorizontalStack>
+            {colorPickerVisible && 
+                <HexColorPicker 
+                  color={preferences.accentColour}
+                  onChange={(value) => handleChangePreference('accentColour', value)}
+                />
+            }
+  
+            <Box minHeight="0.5rem"/>
+            <Text variant="headingMd" as="h6">
+              Assistant Name
+            </Text>
+            <TextField
+              value={preferences.assistantName}
+              onChange={(value) => handleChangePreference('assistantName', value)}
+              label="Assistant Name"
+              labelHidden
+              error={assistantNameError}
+            />
+          </VerticalStack>
+        </AlphaCard>
+
+
+        <Box minHeight="0.5rem"/>
+        <Text variant="headingLg" as="h5">Launcher</Text>
+        <AlphaCard>
+          <VerticalStack gap="4">
+            {/* <Text variant="headingMd" as="h6">Select Icon</Text>
             <HorizontalStack gap="4">
               {["default_v14.png", "default_v40.png", "default_v35.png", "default_v47.png", "default_v18.png", "default_v33.png",
                 "default_v7.png", "default_v30.png", "default_v26.png", "default_v1.png", "default_v29.png", "default_v9.png"].map((src, index) => (
@@ -354,7 +385,7 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
                   key={index}
                   src={`https://shopify-recommendation-app.s3.amazonaws.com/avatars/${src}`}
                   alt={src}
-                  onClick={() => handleChangeAvatar(src)}
+                  onClick={() => handleChangePreference('avatarImageSrc', src)}
                   style={{
                     cursor: 'pointer',
                     width: '64px',
@@ -365,35 +396,66 @@ export default function CustomizeUIForm({preferences, resetPreferences, setPrefe
                 />
               ))}
             </HorizontalStack>
+
+
+            <Box minHeight="1rem"/> */}
+            <SettingToggle
+              enabled={preferences.showLauncherText}
+              handleToggle={() => handleChangePreference('showLauncherText', !preferences.showLauncherText)}
+              title="Show Launcher Text"
+              description="Call attention to the launcher with a popup text bubble."
+            />
+            {preferences.showLauncherText && 
+              <VerticalStack gap="4">
+                <Box minHeight="0.5rem"/>
+                <Text variant="headingMd" as="h6">
+                  Launcher Text
+                </Text>
+                <TextField
+                  value={preferences.launcherText}
+                  onChange={(value) => handleChangePreference('launcherText', value)}
+                  label="Launcher Text"
+                  labelHidden
+                  error={null}
+                  multiline
+                />
+              </VerticalStack>
+            }
           </VerticalStack>
+        </AlphaCard>
 
-          <Box minHeight="1rem"/>
 
-          <SettingToggle
-            enabled={preferences.homeScreen}
-            handleToggle={handleToggleHomeScreen}
-            title="Home Screen"
-            description="Displays a home screen outlining the functionality of the assistant instead of a welcome message"
-          />
-
-          {!preferences.homeScreen && 
-            <VerticalStack gap="4">
-              <Box minHeight="0.5rem"/>
-              <Text variant="headingMd" as="h6">
-                Welcome Message
-              </Text>
-              <TextField
-                value={preferences.welcomeMessage}
-                onChange={handleChangeWelcomeMessage}
-                label="Name"
-                labelHidden
-                error={welcomeMessageError}
-                multiline
-              />
-            </VerticalStack>
-          }
-        </FormLayout>
-      </Form>
-    </AlphaCard>
+        <Box minHeight="0.5rem" />
+        <Text variant="headingLg" as="h5">Pages</Text>
+        <AlphaCard>
+          <VerticalStack gap="4">
+            <SettingToggle
+              enabled={preferences.showSupportForm}
+              handleToggle={() => handleChangePreference('showSupportForm', !preferences.showSupportForm)}
+              title="Enable Support Form"
+              description="Allow the AI to display a support form where users can send support questions"
+            />
+            {preferences.showSupportForm && 
+              <VerticalStack gap="4">
+                <Box minHeight="0.5rem"/>
+                <VerticalStack gap='1'>
+                  <Text variant="headingMd" as="h6"> Support Email</Text>
+                  <Text>Please contact our support team to change your support email.</Text>
+                </VerticalStack>
+                <TextField
+                  value={'example@email.com'}
+                  onChange={null}
+                  label="Support Email"
+                  labelHidden
+                  error={null}
+                  disabled
+                />
+              </VerticalStack>
+            }
+          </VerticalStack>
+        </AlphaCard>
+        <Box minHeight="1rem" />
+      </FormLayout>
+    </Form>
   );
 }

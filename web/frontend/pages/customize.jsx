@@ -3,14 +3,9 @@ import {
   Frame,
   Page,
   Layout,
-  SkeletonBodyText,
-  AlphaCard,
-  Text,
-  Box,
-  VerticalStack,
-  SkeletonDisplayText,
   Banner,
   Toast,
+  Box,
 } from "@shopify/polaris"
 import CustomizeUIForm from "../components/CustomizeUIForm";
 import WidgetDynamicUI from "../components/WidgetDynamicUI";
@@ -38,7 +33,12 @@ export default function CustomizePage() {
     darkMode: false,
     homeScreen: true,
     welcomeMessage: "Welcome to our store! Are there any products I could help you find?",
-    avatarImageSrc: "default_v1.png"
+    avatarImageSrc: "default_v1.png",
+    greetingLineOne: "Hi There 👋",
+    greetingLineTwo: "How can we help?",
+    showSupportForm: false,
+    showLauncherText: true,
+    launcherText: "Hi! Anything I can help "
   });
 
   const authFetch = useAuthenticatedFetch()
@@ -113,109 +113,49 @@ export default function CustomizePage() {
       });
   }, []);
 
-  if (isLoading) {
-    return (
+  return (
+    <Frame>
       <Page>
-        <TitleBar
-          title="Customize"
-          breadcrumbs={breadcrumbs}
-          primaryAction={null}
-        />
-        <Loading/>
-        <Layout>
-          <Layout.Section>
-            <VerticalStack gap="4">
-              <Text variant="headingLg" as="h5">Settings</Text>
-              <AlphaCard>
-                <Text variant="headingMd" as="h6">Assistant Name</Text>
-                <Box minHeight="1rem"/>
-                <SkeletonBodyText />
-                <Box minHeight="1rem"/>
+          <TitleBar
+            title="Customize"
+            breadcrumbs={breadcrumbs}
+            primaryAction={null}
+          />
+          {isLoading && <Loading />}
+          {toastActive && <Toast content="Preferences Updated" onDismiss={toggleToast} />}
+          <Layout>
   
-                <Box minHeight="2rem" />
-  
-                <Text variant="headingMd" as="h6">Accent Color</Text>
-                <Box minHeight="1rem"/>
-                <SkeletonBodyText />
-                <Box minHeight="1rem"/>
-
-                <Box minHeight="2rem" />
-  
-                <Text variant="headingMd" as="h6">Select Avatar</Text>
-                <Box minHeight="1rem"/>
-                <SkeletonBodyText />
-                <Box minHeight="1rem"/>
-  
-                <Box minHeight="2.5rem" />
-  
-                <Text variant="headingMd" as="h6">Home Screen</Text>
-                <Box minHeight="1rem"/>
-                <SkeletonBodyText />
-                <Box minHeight="1rem"/>
-              </AlphaCard>
-            </VerticalStack>
-          </Layout.Section>
-          <Layout.Section secondary>
-            <VerticalStack gap="4">
-              <Text variant="headingLg" as="h5">Preview</Text>
-              <AlphaCard>
-                <SkeletonDisplayText />
-                <Box minHeight="1rem"/>
-                <SkeletonBodyText />
-              </AlphaCard>
-            </VerticalStack>
-          </Layout.Section>
-        </Layout>
-      </Page>
-    );
-  }
-
-  if (!isLoading) {
-    return (
-      <Frame>
-        <Page>
-            <TitleBar
-              title="Customize"
-              breadcrumbs={breadcrumbs}
-              primaryAction={null}
-            />
-            {toastActive && <Toast content="Preferences Updated" onDismiss={toggleToast} />}
-            <Layout>
-    
-              {/*Error banner */}
-              {error.status === true && 
-                <Layout.Section fullWidth>
-                  <Banner 
-                    title={error.title} 
-                    onDismiss={() => {setError({status: false, title: "", body: ""})}}
-                    status="critical"
-                  >
-                      <p>{error.body}</p>
-                  </Banner>
-                </Layout.Section>
-              }
-    
-              <Layout.Section>
-                <VerticalStack gap="4">
-                  <Text variant="headingLg" as="h5">Settings</Text>
-                  <CustomizeUIForm
-                    preferences={preferences}
-                    resetPreferences={refetchPreferences}
-                    setPreferences={setPreferences}
-                    setError={setError}
-                    toggleToast={toggleToast}
-                  />
-                </VerticalStack>
+            {/*Error banner */}
+            {error.status === true && 
+              <Layout.Section fullWidth>
+                <Banner 
+                  title={error.title} 
+                  onDismiss={() => {setError({status: false, title: "", body: ""})}}
+                  status="critical"
+                >
+                    <p>{error.body}</p>
+                </Banner>
               </Layout.Section>
-              <Layout.Section secondary>
-                <VerticalStack gap="4">
-                  <Text variant="headingLg" as="h5">Preview</Text>
-                  <WidgetDynamicUI preferences={preferences}/>
-                </VerticalStack>
-              </Layout.Section>
-            </Layout>
-        </Page> 
-      </Frame>
-    )
-  }
+            }
+  
+            <Layout.Section>
+              <CustomizeUIForm
+                isLoading={isLoading}
+                preferences={preferences}
+                resetPreferences={refetchPreferences}
+                setPreferences={setPreferences}
+                setError={setError}
+                toggleToast={toggleToast}
+              />
+            </Layout.Section>
+            <Layout.Section secondary>
+              <WidgetDynamicUI 
+                isLoading={isLoading}
+                preferences={preferences}
+              />
+            </Layout.Section>
+          </Layout>
+      </Page> 
+    </Frame>
+  )
 }

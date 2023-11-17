@@ -26,4 +26,4 @@ embedded = false
 
 [build]
 automatically_update_urls_on_dev = false
-dev_store_url = "ceepul-dev-store.myshopify.com"
+dev_store_url = "shopmate-demo.myshopify.com"

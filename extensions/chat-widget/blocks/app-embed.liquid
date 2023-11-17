@@ -8,8 +8,10 @@
 <chat-widget
   data-close-icon-url="{{ 'down-chevron.svg' | asset_url }}"
   data-close-icon-dark-url="{{ 'down-chevron-dark.svg' | asset_url }}"
-  data-trash-icon-url="{{ 'trash-icon.svg' | asset_url }}"
-  data-trash-icon-dark-url="{{ 'trash-icon-dark.svg' | asset_url }}"
+  data-back-icon-url="{{ 'back-icon.svg' | asset_url }}"
+  data-back-icon-dark-url="{{ 'back-icon-dark.svg' | asset_url }}"
+  data-reset-icon-url="{{ 'reset-icon.svg' | asset_url }}"
+  data-reset-icon-dark-url="{{ 'reset-icon-dark.svg' | asset_url }}"
   data-send-icon-url="{{ 'send2.svg' | asset_url }}"
   data-capabilities-icon-url="{{ 'capabilities1.svg' | asset_url }}"
   data-x-icon-url="{{ 'x-icon.svg' | asset_url }}"
@@ -25,7 +27,7 @@
   {
     "name": "AI Shopping Assistant",
     "target": "head",
-    "javascript": "chat-widget.js",
+    "javascript": "dev-chat-widget.js",
     "settings": [
       {
         "id": "position",

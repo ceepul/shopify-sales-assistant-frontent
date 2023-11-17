@@ -29,7 +29,7 @@ import './ChatSessionList.css'
 export default function ChatSessionList({ isLoading, error, sessions, activeSession, setActiveSession, hasNextPage, fetchSessions, isFetching }) {
   const sidebarRef = useRef();
   const [filters, setFilters] = useState([]);
-  const [sortAscending, setSortAscending] = useState(false);
+  const [sortAscending, setSortAscending] = useState(true);
 
   const [popoverActive, setPopoverActive] = useState(false);
   const togglePopoverActive = useCallback(() => {

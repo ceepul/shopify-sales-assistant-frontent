@@ -23,7 +23,8 @@ export default function ChatSessionDetail({ isLoading, activeSession, setActiveS
   const [error, setError] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   
-  const [sessionEvents, setSessionEvents] = useState(null);
+  const [eventData, setEventData] = useState(null);
+  const [sortedEvents, setSortedEvents] = useState(null);
 
   const fetchActiveSession = async () => {
     const response = await fetch(`https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/session/events?sessionId=${activeSession.id}`, {
@@ -40,7 +41,7 @@ export default function ChatSessionDetail({ isLoading, activeSession, setActiveS
     return await response.json();
   }
 
-  function sortEvents(messages, recommendationEvents) {
+  function sortEvents(messages, recommendationEvents, viewEvents) {
     // Add an identifier to each message
     const messagesWithId = messages.map(msg => ({
       ...msg,
@@ -54,12 +55,18 @@ export default function ChatSessionDetail({ isLoading, activeSession, setActiveS
       type: 'recommendation',
       timestamp: re.recommendedAt
     }));
+
+    const viewEventsWithId = viewEvents.map(ve => ({
+      ...ve,
+      type: 'view',
+      timestamp: ve.viewedAt
+    }));
   
     // Merge and sort the arrays
-    const mergedArray = [...messagesWithId, ...recommendationEventsWithId];
+    const mergedArray = [...messagesWithId, ...recommendationEventsWithId, ...viewEventsWithId];
     mergedArray.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
   
-    setSessionEvents(mergedArray);
+    setSortedEvents(mergedArray);
     console.log(mergedArray)
   }
   
@@ -69,7 +76,8 @@ export default function ChatSessionDetail({ isLoading, activeSession, setActiveS
       setError(false);
 
       fetchActiveSession().then(eventData => {
-        sortEvents(eventData.messages, eventData.recommendationEvents);
+        setEventData(eventData)
+        sortEvents(eventData.messages, eventData.recommendationEvents, eventData.viewEvents);
       }).catch((err) => {
         console.error(err);
         setError(true);
@@ -151,8 +159,8 @@ export default function ChatSessionDetail({ isLoading, activeSession, setActiveS
     return formattedDuration.trim();
   }
 
-  const chatMarkup = sessionEvents && sessionEvents.length ? (
-    sessionEvents.map((event, index) => {
+  const chatMarkup = sortedEvents && sortedEvents.length ? (
+    sortedEvents.map((event, index) => {
       switch (event.type) {
         case 'message':
           if (event.sender === 'user') {
@@ -171,11 +179,21 @@ export default function ChatSessionDetail({ isLoading, activeSession, setActiveS
           break;
         case 'recommendation':
           return (
-           <div key={index}><ProductContainer productIds={event.productIds} /></div>
+            <div key={index}>
+              <ProductContainer productIds={event.productIds} />
+              <Box minHeight="16px"/>
+            </div>
           )
           break;
         case 'view':
-          console.log(`Product View event: ${JSON.stringify(event)}`)
+          return (
+            <div key={index} className="chat-widget__user-message">
+              <Box minHeight="0.25rem"/>
+              <p className="chat-widget__user-text">User#{activeSession.id} viewed the following product:</p>
+              <Box minHeight="0.25rem"/>
+              <ProductContainer productIds={[event.productId]}/>
+            </div>
+          )
           break;
         case 'atc':
           console.log(`Add to cart event: ${JSON.stringify(event)}`)
@@ -207,7 +225,7 @@ export default function ChatSessionDetail({ isLoading, activeSession, setActiveS
           <Text variant="headingMd">{`User#${activeSession.id}`}</Text>
         </HorizontalStack>
         <VerticalStack inlineAlign='end'>
-          <Text>18 Messages</Text>
+          {eventData?.messages && <Text>{eventData.messages.length} messages</Text>}
           <Text>{formatDuration(activeSession.sessionDuration)}</Text>
         </VerticalStack>
       </div>

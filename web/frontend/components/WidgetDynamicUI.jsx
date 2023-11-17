@@ -8,8 +8,16 @@ import {
   capabilitiesIcon,
   sendB
 } from "../assets/index"
+import { 
+  SkeletonBodyText,
+  VerticalStack,
+  SkeletonDisplayText,
+  AlphaCard,
+  Box,
+  Text
+} from '@shopify/polaris';
 
-export default function WidgetDynamicUI({preferences}) {
+export default function WidgetDynamicUI({ isLoading, preferences}) {
 
   const [assistantName, setAssistantName] = useState("ShopMate");
   const [accentColour, setAccentColour] = useState("#47AFFF");
@@ -123,43 +131,60 @@ export default function WidgetDynamicUI({preferences}) {
     </div>
   )
 
+  if (isLoading) {
+    return (
+      <VerticalStack gap="2">
+        <SkeletonDisplayText />
+        <AlphaCard>
+          <SkeletonDisplayText />
+          <Box minHeight="1rem"/>
+          <SkeletonBodyText />
+          <Box minHeight="20.25rem"/>
+        </AlphaCard>
+      </VerticalStack>
+    )
+  }
+
   return (
-    <div className="widget">
-
-      <div className="header-container">
-        <div className="header-background-round" style={headerBgStyle} />
-        <div className="header-background-main" style={headerBgMainStyle} />
-        <div className="header-content">
-          <img className="avatar" alt="Avatar" src={`https://shopify-recommendation-app.s3.amazonaws.com/avatars/${preferences.avatarImageSrc}`} />
-          <div className='title-container'>
-            <div className="assistant-name" style={assistantNameStyle}>{assistantName}</div>
-            <div className="assistant-subtitle" style={textColorStyle}>AI Shopping Assistant</div>
-          </div>
-          <div className='info-icon-container'>
-            <img className='header-icon' alt="Info icon" src={circleIconPath}/>
-          </div>
-          <div className='close-icon-container'>
-            <img className='header-icon' alt="Close icon" src={closeIconPath}/>
+    <VerticalStack gap="4">
+      <Text variant="headingLg" as="h5">Widget</Text>
+      <div className="widget">
+  
+        <div className="header-container">
+          <div className="header-background-round" style={headerBgStyle} />
+          <div className="header-background-main" style={headerBgMainStyle} />
+          <div className="header-content">
+            <img className="avatar" alt="Avatar" src={`https://shopify-recommendation-app.s3.amazonaws.com/avatars/${preferences.avatarImageSrc}`} />
+            <div className='title-container'>
+              <div className="assistant-name" style={assistantNameStyle}>{assistantName}</div>
+              <div className="assistant-subtitle" style={textColorStyle}>AI Shopping Assistant</div>
+            </div>
+            <div className='info-icon-container'>
+              <img className='header-icon' alt="Info icon" src={circleIconPath}/>
+            </div>
+            <div className='close-icon-container'>
+              <img className='header-icon' alt="Close icon" src={closeIconPath}/>
+            </div>
           </div>
         </div>
+  
+        {homeScreen ? emptyMarkup : populatedMarkup}
+  
+        <footer className="footer-container">
+          <div className="input-field">
+            <div className="input-placeholder">Start typing...</div>
+            <div className='send-button-container'>
+              <img className='send-button' alt="Send icon" src={sendB} />
+            </div>
+          </div>
+          <div className="footer-divider"/>
+          <div className="powered-by-container">
+            <div className="powered-by-text">Powered by</div>
+            <div className="powered-by-name" style={poweredByNameStyle}>ShopMate</div>
+          </div>
+        </footer>
+  
       </div>
-
-      {homeScreen ? emptyMarkup : populatedMarkup}
-
-      <footer className="footer-container">
-        <div className="input-field">
-          <div className="input-placeholder">Start typing...</div>
-          <div className='send-button-container'>
-            <img className='send-button' alt="Send icon" src={sendB} />
-          </div>
-        </div>
-        <div className="footer-divider"/>
-        <div className="powered-by-container">
-          <div className="powered-by-text">Powered by</div>
-          <div className="powered-by-name" style={poweredByNameStyle}>ShopMate</div>
-        </div>
-      </footer>
-
-    </div>
+    </VerticalStack>
   );
 }

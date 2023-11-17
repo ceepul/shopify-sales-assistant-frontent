@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './ProductContainer.css'
 import { Box, Text } from '@shopify/polaris';
+import CenteredDiv from './CenteredDiv';
 
 export default function ProductContainer ({ productIds }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -46,32 +47,37 @@ export default function ProductContainer ({ productIds }) {
 
   return (
     <div className='recommendation-event-container'>
-      <p className='recommendation-event-text'>Recommendation Event</p>
-      <Box minHeight='0.5rem'/>
+      {isLoading && 
+        <CenteredDiv minHeight='210px'>
+          <p>Loading products...</p>
+        </CenteredDiv>
+      }
 
-      {isLoading && <p>Loading products...</p>}
-
-      {!isLoading && error && <p>An error occured while fetching the product data.</p>}
+      {!isLoading && error && 
+        <CenteredDiv minHeight='100px'>
+          <p>An error occured while fetching product data.</p>
+        </CenteredDiv>
+      }
 
       {!isLoading && !error && products.length === 0 && (
-        <p>We couldn't find the products, they may have been deleted.</p>
+        <CenteredDiv minHeight='100px'>
+          <p>We couldn't find the products, they may have been deleted.</p>
+        </CenteredDiv>
       )}
 
       {!isLoading && !error && 
-        <div className='product-container-border'>
-          <div className='chat-widget__product-container'>
-            {products.map(product => {
-              return (
-                <div key={product.id} className="chat-widget__product-card">
-                  <img className="chat-widget__product-image" alt={product.imageAlt} src={product.imageSrc} />
-                  <div className='chat-widget__product-title'>${product.title}</div>
-                  <div className='chat-widget__product-action-container'>
-                    <p className='chat-widget__product-price'>$${product.price}</p>
-                  </div>
+        <div className='chat-widget__product-container'>
+          {products.map((product, index) => {
+            return (
+              <div key={index} className="chat-widget__product-card">
+                <img className="chat-widget__product-image" alt={product.imageAlt} src={product.imageSrc} />
+                <div className='chat-widget__product-title'>{product.title}</div>
+                <div className='chat-widget__product-action-container'>
+                  <p className='chat-widget__product-price'>${product.price}</p>
                 </div>
-              )
-            })}
-          </div>
+              </div>
+            )
+          })}
         </div>
       }
     </div>
