@@ -112,8 +112,20 @@ class ChatWidget extends HTMLElement {
           box-shadow: 0 4px 8px rgba(128, 128, 128, 0.2);
         }
 
+        .chat-widget__home-page {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+        }
+
+        .chat-widget__message-page {
+          position: absolute;
+          width: 100%;
+        }
+
         .chat-widget__home-background {
           position: absolute;
+          top: 0;
           width: 100%;
           height: 480px;
           background: linear-gradient(
@@ -123,8 +135,18 @@ class ChatWidget extends HTMLElement {
           );        
         }
 
+        .chat-widget__home-background.collapse {
+          height: 124px;
+          transition: height 0.2s ease-in-out;
+        }        
+
+        .chat-widget__home-background.expand {
+          height: 480px;
+          transition: height 0.2s ease-in-out;
+        }
+
         .chat-widget__home-header {
-          z-index: 1;
+          position: relative;
           display: flex;
           align-items: center;
           justify-content: flex-start;
@@ -135,13 +157,14 @@ class ChatWidget extends HTMLElement {
         }
 
         .chat-widget__home-card-container {
+          position: relative;
           cursor: pointer;
           display: flex;
           flex-direction: column;
           justify-content: space-between;
           align-items: center;
           width: 85%;
-          height: calc(100% - 40px);
+          height: calc(100% - 260px);
           background: #FFFFFF;
           box-shadow: 0 4px 6px rgba(128, 128, 128, 0.3);
           margin-left: auto;
@@ -237,6 +260,16 @@ class ChatWidget extends HTMLElement {
           top: 0;
           overflow: hidden;
           position: relative;
+        }
+
+        .chat-widget__header-container.fade-in {
+          opacity: 1;
+          transition: opacity 0.2s ease-in-out;
+        }
+
+        .chat-widget__header-container.fade-out {
+          opacity: 0;
+          transition: opacity 0.2s ease-in-out;
         }
         
         .chat-widget__header-background-round {
@@ -1112,7 +1145,8 @@ class ChatBox extends HTMLElement  {
 
     this.innerHTML = `
       <div id="home-page">
-        <div class="chat-widget__home-background" style="${homeBgGradientStyle}">
+        <div class="chat-widget__home-background" style="${homeBgGradientStyle}">&nbsp</div>
+        <div id="home-page-content" class="chat-widget__home-page">
           <div class="chat-widget__home-header">
             <div class='chat-widget__title-container'>
               <div class="chat-widget__assistant-name" style="${assistantNameStyle}">Hi there 👋</div>
@@ -1122,7 +1156,7 @@ class ChatBox extends HTMLElement  {
               <img class='chat-widget__header-icon' alt="Close icon" src="${this.closeIconURL}"/>
             </div>
           </div>
-
+  
           <div id="card-container" class="chat-widget__home-card-container">
             <div class="chat-widget__card-content"></div>
             <div class="chat-widget__card-footer-container">
@@ -1145,7 +1179,7 @@ class ChatBox extends HTMLElement  {
         </div>
       </div>
 
-      <div id="message-page" class="chat-widget__hidden">
+      <div id="message-page" class="chat-widget__message-page chat-widget__hidden">
         <div class="chat-widget__header-container">
           <div class="chat-widget__header-background-round" style="${bgColorStyle}">&nbsp;</div>
           <div class="chat-widget__header-background-main" style="${bgGradientColorStyle}">&nbsp;</div>
@@ -1230,8 +1264,7 @@ class ChatBox extends HTMLElement  {
 
   /* Event handlers */
   handleBackIconClick() {
-    this.querySelector('#message-page').classList.add('chat-widget__hidden');
-    this.querySelector('#home-page').classList.remove('chat-widget__hidden')
+    this.switchPage('home');
   }
 
   handleResetIconClick() {
@@ -1295,8 +1328,7 @@ class ChatBox extends HTMLElement  {
   }
 
   handleCardClick() {
-    this.querySelector('#home-page').classList.add('chat-widget__hidden');
-    this.querySelector('#message-page').classList.remove('chat-widget__hidden')
+    this.switchPage('message');
     if (this.messages.length <= 1) {
       this.messages = [{role: 'assistant', content: this.cardsData[this.currentCardIndex].message}];
       sessionStorage.setItem('shopmate-messages', JSON.stringify(this.messages));
@@ -1310,46 +1342,6 @@ class ChatBox extends HTMLElement  {
         if (this.autoSwitch) this.moveToNextCard();
     }, 5000);
 
-    this.updateCardContent(this.currentCardIndex);
-  }
-
-  updateCardContent(index) {
-    const cardContent = this.querySelector('.chat-widget__card-content');
-
-    // Start sliding out and fading out the old content
-    cardContent.classList.add('slide-out');
-
-    // After the old content has slid out, update and slide in the new content
-    setTimeout(() => {
-        const cardData = this.cardsData[index];
-        const cardTitle = this.querySelector('.chat-widget__card-title');
-        const cardSubtitle = this.querySelector('.chat-widget__card-subtitle');
-
-        cardTitle.textContent = cardData.title;
-        cardSubtitle.textContent = cardData.subtitle;
-        cardContent.innerHTML = cardData.content;
-
-        const dotList = this.querySelectorAll('.chat-widget__card-dot');
-        dotList.forEach((dot, i) => {
-          dot.classList.remove('active');
-          if (i === index) {
-            dot.classList.add('active')
-          }
-        })
-
-        // Reset to starting position (off-screen to the right) without transition
-        cardContent.classList.remove('slide-in', 'slide-out');
-        cardContent.style.transition = 'none';
-        cardContent.getBoundingClientRect(); // Trigger reflow to apply the changes without transition
-
-        // Start sliding in and fading in the new content with transition
-        cardContent.style.transition = '';
-        cardContent.classList.add('slide-in');
-    }, 250); // Delay should match the CSS transition duration
-  }
-
-  moveToNextCard() {
-    this.currentCardIndex = (this.currentCardIndex + 1) % this.cardsData.length;
     this.updateCardContent(this.currentCardIndex);
   }
 
@@ -1486,6 +1478,93 @@ class ChatBox extends HTMLElement  {
       this.websocket.close();
     }
   }  
+
+  switchPage(page) {
+    const homePage = this.querySelector('#home-page');
+    const homePageContent = this.querySelector('#home-page-content');
+    const messagePage = this.querySelector('#message-page');
+    const homeBackground = this.querySelector('.chat-widget__home-background');
+
+    this.currentPage = page;
+    sessionStorage.setItem('shopmate-currentPage', page);
+
+    switch (page) {
+      case('home'):
+        homePageContent.style.opacity = '0';
+        homePageContent.style.transition = 'opacity 0.2s ease-in-out'; 
+        homePage.classList.remove('chat-widget__hidden');
+        homeBackground.style.height = '124px';    
+        homeBackground.style.transition = 'height 0.3s ease-in-out, background 0.3s ease-in-out';
+        messagePage.style.opacity = '1';
+        messagePage.style.transition = 'opacity 0.3s ease-in-out'
+        setTimeout(() => {
+          homeBackground.style.height = '480px';
+          homePageContent.style.opacity = '1';
+          messagePage.style.opacity = '0';
+        }, 10);
+        setTimeout(() => {
+          messagePage.classList.add('chat-widget__hidden');
+        }, 300);
+        break;
+      case('message'): 
+        messagePage.style.opacity = '0';
+        messagePage.style.transition = 'opacity 0.3s ease-in-out'; 
+        messagePage.classList.remove('chat-widget__hidden'); 
+        homeBackground.style.height = '480px';  
+        homeBackground.style.transition = 'height 0.3s ease-in-out, background 0.3s ease-in-out';
+        homePageContent.style.opacity = '1';
+        homePageContent.style.transition = 'opacity 0.2s ease-in-out'
+        setTimeout(() => {
+          homeBackground.style.height = '124px';
+          messagePage.style.opacity = '1';
+          homePageContent.style.opacity = '0';
+        }, 10);
+        setTimeout(() => {
+          homePage.classList.add('chat-widget__hidden');
+        }, 300);
+        break; 
+    }
+  }
+
+  updateCardContent(index) {
+    const cardContent = this.querySelector('.chat-widget__card-content');
+
+    // Start sliding out and fading out the old content
+    cardContent.classList.add('slide-out');
+
+    // After the old content has slid out, update and slide in the new content
+    setTimeout(() => {
+        const cardData = this.cardsData[index];
+        const cardTitle = this.querySelector('.chat-widget__card-title');
+        const cardSubtitle = this.querySelector('.chat-widget__card-subtitle');
+
+        cardTitle.textContent = cardData.title;
+        cardSubtitle.textContent = cardData.subtitle;
+        cardContent.innerHTML = cardData.content;
+
+        const dotList = this.querySelectorAll('.chat-widget__card-dot');
+        dotList.forEach((dot, i) => {
+          dot.classList.remove('active');
+          if (i === index) {
+            dot.classList.add('active')
+          }
+        })
+
+        // Reset to starting position (off-screen to the right) without transition
+        cardContent.classList.remove('slide-in', 'slide-out');
+        cardContent.style.transition = 'none';
+        cardContent.getBoundingClientRect(); // Trigger reflow to apply the changes without transition
+
+        // Start sliding in and fading in the new content with transition
+        cardContent.style.transition = '';
+        cardContent.classList.add('slide-in');
+    }, 250); // Delay should match the CSS transition duration
+  }
+
+  moveToNextCard() {
+    this.currentCardIndex = (this.currentCardIndex + 1) % this.cardsData.length;
+    this.updateCardContent(this.currentCardIndex);
+  }
   
   updatePosition() {
     const windowWidth = window.innerWidth;
@@ -1688,6 +1767,8 @@ class ChatBox extends HTMLElement  {
     if (text === '') {
       return; // Exit the function early if the message is empty
     }
+
+    if (this.currentPage != 'message') this.switchPage('message'); // Switch to the messaging page (if not already on it)
   
     this.setDisableSendButton(true);
     this.addMessage('user', text);
