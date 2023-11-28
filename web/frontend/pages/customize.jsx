@@ -30,15 +30,13 @@ export default function CustomizePage() {
     storeInfo: "",
     assistantName: "ShopMate",
     accentColour: "#47AFFF",
-    darkMode: false,
-    homeScreen: true,
-    welcomeMessage: "Welcome to our store! Are there any products I could help you find?",
     avatarImageSrc: "default_v1.png",
     greetingLineOne: "Hi There 👋",
     greetingLineTwo: "How can we help?",
     showSupportForm: false,
+    supportUrlPath: '',
     showLauncherText: true,
-    launcherText: "Hi! Anything I can help "
+    launcherText: "Hi! Anything I can help you find?"
   });
 
   const authFetch = useAuthenticatedFetch()
@@ -151,7 +149,7 @@ export default function CustomizePage() {
             <Layout.Section secondary>
               <WidgetDynamicUI 
                 isLoading={isLoading}
-                preferences={preferences}
+                fetchedPreferences={preferences}
               />
             </Layout.Section>
           </Layout>

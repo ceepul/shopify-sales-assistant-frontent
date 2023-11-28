@@ -50,6 +50,8 @@ export default function PlanPage() {
     setListError(false);
     if (clear) setSessions([]);
 
+    console.log(sortAscending)
+
     const shop = await authFetch("/api/shop", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -74,12 +76,15 @@ export default function PlanPage() {
       return;
     }
     
-    const sessions = await response.json();
-    if (sessions.length < 50) setHasNextPage(false);
-    if (sessions.length > 0 && sessions[sessions.length - 1].id !== undefined) {
-      setCursor(sessions[sessions.length - 1].id);
+    const newSessions = await response.json();
+    if (newSessions.length < 50) {
+      setHasNextPage(false);
     }
-    setSessions(prev => [...prev, ...sessions]);
+        
+    if (newSessions.length > 0) {
+      setCursor(newSessions[newSessions.length - 1].id);
+    }
+    setSessions(prev => [...prev, ...newSessions]);
     setIsFetching(false);
     return;
   };

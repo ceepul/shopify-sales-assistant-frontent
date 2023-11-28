@@ -29,7 +29,7 @@ import './ChatSessionList.css'
 export default function ChatSessionList({ isLoading, error, sessions, activeSession, setActiveSession, hasNextPage, fetchSessions, isFetching }) {
   const sidebarRef = useRef();
   const [filters, setFilters] = useState([]);
-  const [sortAscending, setSortAscending] = useState(true);
+  const [sortAscending, setSortAscending] = useState(false);
 
   const [popoverActive, setPopoverActive] = useState(false);
   const togglePopoverActive = useCallback(() => {
@@ -42,28 +42,39 @@ export default function ChatSessionList({ isLoading, error, sessions, activeSess
   }
 
   const handleSortChange = () => {
+    const prev = sortAscending;
     setSortAscending(prev => !prev)
-    fetchSessions(filters, sortAscending, true)
+    fetchSessions(filters, !prev, true)
   }
 
+  const debounce = (func, wait) => {
+    let timeout;
+  
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  };  
+
   useEffect(() => {
-    const handleScroll = () => {
+    const handleScroll = debounce(() => {
+      console.log('scroll')
       if (!sidebarRef.current || !hasNextPage || isFetching) return;
   
-      if (sidebarRef.current.scrollTop + sidebarRef.current.clientHeight >= sidebarRef.current.scrollHeight - 30) {
+      if (sidebarRef.current.scrollTop + sidebarRef.current.clientHeight >= sidebarRef.current.scrollHeight - 60) {
         fetchSessions(filters, sortAscending);
       }
-    };
+    }, 100);
   
     if (!isLoading && sidebarRef.current) {
       const sidebar = sidebarRef.current;
       sidebar.addEventListener('scroll', handleScroll);
   
       return () => {
-        //sidebar.removeEventListener('scroll', handleScroll);
+        sidebar.removeEventListener('scroll', handleScroll);
       };
     }
-  }, [isLoading, fetchSessions]);
+  }, [isLoading, isFetching]);
 
   const formatSessionDate = (sessionStart) => {
     const utcTimestamp = `${sessionStart}Z`
@@ -166,7 +177,7 @@ export default function ChatSessionList({ isLoading, error, sessions, activeSess
                           <Text>Product View</Text>
                         </HorizontalStack>
               },
-              {
+              /* {
                 value: 'hasAddToCart', 
                 label: <HorizontalStack blockAlign="center" gap="1">
                           <Icon source={PlusMinor} color='base'/>
@@ -179,7 +190,7 @@ export default function ChatSessionList({ isLoading, error, sessions, activeSess
                           <Icon source={CashDollarMinor} color='base'/>
                           <Text>Conversion</Text>
                         </HorizontalStack>
-              },
+              }, */
             ]}
             selected={filters}
             allowMultiple

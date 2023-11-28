@@ -5,8 +5,12 @@ import {
   infoCircleDark,
   downChevron,
   downChevronDark,
-  capabilitiesIcon,
-  sendB
+  sendB,
+  backIconDark,
+  chatIcon,
+  chatIconDark,
+  resetIcon,
+  resetIconDark
 } from "../assets/index"
 import { 
   SkeletonBodyText,
@@ -17,39 +21,30 @@ import {
   Text
 } from '@shopify/polaris';
 
-export default function WidgetDynamicUI({ isLoading, preferences}) {
+export default function WidgetDynamicUI({ isLoading, fetchedPreferences }) {
 
-  const [assistantName, setAssistantName] = useState("ShopMate");
-  const [accentColour, setAccentColour] = useState("#47AFFF");
-  const [darkMode, setDarkMode] = useState(false);
-  const [homeScreen, setHomeScreen] = useState(true);
-  const [welcomeMessage, setWelcomeMessage] = useState(
-    "Welcome to our store! Are there any products I could help you find?"
-  );
-  const [avatarImageSrc, setAvatarImageSrc] = useState('default_v1.png')
+  const [preferences, setPreferences] = useState({
+    greetingLineOne: "Hi There 👋",
+    greetingLineTwo: "How can we help?",
+    accentColour: "#47AFFF",
+    assistantName: "ShopMate",
+    showLauncherText: true,
+    launcherText: "Hi 👋 Anything I can help you find?",
+    showSupportForm: false,
+    welcomeMessage: "Welcome to our store! Are there any products I could help you find?",
+    avatarImageSrc: "default_v1.png",
+  })
 
-  const [assistantNameFontSize, setAssistantNameFontSize] = useState('22px');
+  const [currentPage, setCurrentPage] = useState('home');
 
   useEffect(() => {
-    if (preferences) {
-      const { assistantName, accentColour, darkMode, homeScreen, welcomeMessage, avatarImageSrc } = preferences;
-      setAssistantName(assistantName);
-      setAccentColour(accentColour);
-      setDarkMode(darkMode);
-      setHomeScreen(homeScreen);
-      setWelcomeMessage(welcomeMessage);
-      setAvatarImageSrc(avatarImageSrc)
+    if (fetchedPreferences) {
+      setPreferences(prev => ({
+        ...prev,
+        ...fetchedPreferences
+      }));
     }
-  }, [preferences]);
-
-  useEffect(() => {
-    if (assistantName.length > 16) {
-      setAssistantNameFontSize('18px')
-    } else if (assistantName.length > 13) {
-      setAssistantNameFontSize('20px')
-    } else setAssistantNameFontSize('22px')
-  }, [assistantName]);
-
+  }, [fetchedPreferences]);
 
   function hexToRgb(hex) {
     // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
@@ -76,7 +71,8 @@ export default function WidgetDynamicUI({ isLoading, preferences}) {
     return luminance;
   } 
 
-  const accentRgb = hexToRgb(accentColour);
+  console.log(preferences.accentColour)
+  const accentRgb = hexToRgb(preferences.accentColour);
   const darkerAccentRgb = darkenRgb(accentRgb, 0.14); // Darken by 14%
 
   const headerBgMainStyle = {
@@ -86,7 +82,16 @@ export default function WidgetDynamicUI({ isLoading, preferences}) {
   };
 
   const headerBgStyle = {
-    backgroundColor: accentColour,
+    backgroundColor: preferences.accentColour,
+  };
+
+  const homeBgGradientStyle = {
+    background: `linear-gradient(
+      ${preferences.accentColour} 0%, 
+      ${preferences.accentColour} 25%,
+      rgb(${accentRgb[0]}, ${accentRgb[1]}, ${accentRgb[2]}, 0.60) 75%, 
+      #FFFFFF 100%
+    )`        
   };
   
   const textColorStyle = {
@@ -94,42 +99,24 @@ export default function WidgetDynamicUI({ isLoading, preferences}) {
   };
 
   const assistantNameStyle = {
-    ...textColorStyle,
-    fontSize: assistantNameFontSize
+    ...textColorStyle
   };
 
   const poweredByNameStyle = {
-    color: calculateLuminance(accentRgb) > 0.7 ? '#2a2a2a' : accentColour,
+    color: calculateLuminance(accentRgb) > 0.7 ? '#2a2a2a' : preferences.accentColour,
   };
 
-  const circleIconPath = calculateLuminance(accentRgb) > 0.7 ? infoCircleDark : infoCircle
-  const closeIconPath = calculateLuminance(accentRgb) > 0.7 ? downChevronDark : downChevron
+  const isDark = calculateLuminance(accentRgb) > 0.7 ? true : false;
+  const closeIconPath = isDark ? downChevronDark : downChevron;
+  const chatIconPath = isDark ? chatIconDark : chatIcon;
+  const resetIconPath = isDark ? resetIconDark : resetIcon;
 
-  const emptyMarkup = (
-    <div className="body-container">
-      <div className="capabilities-container">
-        <img className='capabilities-icon' alt="Checklist icon" src={capabilitiesIcon} />
-        <div className="capabilities-text">Capabilities</div>
-      </div>
-      <div className="example-container">
-          <p className="example-heading">Find exactly what your looking for</p>
-          <p className="example-text">“Show me low-top white shoes”</p>
-      </div>
-      <div className="example-container">
-          <div className="example-heading">Get smart style recommendations</div>
-          <p className="example-text">“I need a top I can wear to a semi-formal event on a hot</p>
-          <p className="example-text"> summer day and that will go with my beige dress pants”</p>
-      </div>
-    </div>
-  )
-
-  const populatedMarkup = (
-    <div className='body-container'>
-      <div className="assistant-message">
-        <p className="assistant-text">{welcomeMessage}</p>
-      </div>
-    </div>
-  )
+  const currentDate = new Date();
+  const formattedDate = currentDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
 
   if (isLoading) {
     return (
@@ -147,43 +134,108 @@ export default function WidgetDynamicUI({ isLoading, preferences}) {
 
   return (
     <VerticalStack gap="4">
-      <Text variant="headingLg" as="h5">Widget</Text>
+      <Text variant="headingLg" as="h5">Preview</Text>
       <div className="widget">
+        {currentPage === 'home' && 
+          <div>
+            <div className="home-background" style={homeBgGradientStyle} />
+            <div className="home-page">
+              <div className="home-header">
+                <div className='title-container'>
+                  <div className="assistant-name" style={textColorStyle} >{preferences.greetingLineOne}</div>
+                  <div className="assistant-subtitle" style={textColorStyle} >{preferences.greetingLineTwo}</div>
+                </div>
+                <div id="home-page-close-button" className='right-icon-container'>
+                  <img className='header-icon' alt="Close icon" src={closeIconPath}/>
+                </div>
+              </div>
+      
+              <div onClick={() => setCurrentPage('message')} className="home-card-container">
+                <div className="card-content">
+                <img className='card-image' 
+                  src='https://shopify-recommendation-app.s3.amazonaws.com/illustrations/recommendation-card-illustration.svg'
+                  alt='Illustration of a women sitting using a computer'
+                />
+                </div>
+                <div className="card-footer-container">
+                  <div className="card-title">AI Product Recommendations</div>
+                  <div className="card-subtitle">Tell us what you need and we’ll help find the perfect product!</div>
+                  <div className="card-button-container">
+                    <div className="card-button">
+                      <img className='header-icon' alt="Prev Page" src={backIconDark}/>
+                    </div>
+                    <div className="dot-container">
+                      <div className="card-dot active">&nbsp;</div>
+                      <div className="card-dot">&nbsp;</div>
+                    </div>
+                    <div className="card-button flip">
+                      <img className='header-icon' alt="Next Page" src={backIconDark}/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
   
-        <div className="header-container">
-          <div className="header-background-round" style={headerBgStyle} />
-          <div className="header-background-main" style={headerBgMainStyle} />
-          <div className="header-content">
-            <img className="avatar" alt="Avatar" src={`https://shopify-recommendation-app.s3.amazonaws.com/avatars/${preferences.avatarImageSrc}`} />
-            <div className='title-container'>
-              <div className="assistant-name" style={assistantNameStyle}>{assistantName}</div>
-              <div className="assistant-subtitle" style={textColorStyle}>AI Shopping Assistant</div>
+        {currentPage === 'message' && 
+          <div className="message-page">
+            <div className="header-container">
+              <div className="header-background-round" style={headerBgStyle}>&nbsp;</div>
+              <div className="header-background-main" style={headerBgMainStyle}>&nbsp;</div>
+              <div className="header-content">
+                <div className='icon-container' onClick={() => setCurrentPage('home')}>
+                  <img className='header-icon rotate90' alt="Back icon" src={closeIconPath}/>
+                </div>
+                <div className='title-container'>
+                  <div className="assistant-name" style={assistantNameStyle}>{preferences.assistantName}</div>
+                  <div className="assistant-subtitle" style={textColorStyle}>AI Shopping Assistant</div>
+                </div>
+                <div className='right-icon-container'>
+                  <img className='header-icon' alt="Info icon" src={resetIconPath}/>
+                </div>
+              </div>
             </div>
-            <div className='info-icon-container'>
-              <img className='header-icon' alt="Info icon" src={circleIconPath}/>
+          
+            <div id="message-page-body" class="body-container">
+              <p class="date-text">{formattedDate}</p>
+              <div className="assistant-message">
+                <p className="assistant-text">{preferences.welcomeMessage}</p>
+              </div>
             </div>
-            <div className='close-icon-container'>
-              <img className='header-icon' alt="Close icon" src={closeIconPath}/>
+          </div>
+        }
+  
+        <div className="footer-container">
+          <div className="footer-divider"/>
+          <div className="input-group">
+            <div className="input-field">Start typing...</div>
+            <button className="send-button-container">
+              <img className='send-button' alt="Send icon" src={sendB} />
+            </button>
+          </div>
+          <div className="character-count-container">
+            <div className="character-count-text">0/200</div>
+          </div>
+          <div className="powered-by-container">
+            <div className="powered-by-text">Powered by</div>
+            <div className="powered-by-name" style={poweredByNameStyle}>
+              <div style={poweredByNameStyle}>ShopMate</div>
             </div>
           </div>
         </div>
   
-        {homeScreen ? emptyMarkup : populatedMarkup}
-  
-        <footer className="footer-container">
-          <div className="input-field">
-            <div className="input-placeholder">Start typing...</div>
-            <div className='send-button-container'>
-              <img className='send-button' alt="Send icon" src={sendB} />
-            </div>
+      </div>
+
+      <div className='toggle'>
+        <div className="toggle-button" style={headerBgStyle}>
+          <img className="toggle-icon" alt="Toggle Icon" src={chatIconPath} />
+        </div>
+        {preferences.showLauncherText &&
+          <div id="#animated-message" className="animated-message-left">
+            <p class="assistant-text">{preferences.launcherText}</p>
           </div>
-          <div className="footer-divider"/>
-          <div className="powered-by-container">
-            <div className="powered-by-text">Powered by</div>
-            <div className="powered-by-name" style={poweredByNameStyle}>ShopMate</div>
-          </div>
-        </footer>
-  
+        }
       </div>
     </VerticalStack>
   );

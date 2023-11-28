@@ -1,6 +1,5 @@
 export { default as homeTrophy } from "./home-trophy.png";
 export { default as notFoundImage } from "./empty-state.svg"
-export { default as capabilitiesIcon } from "./capabilities1.svg";
 export { default as downChevron } from "./down-chevron.svg";
 export { default as downChevronDark } from "./down-chevron-dark.svg";
 export { default as embedSS } from "./embed-ss.png";
@@ -9,3 +8,8 @@ export { default as infoCircle } from "./info-circle.svg";
 export { default as infoCircleDark } from "./info-circle-dark.svg";
 export { default as sendA } from "./send1.svg";
 export { default as sendB } from "./send2.svg";
+export { default as backIconDark } from "./back-icon-dark.svg";
+export { default as chatIcon } from "./chat-icon.svg";
+export { default as chatIconDark } from "./chat-icon-dark.svg";
+export { default as resetIcon } from "./reset-icon.svg";
+export { default as resetIconDark } from "./reset-icon-dark.svg";

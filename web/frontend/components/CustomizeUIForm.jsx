@@ -65,6 +65,7 @@ export default function CustomizeUIForm({isLoading, preferences, resetPreference
         greetingLineOne: preferences.greetingLineOne,
         greetingLineTwo: preferences.greetingLineTwo,
         showSupportForm: preferences.showSupportForm,
+        supportUrlPath: preferences.supportUrlPath,
         showLauncherText: preferences.showLauncherText,
         launcherText: preferences.launcherText,
       }
@@ -416,7 +417,6 @@ export default function CustomizeUIForm({isLoading, preferences, resetPreference
                   onChange={(value) => handleChangePreference('launcherText', value)}
                   label="Launcher Text"
                   labelHidden
-                  error={null}
                   multiline
                 />
               </VerticalStack>
@@ -432,23 +432,22 @@ export default function CustomizeUIForm({isLoading, preferences, resetPreference
             <SettingToggle
               enabled={preferences.showSupportForm}
               handleToggle={() => handleChangePreference('showSupportForm', !preferences.showSupportForm)}
-              title="Enable Support Form"
-              description="Allow the AI to display a support form where users can send support questions"
+              title="Enable Support Link"
+              description="Allow the AI to display a link to your contact page."
             />
             {preferences.showSupportForm && 
               <VerticalStack gap="4">
                 <Box minHeight="0.5rem"/>
                 <VerticalStack gap='1'>
-                  <Text variant="headingMd" as="h6"> Support Email</Text>
-                  <Text>Please contact our support team to change your support email.</Text>
+                  <Text variant="headingMd" as="h6">URL Path</Text>
+                  <Text>The path to your store's contact page. Typically "/pages/contact" OR "/pages/contact-us" for Shopify stores.</Text>
                 </VerticalStack>
                 <TextField
-                  value={'example@email.com'}
-                  onChange={null}
-                  label="Support Email"
+                  value={preferences.supportUrlPath}
+                  onChange={(value) => handleChangePreference('supportUrlPath', value)}
+                  label="URL Path"
+                  placeholder="/pages/contact"
                   labelHidden
-                  error={null}
-                  disabled
                 />
               </VerticalStack>
             }

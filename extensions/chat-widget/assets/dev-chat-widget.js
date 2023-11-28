@@ -135,16 +135,6 @@ class ChatWidget extends HTMLElement {
           );        
         }
 
-        .chat-widget__home-background.collapse {
-          height: 124px;
-          transition: height 0.2s ease-in-out;
-        }        
-
-        .chat-widget__home-background.expand {
-          height: 480px;
-          transition: height 0.2s ease-in-out;
-        }
-
         .chat-widget__home-header {
           position: relative;
           display: flex;
@@ -165,7 +155,7 @@ class ChatWidget extends HTMLElement {
           align-items: center;
           width: 85%;
           height: calc(100% - 260px);
-          background: #FFFFFF;
+          background: rgba(255, 255, 255, 1);;
           box-shadow: 0 4px 6px rgba(128, 128, 128, 0.3);
           margin-left: auto;
           margin-right: auto;
@@ -174,9 +164,19 @@ class ChatWidget extends HTMLElement {
         }
 
         .chat-widget__card-content {
-          opacity: 0;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          padding: 20px;
+          overflow: hidden;
           transform: translateX(100%);
           transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        .chat-widget__card-image {
+          border-radius: 10px;
         }
         
         .chat-widget__card-content.slide-in {
@@ -187,6 +187,37 @@ class ChatWidget extends HTMLElement {
         .chat-widget__card-content.slide-out {
             opacity: 0;
             transform: translateX(-100%);
+        }
+
+        .chat-widget__faq-button {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background-color: #bbbbbb;
+          box-shadow: 0 2px 6px rgba(128, 128, 128, 0.6);
+          border-radius: 10px;
+          padding: 10px;
+          width: 100%;
+          margin-top: 12px;
+        }
+
+        .chat-widget__faq-button:hover {
+          transform: scale(1.04);
+          box-shadow: 0 2px 6px rgba(128, 128, 128, 1);
+        }
+
+        .chat-widget__faq-text {
+          color: #ffffff;
+          font-family: "Open Sans", Helvetica;
+          font-size: 13px;
+          font-weight: 400;
+          line-height: 18px;
+          letter-spacing: -0.005em;
+          margin: 0;
+          padding-right: 6px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
         }
 
         .chat-widget__card-footer-container {
@@ -220,8 +251,8 @@ class ChatWidget extends HTMLElement {
           display: flex;
           justify-content: center;
           align-items: center;
-          height: 32px;
-          width: 32px;
+          height: 36px;
+          width: 36px;
           border-radius: 8px;
         }
 
@@ -245,6 +276,10 @@ class ChatWidget extends HTMLElement {
 
         .chat-widget__flip {
           transform: rotate(180deg);
+        }
+
+        .chat-widget__rotate90 {
+          transform: rotate(90deg);
         }
 
         .chat-widget__card-button:hover {
@@ -383,54 +418,6 @@ class ChatWidget extends HTMLElement {
         .chat-widget__body-container::-webkit-scrollbar {
           display: none;
         }
-
-        .chat-widget__confirm-clear-container {
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          padding: 20px;
-          text-align: center;
-        }
-        
-        .chat-widget__confirm-clear-text {
-            margin-bottom: 20px;
-            font-size: 16px;
-            color: #333;
-        }
-        .chat-widget__button-clear,
-        .chat-widget__button-cancel {
-            width: 30%;
-            max-width: 100px;
-            padding: 10px 20px;
-            margin: 5px;
-            border: none;
-            border-radius: 5px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        
-        .chat-widget__button-clear {
-            background-color: #e44d26;
-            color: #fff;
-        }
-        
-        .chat-widget__button-clear:hover {
-            background-color: #b8371e;
-            color: #fff;
-        }
-        
-        .chat-widget__button-cancel {
-            background-color: #ddd;
-            color: #333;
-        }
-        
-        .chat-widget__button-cancel:hover {
-            background-color: #ccc;
-            color: #222;
-        }      
         
         .chat-widget__footer-container {
           background-color: #ffffff;
@@ -476,8 +463,6 @@ class ChatWidget extends HTMLElement {
         
         .chat-widget__send-button-container {
           cursor: pointer;
-          height: 40px;
-          width: 40px;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -485,6 +470,7 @@ class ChatWidget extends HTMLElement {
           border-radius: 8px;
           border: none;
           margin-left: 10px;
+          padding: 4px;
         }
         
         .chat-widget__send-button-container:hover {
@@ -566,7 +552,16 @@ class ChatWidget extends HTMLElement {
           color: #E00000;
         }
 
-        .chat-widget__animated-message {
+        .chat-widget__animated-message-left {
+          background-color: #f1f2f4;
+          border-radius: 10px 10px 10px 0px;
+          align-self: flex-start;
+          padding: 10px;
+          margin-left: 20px;
+          margin-bottom: 16px;
+        }
+
+        .chat-widget__animated-message-right {
           background-color: #f1f2f4;
           border-radius: 10px 10px 0px 10px;
           align-self: flex-end;
@@ -579,7 +574,7 @@ class ChatWidget extends HTMLElement {
           opacity: 0;
           transform: translateY(30px);
           animation: fadeInUp 1s forwards;
-          animation-delay: 3s;
+          animation-delay: 2s;
         }        
 
         @keyframes fadeInUp {
@@ -626,13 +621,58 @@ class ChatWidget extends HTMLElement {
         }
           
         .chat-widget__user-text {
-            color: #ffffff;
-            font-family: "Open Sans", Helvetica;
-            font-size: 13px;
-            font-weight: 400;
-            line-height: 18px;
-            letter-spacing: -0.005em;
-            margin: 0;
+          color: #ffffff;
+          font-family: "Open Sans", Helvetica;
+          font-size: 13px;
+          font-weight: 400;
+          line-height: 18px;
+          letter-spacing: -0.005em;
+          margin: 0;
+        }
+
+        .chat-widget__date-text {
+          font-size: 14px;
+          font-weight: 400;
+          margin: 14px;
+        }
+
+        .chat-widget__loading-text {
+          color: #2e3138cc;
+          font-family: "Open Sans", Helvetica;
+          font-size: 13px;
+          font-weight: 400;
+          margin: 0;
+          margin-right: 8px;
+        }
+
+        .chat-widget__contact-form-container {
+          text-decoration: none;
+          color: inherit;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          border-radius: 10px;
+          align-self: flex-start;
+          padding: 20px;
+          max-width: 50%;
+          margin-bottom: 20px;
+        }
+
+        .chat-widget__contact-form-container:hover {
+          transform: scale(1.05);
+        }
+
+        .chat-widget__contact-form-image {
+          width: 100px;
+        }
+
+        .chat-widget__contact-form-text {
+          font-family: "Open Sans", Helvetica;
+          font-size: 16px;
+          font-weight: 600;
+          margin: 0;
+          margin-top: 6px;
         }
         
         .chat-widget__product-container {
@@ -758,13 +798,13 @@ class ChatWidget extends HTMLElement {
 
         @media only screen and (max-width: 768px) {
           .chat-widget {
-            bottom: 20px;
-            right: 20px;
+            bottom: 32px;
+            right: 32px;
           }
         
           .chat-widget__toggle {
-            bottom: 20px;
-            right: 20px;
+            bottom: 32px;
+            right: 32px;
             top: auto;
             left: auto;
           }
@@ -772,7 +812,7 @@ class ChatWidget extends HTMLElement {
           .chat-widget__box {
             width: 100vw;
             height: calc(var(--vh, 1vh) * 100);
-            bottom: -20px;
+            bottom: -31px;
             right: 0;
             border-radius: 0;
           }
@@ -822,9 +862,9 @@ class ChatWidget extends HTMLElement {
 
       if (position === 'left') {
         widget.style.right = 'auto';
-        widget.style.left = '20px';
+        widget.style.left = '32px';
       } else {
-        widget.style.right = '20px';
+        widget.style.right = '32px';
         widget.style.left = 'auto';
       }
 
@@ -837,6 +877,7 @@ class ChatWidget extends HTMLElement {
       toggle.setAttribute('data-launcher-text', preferences.launcherText);
       toggle.setAttribute('data-x-icon-url', xIconURL);
       toggle.setAttribute('data-chat-icon-url', chatIconURL);
+      toggle.setAttribute('data-position', position);
 
       // Create the ChatBox element using the custom constructor
       const box = document.createElement('chat-box');
@@ -846,13 +887,14 @@ class ChatWidget extends HTMLElement {
       box.setAttribute('data-position', position);
       box.setAttribute('data-accent-color', preferences.accentColour);
       box.setAttribute('data-assistant-name', preferences.assistantName);
-      box.setAttribute('data-welcome-message', preferences.welcomeMessage);
       box.setAttribute('data-avatar-image-src', preferences.avatarImageSrc);
       box.setAttribute('data-close-icon-url', closeIconURL);
       box.setAttribute('data-back-icon-url', backIconURL);
       box.setAttribute('data-back-icon-dark-url', backIconDarkURL);
       box.setAttribute('data-reset-icon-url', resetIconURL);
       box.setAttribute('data-send-icon-url', sendIconURL);
+      box.setAttribute('data-show-support-form', preferences.showSupportForm);
+      box.setAttribute('data-support-page-path', preferences.supportUrlPath);
 
       widget.append(toggle, box);
 
@@ -914,6 +956,7 @@ class ChatToggle extends HTMLElement  {
     this.luminance = calculateLuminance(this.accentRgb);
     this.showLauncherText = this.getAttribute('data-show-launcher-text');
     this.launcherText = this.getAttribute('data-launcher-text');
+    this.position = this.getAttribute('data-position');
 
     this.xIconURL = this.getAttribute('data-x-icon-url');
     this.chatIconURL = this.getAttribute('data-chat-icon-url');
@@ -972,12 +1015,18 @@ class ChatToggle extends HTMLElement  {
           </div>
         `;
       } else {
-        const ctaText = this.showLauncherText && sessionStorage.getItem('shopmate-hasBeenOpened') != 'true' ? `
-          <div class="chat-widget__animated-message" id="animatedMessage">
+        const ctaClass = this.position === 'left' ? 'chat-widget__animated-message-left' : 'chat-widget__animated-message-right';
+        const ctaText = this.showLauncherText === 'true' && sessionStorage.getItem('shopmate-hasBeenOpened') != 'true' ? `
+          <div class=${ctaClass} id="animatedMessage">
             <p class="chat-widget__assistant-text">${this.launcherText}</p>
           </div>
         ` : ``;
-        this.innerHTML = `
+        this.innerHTML = this.position === 'left' ? `
+          <div class="chat-widget__toggle-button">
+            <img class="chat-widget__toggle-icon" alt="Toggle Icon" src="${this.chatIconURL}" />
+          </div>
+          ${ctaText}
+        ` : `
           ${ctaText}
           <div class="chat-widget__toggle-button">
             <img class="chat-widget__toggle-icon" alt="Toggle Icon" src="${this.chatIconURL}" />
@@ -1062,7 +1111,6 @@ class ChatBox extends HTMLElement  {
     this.accentColor = this.getAttribute('data-accent-color');
     this.assistantName = this.getAttribute('data-assistant-name');
     this.avatarImageSrc = this.getAttribute('data-avatar-image-src');
-    this.welcomeMessage = this.getAttribute('data-welcome-message');
     this.sendIconURL = this.getAttribute('data-send-icon-url');
     this.accentRgb = hexToRgb(this.accentColor);
     this.darkerAccentRgb = darkenRgb(this.accentRgb, 0.14);
@@ -1071,31 +1119,22 @@ class ChatBox extends HTMLElement  {
     this.backIconURL = this.getAttribute('data-back-icon-url');
     this.backIconDarkURL = this.getAttribute('data-back-icon-dark-url');
     this.resetIconURL = this.getAttribute('data-reset-icon-url');
+    this.showSupportForm = this.getAttribute('data-show-support-form');
+    this.supportPagePath = this.getAttribute('data-support-page-path');
     
     this.isLoading = false;
     this.messages = sessionStorage.getItem('shopmate-messages') ? 
-      JSON.parse(sessionStorage.getItem('shopmate-messages')) : [{ role: "assistant", content: this.welcomeMessage }];
+      JSON.parse(sessionStorage.getItem('shopmate-messages')) : [];
+
+    this.threadId = sessionStorage.getItem('shopmate-threadId') ? 
+      JSON.parse(sessionStorage.getItem('shopmate-threadId')) : null;
   
     this.currentPage = sessionStorage.getItem('shopmate-currentPage') ? 
       JSON.parse(sessionStorage.getItem('shopmate-currentPage')) : 'home';
+
     this.currentCardIndex = 0;
     this.autoSwitch = true;
     this.cardChangeInterval = null;
-
-    this.cardsData = [
-      { 
-        title: "AI Product Recommendations", 
-        subtitle: "Tell us what you need and we’ll help find the perfect product!", 
-        content: "<p>Content for Card 1</p>",
-        message: "What can I help you find?"
-      },
-      { 
-        title: "FAQ", 
-        subtitle: "Have a question? Ask away for immediate answers to frequently asked questions.", 
-        content: "<p>Content for Card 2</p>",
-        message: "Let me know if you have any questions!"
-      },
-    ];
 
     // Update position initally
     this.updatePosition();
@@ -1118,7 +1157,7 @@ class ChatBox extends HTMLElement  {
         rgb(${this.accentRgb[0]}, ${this.accentRgb[1]}, ${this.accentRgb[2]}, 0.60) 75%, 
         #FFFFFF 100%
       );        
-    `
+    `;
 
     const bgGradientColorStyle = `
       background: linear-gradient(180deg, 
@@ -1143,8 +1182,69 @@ class ChatBox extends HTMLElement  {
       color: ${this.luminance > 0.7 ? '#2a2a2a' : this.accentColor}
     `;
 
+    this.faqTestEmpty = [];
+    this.faqTestData = [
+      {
+        question: "How long does shipping take?",
+        answer: "Our standard shipping times are 7-12 business days."
+      },
+      {
+        question:"Who are you?",
+        answer: "That's for us to know."
+      },
+      {
+        question: "Here's a super long question to test text cutoff for questions that are longer than the allowed limit.",
+        answer: "Idk"
+      },
+      {
+        question: "How long does shipping take?",
+        answer: "Our standard shipping times are 7-12 business days."
+      }
+    ]
+
+    const faqContent = this.faqTestData.length ? `
+      <div>
+        ${this.faqTestData.map((faq, index) => {
+          return (
+            `
+              <div data-faq-index="${index}" class="chat-widget__faq-button" style="${bgColorStyle}">
+                <div class="chat-widget__faq-text">${faq.question}</div>
+                <img class='chat-widget__header-icon chat-widget__flip' alt="Next Page" src="${this.backIconURL}"/>
+              </div>
+            `)
+        }).join('')}
+      </div>
+    ` : `
+      <img class='chat-widget__card-image' 
+        src='https://shopify-recommendation-app.s3.amazonaws.com/illustrations/faq-card-illustration.svg'
+        alt='Illustration of a women standing with a question bubble above her head'
+      />
+    `;
+
+    this.cardsData = [
+      { 
+        title: "AI Product Recommendations", 
+        subtitle: "Tell us what you need and we’ll help find the perfect product!", 
+        content: `
+          <img class='chat-widget__card-image' 
+            src='https://shopify-recommendation-app.s3.amazonaws.com/illustrations/recommendation-card-illustration.svg'
+            alt='Illustration of a women sitting using a computer'
+          />
+        `,
+        message: "What can I help you find?",
+        page: "recommendation"
+      },
+      { 
+        title: "FAQ", 
+        subtitle: "Have a question? Ask away for immediate answers to frequently asked questions.", 
+        content: faqContent,
+        message: "Let me know if you have any questions!",
+        page: "faq"
+      },
+    ];
+
     this.innerHTML = `
-      <div id="home-page">
+      <div id="home-page" class='chat-widget__hidden'>
         <div class="chat-widget__home-background" style="${homeBgGradientStyle}">&nbsp</div>
         <div id="home-page-content" class="chat-widget__home-page">
           <div class="chat-widget__home-header">
@@ -1164,14 +1264,14 @@ class ChatBox extends HTMLElement  {
               <div class="chat-widget__card-subtitle">Subtitle</div>
               <div class="chat-widget__card-button-container">
                 <div id="prev-card-button" class="chat-widget__card-button">
-                  <img class='chat-widget__header-icon' alt="Back icon" src="${this.backIconDarkURL}"/>
+                  <img class='chat-widget__header-icon' alt="Prev Page" src="${this.backIconDarkURL}"/>
                 </div>
                 <div class="chat-widget__dot-container">
                   <div class="chat-widget__card-dot">&nbsp;</div>
                   <div class="chat-widget__card-dot">&nbsp;</div>
                 </div>
                 <div id="next-card-button" class="chat-widget__card-button chat-widget__flip">
-                  <img class='chat-widget__header-icon' alt="Back icon" src="${this.backIconDarkURL}"/>
+                  <img class='chat-widget__header-icon' alt="Next Page" src="${this.backIconDarkURL}"/>
                 </div>
               </div>
             </div>
@@ -1185,7 +1285,7 @@ class ChatBox extends HTMLElement  {
           <div class="chat-widget__header-background-main" style="${bgGradientColorStyle}">&nbsp;</div>
           <div class="chat-widget__header-content">
             <div id="message-page-back-button" class='chat-widget__icon-container'>
-              <img class='chat-widget__header-icon' alt="Back icon" src="${this.backIconURL}"/>
+              <img class='chat-widget__header-icon chat-widget__rotate90' alt="Back icon" src="${this.closeIconURL}"/>
             </div>
             <div class='chat-widget__title-container'>
               <div class="chat-widget__assistant-name" style="${assistantNameStyle}">${this.assistantName}</div>
@@ -1220,11 +1320,40 @@ class ChatBox extends HTMLElement  {
       </div>
     `;
 
+    this.currentPage === 'home' ? (
+      this.querySelector('#home-page').classList.remove('chat-widget__hidden')
+    ) : (
+      this.querySelector('#message-page').classList.remove('chat-widget__hidden')
+    )
+
     this.renderMessages();
     this.setupCarousel();
 
     /* Add event listeners */
     window.addEventListener('resize', this.boundUpdatePosition);
+
+    // Attach a single event listener to the bodyContainer
+    const bodyContainer = this.querySelector('#message-page-body');
+    
+    bodyContainer.addEventListener('click', (e) => {
+      const productLink = e.target.closest('.chat-widget__product-link');
+      if (productLink) {
+        const productId = productLink.getAttribute('data-product-id');
+        this.addProductViewEvent(productId);
+
+        let closeRequestEvent = new Event('requestChatBoxClose');
+        window.dispatchEvent(closeRequestEvent);
+        sessionStorage.setItem('shopmate-isChatBoxOpen', JSON.stringify(false));
+        return;
+      } 
+      const contactLink = e.target.closest('.chat-widget__contact-form-container');
+      if (contactLink) {
+        let closeRequestEvent = new Event('requestChatBoxClose');
+        window.dispatchEvent(closeRequestEvent);
+        sessionStorage.setItem('shopmate-isChatBoxOpen', JSON.stringify(false));
+        return;
+      }
+    });
 
     this.querySelector('#next-card-button').addEventListener('click', this.boundNextCardClick);
     this.querySelector('#prev-card-button').addEventListener('click', this.boundPrevCardClick);
@@ -1242,21 +1371,7 @@ class ChatBox extends HTMLElement  {
   }
 
   disconnectedCallback() {
-    /* Remove event listeners */
-    this.querySelector('#next-card-button')?.removeEventListener('click', this.boundNextCardClick);
-    this.querySelector('#prev-card-button')?.removeEventListener('click', this.boundPrevCardClick);
-    this.querySelector('#card-container')?.removeEventListener('click', this.boundCardClick);
-    this.querySelector('#message-page-back-button').removeEventListener('click', this.boundBackIconClick);
-    this.querySelector('#message-page-reset-button')?.removeEventListener('click', this.boundResetIconClick);
-    this.querySelector('#home-page-close-button')?.removeEventListener('click', this.boundCloseIconClick);
-    this.querySelector('#send-button')?.removeEventListener('click', this.boundSendButtonClick);
-
-    const input = this.querySelector('#chat-input');
-    if (input) {
-      input.removeEventListener('input', this.boundInputEvent);
-      input.removeEventListener('keydown', this.boundKeyDownEvent);
-    }
-
+    /* Remove event listeners attached to Window or Document*/
     this.closeWebSocket();
     window.removeEventListener('resize', this.boundUpdatePosition);
     document.removeEventListener('setupWebsocket', this.boundSetupWebSocket);
@@ -1271,6 +1386,9 @@ class ChatBox extends HTMLElement  {
     const resetButton = document.getElementById('message-page-reset-button');
     
     if (!resetButton.disabled) {
+      this.threadId = null;
+      sessionStorage.setItem('shopmate-threadId', this.threadId);
+
       this.messages = [{role: 'assistant', content: 'How can I help you today?'}];
       sessionStorage.setItem('shopmate-messages', JSON.stringify(this.messages));
       this.renderMessages();
@@ -1328,6 +1446,8 @@ class ChatBox extends HTMLElement  {
   }
 
   handleCardClick() {
+    this.autoSwitch = false;
+    clearInterval(this.cardChangeInterval);
     this.switchPage('message');
     if (this.messages.length <= 1) {
       this.messages = [{role: 'assistant', content: this.cardsData[this.currentCardIndex].message}];
@@ -1390,7 +1510,20 @@ class ChatBox extends HTMLElement  {
         sendConnectionId: (payload) => {
           sessionStorage.setItem('shopmate-websocketConnectionId', JSON.stringify(payload.data.connectionId));
         },
+        sendThreadId: (payload) => {
+          this.threadId = payload.data.threadId;
+          sessionStorage.setItem('shopmate-threadId', JSON.stringify(payload.data.threadId));
+        },
+        showContactForm: () => {
+          this.messages.push({ role: 'contact_form', content: '' });
+          this.renderMessages();
+        },
+        showLoadingState: (payload) => {
+          const data = payload.data;
+          this.showLoading(data.text);
+        },
         finish: (payload) => {
+          if (this.isLoading) this.hideLoading(); 
           sessionStorage.setItem('shopmate-messages', JSON.stringify(this.messages));
           this.nextIndex = 0;
           this.lastIndex = null;
@@ -1429,13 +1562,14 @@ class ChatBox extends HTMLElement  {
       // Handle incoming messages
       this.handleMessage = (event) => {
         const dataFromServer = JSON.parse(event.data);
-        if (this.isLoading) this.hideLoading(); 
-
         const actionType = dataFromServer.action;
+
         if (typeof this.messageHandlers[actionType] === 'function') {
           this.messageHandlers[actionType](dataFromServer);
         } else {
           console.warn("No handler found for action type:", actionType);
+          if (this.isLoading) this.hideLoading(); 
+          this.setDisableSendButton(false);
         }
       };
     
@@ -1486,7 +1620,7 @@ class ChatBox extends HTMLElement  {
     const homeBackground = this.querySelector('.chat-widget__home-background');
 
     this.currentPage = page;
-    sessionStorage.setItem('shopmate-currentPage', page);
+    sessionStorage.setItem('shopmate-currentPage', JSON.stringify(page));
 
     switch (page) {
       case('home'):
@@ -1526,6 +1660,35 @@ class ChatBox extends HTMLElement  {
     }
   }
 
+  // Function to bind event listeners to FAQ buttons
+  bindFaqButtonListeners() {
+    const faqButtons = this.querySelectorAll('.chat-widget__faq-button');
+    faqButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        
+        // Retrieve the index from the data attribute
+        const index = e.currentTarget.getAttribute('data-faq-index');
+        const faqItem = this.faqTestData[index];
+
+        this.switchPage('message');
+        this.messages.length <= 1 ? 
+          this.messages = [{role: 'user', content: faqItem.question}] : this.messages.push({role: 'user', content: faqItem.question});
+
+        this.setDisableSendButton(true);
+        this.renderMessages();
+        this.showLoading();
+        setTimeout(() => {
+          this.hideLoading();
+          this.messages.push({role: 'assistant', content: faqItem.answer});
+          this.renderMessages();
+          this.setDisableSendButton(false);
+          sessionStorage.setItem('shopmate-messages', JSON.stringify(this.messages));
+        }, 1000);
+      });
+    });
+  }
+
   updateCardContent(index) {
     const cardContent = this.querySelector('.chat-widget__card-content');
 
@@ -1541,6 +1704,10 @@ class ChatBox extends HTMLElement  {
         cardTitle.textContent = cardData.title;
         cardSubtitle.textContent = cardData.subtitle;
         cardContent.innerHTML = cardData.content;
+
+        if (cardData.page === 'faq') {
+          this.bindFaqButtonListeners();
+        }
 
         const dotList = this.querySelectorAll('.chat-widget__card-dot');
         dotList.forEach((dot, i) => {
@@ -1569,28 +1736,22 @@ class ChatBox extends HTMLElement  {
   updatePosition() {
     const windowWidth = window.innerWidth;
     if (windowWidth >= 768) {
-      const transformValue = -20 + (windowWidth - 384) / 2
-
+      // const transformValue = -32 + (windowWidth - 384) / 2 --> FOR CENTERING (NO LONGER NEEDED)
       if(this.position === 'left') {
-          if (windowWidth < 524) {
-              this.style.left = `${transformValue}px`;
-              this.style.right = 'auto';
-          } else {
-              this.style.left = '50px';
-              this.style.right = 'auto';
-          }
+        this.style.left = '50px';
+        this.style.right = 'auto';
       } else {
-          if (windowWidth < 524) {
-              this.style.right = `${transformValue}px`;
-              this.style.left = 'auto';
-          } else {
-              this.style.right = '50px';
-              this.style.left = 'auto';
-          }
+        this.style.right = '50px';
+        this.style.left = 'auto';
       }
     } else {
-      this.style.left = 'auto';
-      this.style.right = '-20px';
+      if(this.position === 'left') {
+        this.style.right = 'auto';
+        this.style.left = '-32px';
+      } else {
+        this.style.left = 'auto';
+        this.style.right = '-32px';
+      }
     }
   }
 
@@ -1613,7 +1774,16 @@ class ChatBox extends HTMLElement  {
     // Display messages
     if (updateAll) {
       // Re-render all messages
-      bodyContainer.innerHTML = '';
+      const currentDate = new Date();
+      const formattedDate = currentDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+
+      bodyContainer.innerHTML = `
+        <p class="chat-widget__date-text">${formattedDate}</p>
+      `;
       this.messages.forEach((message, index) => {
         this.appendMessage(message.role, message.content, index);
       });
@@ -1630,7 +1800,7 @@ class ChatBox extends HTMLElement  {
     }
   }  
 
-  appendMessage(role, content, index) {
+  appendMessage(role, content) {
     const bodyContainer = this.querySelector('#message-page-body');
     let markup;
 
@@ -1642,17 +1812,15 @@ class ChatBox extends HTMLElement  {
       color: ${this.luminance > 0.7 ? '#2a2a2a' : '#ffffff'};
     `;
 
-    const firstMessageClass = index === 0 ? 'chat-widget__first-message' : '';
-
     if (role === 'assistant') {
       markup = `
-      <div class="chat-widget__assistant-message ${firstMessageClass}">
+      <div class="chat-widget__assistant-message">
         <p class="chat-widget__assistant-text">${content}</p>
       </div>
       `;
     } else if (role === 'user') {
       markup = `
-      <div class="chat-widget__user-message ${firstMessageClass}" style="${bgColorStyle}">
+      <div class="chat-widget__user-message" style="${bgColorStyle}">
         <p class="chat-widget__user-text" style="${textColorStyle}">${content}</p>
       </div>
       `;
@@ -1675,36 +1843,40 @@ class ChatBox extends HTMLElement  {
       });
       
       markup += "</div>";
+    } else if (role === 'contact_form') {
+      const contactFormStyle = `
+        border: 2px solid rgba(${this.accentRgb[0]}, ${this.accentRgb[1]}, ${this.accentRgb[2]}, 0.80);
+        box-shadow: 0px 4px 6px 2px rgba(${this.accentRgb[0]}, ${this.accentRgb[1]}, ${this.accentRgb[2]}, 0.80);
+      `;
+      const website_url = window.location.origin;
+      const contactFormURL = `${website_url}${this.supportPagePath}`;
+      markup = `
+        <a href="${contactFormURL}" class="chat-widget__contact-form-container" style="${contactFormStyle}">
+          <img class="chat-widget__contact-form-image" 
+            src="https://shopify-recommendation-app.s3.amazonaws.com/illustrations/sent-message-illustration.svg"
+            alt="Image of a letter"
+          />
+          <p class="chat-widget__contact-form-text">Contact Us</p>
+        </a>
+      `;
     }
   
     bodyContainer.insertAdjacentHTML('beforeend', markup);
-
-    // Get all the product-link elements
-    const productLinks = bodyContainer.querySelectorAll('.chat-widget__product-link');
-    productLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        const productId = e.currentTarget.getAttribute('data-product-id');
-        this.addProductViewEvent(productId);
-
-        // Dispatch an event to request the chat box to toggle/close.
-        let closeRequestEvent = new Event('requestChatBoxClose');
-        window.dispatchEvent(closeRequestEvent);
-
-        sessionStorage.setItem('shopmate-isChatBoxOpen', JSON.stringify(false));
-      });
-    });
 
     setTimeout(() => {
       bodyContainer.lastElementChild.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   }
 
-  showLoading() {
-    if (!this.isLoading) {
+  showLoading(text) {
+    const bodyContainer = this.querySelector('#message-page-body');
+
+    if (text) {
+      this.hideLoading();
       this.isLoading = true;
-      const bodyContainer = this.querySelector('#message-page-body');
       const loadingMarkup = `
         <div class="chat-widget__loading-animation">
+          <p class="chat-widget__loading-text">${text}</p>
           <div class="chat-widget__dot" style="animation-delay: 0.2s;">&nbsp;</div>
           <div class="chat-widget__dot" style="animation-delay: 0.4s;">&nbsp;</div>
           <div class="chat-widget__dot" style="animation-delay: 0.6s;">&nbsp;</div>
@@ -1713,6 +1885,20 @@ class ChatBox extends HTMLElement  {
       setTimeout(() => {
         bodyContainer.lastElementChild.scrollIntoView({ behavior: 'smooth' });
       }, 100);
+    } else {
+      if (!this.isLoading) {
+        this.isLoading = true;
+        const loadingMarkup = `
+          <div class="chat-widget__loading-animation">
+            <div class="chat-widget__dot" style="animation-delay: 0.2s;">&nbsp;</div>
+            <div class="chat-widget__dot" style="animation-delay: 0.4s;">&nbsp;</div>
+            <div class="chat-widget__dot" style="animation-delay: 0.6s;">&nbsp;</div>
+          </div>`;
+        bodyContainer.insertAdjacentHTML('beforeend', loadingMarkup);
+        setTimeout(() => {
+          bodyContainer.lastElementChild.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
     }
   }
 
@@ -1773,7 +1959,6 @@ class ChatBox extends HTMLElement  {
     this.setDisableSendButton(true);
     this.addMessage('user', text);
 
-    this.showClearChatScreen = false;  // Don't show the homescreen, show the messages instead
     this.renderMessages();
     this.showLoading(); // Show the ... animation
 
@@ -1792,13 +1977,15 @@ class ChatBox extends HTMLElement  {
     try {
       // Send the message through the WebSocket
       this.websocket.send(JSON.stringify({ 
-        action: 'sendMessage',
+        action: 'sendDevMessage',
         shop: this.shop, 
-        messages: this.messages.slice(-9) // Only send the 9 most recent messages
+        message: this.messages[this.messages.length - 1], // Only send the most recent message (user)
+        thread: this.threadId,
+        showSupportForm: (this.showSupportForm === 'true')
       }));
     } catch (error) {
       console.error('Error sending message: ', error);
-    }    
+    }
   }
 }
 customElements.define('chat-box', ChatBox);

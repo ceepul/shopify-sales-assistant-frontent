@@ -170,6 +170,17 @@ export default function ChatSessionDetail({ isLoading, activeSession, setActiveS
               </div>
             )
           } else if (event.sender === 'assistant') {
+            if(event.messageText === '[support form]') {
+              return (
+                <div className="chat-widget__contact-form-container">
+                  <img className="chat-widget__contact-form-image" 
+                    src="https://shopify-recommendation-app.s3.amazonaws.com/illustrations/sent-message-illustration.svg"
+                    alt="Image of a letter"
+                  />
+                  <p className="chat-widget__contact-form-text">Contact Us</p>
+                </div>
+              )
+            }
             return (
               <div key={index} className="chat-widget__assistant-message">
                 <p className="chat-widget__assistant-text">{event.messageText}</p>
