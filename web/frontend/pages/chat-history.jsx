@@ -50,8 +50,6 @@ export default function PlanPage() {
     setListError(false);
     if (clear) setSessions([]);
 
-    console.log(sortAscending)
-
     const shop = await authFetch("/api/shop", {
       method: "GET",
       headers: { "Content-Type": "application/json" },

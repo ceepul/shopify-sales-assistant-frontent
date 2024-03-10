@@ -2,7 +2,7 @@
 
 name = "ShopMate Dev"
 client_id = "c8acbeffc4d6770cc205892ee94f8cb3"
-application_url = "https://sitting-seeking-analyzed-meyer.trycloudflare.com"
+application_url = "https://way-renew-shareware-discs.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -12,10 +12,10 @@ use_legacy_install_flow = true
 
 [auth]
 redirect_urls = [
-  "https://sitting-seeking-analyzed-meyer.trycloudflare.com/auth/callback",
-  "https://sitting-seeking-analyzed-meyer.trycloudflare.com/auth/shopify/callback",
-  "https://sitting-seeking-analyzed-meyer.trycloudflare.com/api/auth/callback",
-  "https://sitting-seeking-analyzed-meyer.trycloudflare.com/.shopify/graphiql/auth/callback"
+  "https://way-renew-shareware-discs.trycloudflare.com/auth/callback",
+  "https://way-renew-shareware-discs.trycloudflare.com/auth/shopify/callback",
+  "https://way-renew-shareware-discs.trycloudflare.com/api/auth/callback",
+  "https://way-renew-shareware-discs.trycloudflare.com/.shopify/graphiql/auth/callback"
 ]
 
 [webhooks]

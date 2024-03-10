@@ -86,7 +86,11 @@ class ChatWidget extends HTMLElement {
         
         .chat-widget__toggle-button:active {
             transform: scale(0.95);
-        }      
+        } 
+        
+        .chat-widget__hidden {
+          display: none;
+        }
 
         .chat-widget__box {
           display: flex;
@@ -107,6 +111,180 @@ class ChatWidget extends HTMLElement {
           transform: translateY(20px);
           box-shadow: 0 4px 8px rgba(128, 128, 128, 0.2);
         }
+
+        .chat-widget__home-page {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+        }
+
+        .chat-widget__message-page {
+          position: absolute;
+          width: 100%;
+        }
+
+        .chat-widget__home-background {
+          position: absolute;
+          top: 0;
+          width: 100%;
+          height: 480px;
+          background: linear-gradient(
+            #F32132 0%, 
+            rgba(237, 110, 120, 0.60) 70%, 
+            #FFFFFF 100%
+          );        
+        }
+
+        .chat-widget__home-header {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          height: 68px;
+          width: 100%;
+          margin-top: 24px;
+          padding-inline: 16px;
+        }
+
+        .chat-widget__home-card-container {
+          position: relative;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          align-items: center;
+          width: 85%;
+          height: calc(100% - 260px);
+          background: rgba(255, 255, 255, 1);;
+          box-shadow: 0 4px 6px rgba(128, 128, 128, 0.3);
+          margin-left: auto;
+          margin-right: auto;
+          margin-top: 32px;
+          border-radius: 10px;
+        }
+
+        .chat-widget__card-content {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          width: 100%;
+          height: 100%;
+          padding: 20px;
+          overflow: hidden;
+          transform: translateX(100%);
+          transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        .chat-widget__card-image {
+          border-radius: 10px;
+        }
+        
+        .chat-widget__card-content.slide-in {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .chat-widget__card-content.slide-out {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+
+        .chat-widget__faq-button {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background-color: #bbbbbb;
+          box-shadow: 0 2px 6px rgba(128, 128, 128, 0.6);
+          border-radius: 10px;
+          padding: 10px;
+          width: 100%;
+          margin-top: 12px;
+        }
+
+        .chat-widget__faq-button:hover {
+          transform: scale(1.04);
+          box-shadow: 0 2px 6px rgba(128, 128, 128, 1);
+        }
+
+        .chat-widget__faq-text {
+          color: #ffffff;
+          font-family: "Open Sans", Helvetica;
+          font-size: 13px;
+          font-weight: 400;
+          line-height: 18px;
+          letter-spacing: -0.005em;
+          margin: 0;
+          padding-right: 6px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+
+        .chat-widget__card-footer-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 12px;
+        }
+
+        .chat-widget__card-title {
+          font-weight: 600;
+          font-size: 18px;
+          text-align: center;
+        }
+        
+        .chat-widget__card-subtitle {
+          font-size: 14px;
+          text-align: center;
+        }
+
+        .chat-widget__card-button-container {
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 12px;
+        }
+
+        .chat-widget__card-button {
+          cursor: pointer;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 36px;
+          width: 36px;
+          border-radius: 8px;
+        }
+
+        .chat-widget__dot-container {
+          display: flex;
+          align-items: center;
+        }
+
+        .chat-widget__card-dot {
+          width: 8px;
+          height: 8px;
+          margin: 2px;
+          background-color: #2e3138cc;
+          border-radius: 50%;
+          opacity: 0.4;
+        }
+
+        .chat-widget__card-dot.active {
+          opacity: 1;
+        }
+
+        .chat-widget__flip {
+          transform: rotate(180deg);
+        }
+
+        .chat-widget__rotate90 {
+          transform: rotate(90deg);
+        }
+
+        .chat-widget__card-button:hover {
+          background-color: rgba(128, 128, 128, 0.15);
+        }
         
         .chat-widget__header-container {
           display: flex;
@@ -117,6 +295,16 @@ class ChatWidget extends HTMLElement {
           top: 0;
           overflow: hidden;
           position: relative;
+        }
+
+        .chat-widget__header-container.fade-in {
+          opacity: 1;
+          transition: opacity 0.2s ease-in-out;
+        }
+
+        .chat-widget__header-container.fade-out {
+          opacity: 0;
+          transition: opacity 0.2s ease-in-out;
         }
         
         .chat-widget__header-background-round {
@@ -173,35 +361,38 @@ class ChatWidget extends HTMLElement {
         .chat-widget__assistant-subtitle {
           color: #ffffff;
           font-family: "Open Sans", Helvetica;
-          font-size: 13px;
+          font-size: 14px;
           font-weight: 300;
           line-height: 22px;
           white-space: nowrap;
         }
-        
-        .chat-widget__trash-icon-container {
-          position: absolute;
-          padding: 8px;
+
+        .chat-widget__icon-container {
+          padding: 12px;
           display: flex;
           justify-content: center;
           align-items: center;
           background-color: transparent;
-          right: 34px;
           border-radius: 8px;
         }
         
-        .chat-widget__close-icon-container {
-          position: absolute;
-          padding: 8px;
+        .chat-widget__right-icon-container {
+          cursor: pointer;
+          padding: 12px;
           display: flex;
           justify-content: center;
           align-items: center;
           background-color: transparent;
-          right: -8px;
           border-radius: 8px;
+          margin-left: auto;
         }
+
+        .chat-widget__right-icon-container.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }     
         
-        .chat-widget__trash-icon-container:hover, .chat-widget__close-icon-container:hover {
+        .chat-widget__right-icon-container:hover, .chat-widget__icon-container:hover{
           background-color: rgba(128, 128, 128, 0.15);
         }
         
@@ -227,54 +418,6 @@ class ChatWidget extends HTMLElement {
         .chat-widget__body-container::-webkit-scrollbar {
           display: none;
         }
-
-        .chat-widget__confirm-clear-container {
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          padding: 20px;
-          text-align: center;
-        }
-        
-        .chat-widget__confirm-clear-text {
-            margin-bottom: 20px;
-            font-size: 16px;
-            color: #333;
-        }
-        .chat-widget__button-clear,
-        .chat-widget__button-cancel {
-            width: 30%;
-            max-width: 100px;
-            padding: 10px 20px;
-            margin: 5px;
-            border: none;
-            border-radius: 5px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        
-        .chat-widget__button-clear {
-            background-color: #e44d26;
-            color: #fff;
-        }
-        
-        .chat-widget__button-clear:hover {
-            background-color: #b8371e;
-            color: #fff;
-        }
-        
-        .chat-widget__button-cancel {
-            background-color: #ddd;
-            color: #333;
-        }
-        
-        .chat-widget__button-cancel:hover {
-            background-color: #ccc;
-            color: #222;
-        }      
         
         .chat-widget__footer-container {
           background-color: #ffffff;
@@ -319,8 +462,7 @@ class ChatWidget extends HTMLElement {
         }
         
         .chat-widget__send-button-container {
-          height: 40px;
-          width: 40px;
+          cursor: pointer;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -328,6 +470,7 @@ class ChatWidget extends HTMLElement {
           border-radius: 8px;
           border: none;
           margin-left: 10px;
+          padding: 4px;
         }
         
         .chat-widget__send-button-container:hover {
@@ -409,7 +552,16 @@ class ChatWidget extends HTMLElement {
           color: #E00000;
         }
 
-        .chat-widget__animated-message {
+        .chat-widget__animated-message-left {
+          background-color: #f1f2f4;
+          border-radius: 10px 10px 10px 0px;
+          align-self: flex-start;
+          padding: 10px;
+          margin-left: 20px;
+          margin-bottom: 16px;
+        }
+
+        .chat-widget__animated-message-right {
           background-color: #f1f2f4;
           border-radius: 10px 10px 0px 10px;
           align-self: flex-end;
@@ -422,7 +574,7 @@ class ChatWidget extends HTMLElement {
           opacity: 0;
           transform: translateY(30px);
           animation: fadeInUp 1s forwards;
-          animation-delay: 3s;
+          animation-delay: 2s;
         }        
 
         @keyframes fadeInUp {
@@ -469,13 +621,58 @@ class ChatWidget extends HTMLElement {
         }
           
         .chat-widget__user-text {
-            color: #ffffff;
-            font-family: "Open Sans", Helvetica;
-            font-size: 13px;
-            font-weight: 400;
-            line-height: 18px;
-            letter-spacing: -0.005em;
-            margin: 0;
+          color: #ffffff;
+          font-family: "Open Sans", Helvetica;
+          font-size: 13px;
+          font-weight: 400;
+          line-height: 18px;
+          letter-spacing: -0.005em;
+          margin: 0;
+        }
+
+        .chat-widget__date-text {
+          font-size: 14px;
+          font-weight: 400;
+          margin: 14px;
+        }
+
+        .chat-widget__loading-text {
+          color: #2e3138cc;
+          font-family: "Open Sans", Helvetica;
+          font-size: 13px;
+          font-weight: 400;
+          margin: 0;
+          margin-right: 8px;
+        }
+
+        .chat-widget__contact-form-container {
+          text-decoration: none;
+          color: inherit;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          border-radius: 10px;
+          align-self: flex-start;
+          padding: 20px;
+          max-width: 50%;
+          margin-bottom: 20px;
+        }
+
+        .chat-widget__contact-form-container:hover {
+          transform: scale(1.05);
+        }
+
+        .chat-widget__contact-form-image {
+          width: 100px;
+        }
+
+        .chat-widget__contact-form-text {
+          font-family: "Open Sans", Helvetica;
+          font-size: 16px;
+          font-weight: 600;
+          margin: 0;
+          margin-top: 6px;
         }
         
         .chat-widget__product-container {
@@ -500,12 +697,10 @@ class ChatWidget extends HTMLElement {
           flex-direction: column;
         }
         
-        
         .chat-widget__product-link:only-child .chat-widget__product-card {
           max-width: 70%;
           flex-grow: 1;
         }
-        
         
         .chat-widget__product-image {
           display: flex;
@@ -549,6 +744,7 @@ class ChatWidget extends HTMLElement {
         }      
         
         .chat-widget__product-addToCart-button {
+          cursor: pointer;
           background-color: #47afffcc;
           border-radius: 4px;
           height: 20px;
@@ -602,13 +798,13 @@ class ChatWidget extends HTMLElement {
 
         @media only screen and (max-width: 768px) {
           .chat-widget {
-            bottom: 20px;
-            right: 20px;
+            bottom: 32px;
+            right: 32px;
           }
         
           .chat-widget__toggle {
-            bottom: 20px;
-            right: 20px;
+            bottom: 32px;
+            right: 32px;
             top: auto;
             left: auto;
           }
@@ -616,7 +812,7 @@ class ChatWidget extends HTMLElement {
           .chat-widget__box {
             width: 100vw;
             height: calc(var(--vh, 1vh) * 100);
-            bottom: -20px;
+            bottom: -31px;
             right: 0;
             border-radius: 0;
           }
@@ -632,7 +828,7 @@ class ChatWidget extends HTMLElement {
     `;
 
     const shop = this.getAttribute('data-domain');
-    const cachedPreferences = sessionStorage.getItem(`preferences-${shop}`);
+    const cachedPreferences = sessionStorage.getItem(`shopmate-preferences-${shop}`);
 
     // If preferences are in the cache, use them. Otherwise, fetch from API
     const preferencesPromise = cachedPreferences
@@ -648,60 +844,58 @@ class ChatWidget extends HTMLElement {
         return; // Exit the funciton if shop is overlimit
       }
 
-      const closeIconURL = this.getAttribute('data-close-icon-url');
-      const closeIconDarkURL = this.getAttribute('data-close-icon-dark-url');
-      const trashIconURL = this.getAttribute('data-trash-icon-url');
-      const trashIconDarkURL = this.getAttribute('data-trash-icon-dark-url');
+      const accentRgb = hexToRgb(preferences.accentColour);
+      const luminance = calculateLuminance(accentRgb);
+      const isDark = luminance > 0.7 ? `-dark` : ``;
+
+      const closeIconURL = this.getAttribute(`data-close-icon${isDark}-url`);
+      const backIconURL = this.getAttribute(`data-back-icon${isDark}-url`)
+      const backIconDarkURL = this.getAttribute(`data-back-icon-dark-url`)
+      const resetIconURL = this.getAttribute(`data-reset-icon${isDark}-url`);
       const sendIconURL = this.getAttribute('data-send-icon-url');
-      const capabilitiesIconURL = this.getAttribute('data-capabilities-icon-url');
-      const xIconURL = this.getAttribute('data-x-icon-url');
-      const xIconDarkURL = this.getAttribute('data-x-icon-dark-url');
-      const chatIconURL = this.getAttribute('data-chat-icon-url');
-      const chatIconDarkURL = this.getAttribute('data-chat-icon-dark-url');
+      const xIconURL = this.getAttribute(`data-x-icon${isDark}-url`);
+      const chatIconURL = this.getAttribute(`data-chat-icon${isDark}-url`);
       const autoOpen = this.getAttribute('data-auto-open'); // This is a string value when stored in session storage
       const position =  this.getAttribute('data-position');
-
 
       const widget = this.querySelector('#chat-widget');
 
       if (position === 'left') {
         widget.style.right = 'auto';
-        widget.style.left = '20px';
+        widget.style.left = '32px';
       } else {
-        widget.style.right = '20px';
+        widget.style.right = '32px';
         widget.style.left = 'auto';
       }
 
       // Create the toggle element
       const toggle = document.createElement('chat-toggle');
       toggle.classList.add('chat-widget__toggle');
-
       toggle.setAttribute('data-auto-open', autoOpen);
       toggle.setAttribute('data-accent-color', preferences.accentColour);
       toggle.setAttribute('data-show-launcher-text', preferences.showLauncherText);
       toggle.setAttribute('data-launcher-text', preferences.launcherText);
       toggle.setAttribute('data-x-icon-url', xIconURL);
-      toggle.setAttribute('data-x-icon-dark-url', xIconDarkURL);
       toggle.setAttribute('data-chat-icon-url', chatIconURL);
-      toggle.setAttribute('data-chat-icon-dark-url', chatIconDarkURL);
+      toggle.setAttribute('data-position', position);
 
       // Create the ChatBox element using the custom constructor
       const box = document.createElement('chat-box');
       box.classList.add('chat-widget__box');
-
       box.setAttribute('data-shop', shop);
       box.setAttribute('data-auto-open', autoOpen);
       box.setAttribute('data-position', position);
       box.setAttribute('data-accent-color', preferences.accentColour);
       box.setAttribute('data-assistant-name', preferences.assistantName);
-      box.setAttribute('data-welcome-message', preferences.welcomeMessage);
-      box.setAttribute('data-avatar-image-src', preferences.avatarImageSrc);
-      box.setAttribute('data-trash-icon-url', trashIconURL);
-      box.setAttribute('data-trash-icon-dark-url', trashIconDarkURL);
+      box.setAttribute('data-greeting-line-one', preferences.greetingLineOne);
+      box.setAttribute('data-greeting-line-two', preferences.greetingLineTwo);
       box.setAttribute('data-close-icon-url', closeIconURL);
-      box.setAttribute('data-close-icon-dark-url', closeIconDarkURL);
+      box.setAttribute('data-back-icon-url', backIconURL);
+      box.setAttribute('data-back-icon-dark-url', backIconDarkURL);
+      box.setAttribute('data-reset-icon-url', resetIconURL);
       box.setAttribute('data-send-icon-url', sendIconURL);
-      box.setAttribute('data-capabilities-icon-url', capabilitiesIconURL);
+      box.setAttribute('data-show-support-form', preferences.showSupportForm);
+      box.setAttribute('data-support-page-path', preferences.supportUrlPath);
 
       widget.append(toggle, box);
 
@@ -732,7 +926,7 @@ class ChatWidget extends HTMLElement {
 
       const preferences = await response.json();
       // Save the fetched preferences to the cache
-      sessionStorage.setItem(`preferences-${shop}`, JSON.stringify(preferences));
+      sessionStorage.setItem(`shopmate-preferences-${shop}`, JSON.stringify(preferences));
       return preferences;
   
     } catch (error) {
@@ -763,23 +957,20 @@ class ChatToggle extends HTMLElement  {
     this.luminance = calculateLuminance(this.accentRgb);
     this.showLauncherText = this.getAttribute('data-show-launcher-text');
     this.launcherText = this.getAttribute('data-launcher-text');
+    this.position = this.getAttribute('data-position');
 
-    const xIconURL = this.getAttribute('data-x-icon-url');
-    const xIconDarkURL = this.getAttribute('data-x-icon-dark-url');
-    const chatIconURL = this.getAttribute('data-chat-icon-url');
-    const chatIconDarkURL = this.getAttribute('data-chat-icon-dark-url');
-    this.xIconURL = this.luminance > 0.7 ? xIconDarkURL : xIconURL;
-    this.chatIconURL = this.luminance > 0.7 ? chatIconDarkURL : chatIconURL;
+    this.xIconURL = this.getAttribute('data-x-icon-url');
+    this.chatIconURL = this.getAttribute('data-chat-icon-url');
 
     window.addEventListener('chatBoxClosed', this.boundToggleChatBox);
 
     // If there is a value of open/closed in the local storage use that to set the icon
     // Otherwise use the value from autoOpen to determine the correct icon
-    if (sessionStorage.getItem('isChatBoxOpen') != null) {
-      sessionStorage.getItem('isChatBoxOpen') === 'true' ? this.updateIcon(true) : this.updateIcon(false)
+    if (sessionStorage.getItem('shopmate-isChatBoxOpen') != null) {
+      sessionStorage.getItem('shopmate-isChatBoxOpen') === 'true' ? this.updateIcon(true) : this.updateIcon(false)
     } else {
       this.autoOpen? this.updateIcon(true) : this.updateIcon(false);
-      sessionStorage.setItem('isChatBoxOpen', JSON.stringify(this.autoOpen))
+      sessionStorage.setItem('shopmate-isChatBoxOpen', JSON.stringify(this.autoOpen))
     }
   }
 
@@ -789,7 +980,7 @@ class ChatToggle extends HTMLElement  {
   }
 
   isChatBoxOpen() {
-    return sessionStorage.getItem('isChatBoxOpen') === 'true'
+    return sessionStorage.getItem('shopmate-isChatBoxOpen') === 'true'
   }
   
   updateIcon(isChatBoxOpen) {
@@ -825,12 +1016,18 @@ class ChatToggle extends HTMLElement  {
           </div>
         `;
       } else {
-        const ctaText = this.showLauncherText && sessionStorage.getItem('hasBeenOpened') != 'true' ? `
-          <div class="chat-widget__animated-message" id="animatedMessage">
+        const ctaClass = this.position === 'left' ? 'chat-widget__animated-message-left' : 'chat-widget__animated-message-right';
+        const ctaText = this.showLauncherText === 'true' && sessionStorage.getItem('shopmate-hasBeenOpened') != 'true' ? `
+          <div class=${ctaClass} id="animatedMessage">
             <p class="chat-widget__assistant-text">${this.launcherText}</p>
           </div>
         ` : ``;
-        this.innerHTML = `
+        this.innerHTML = this.position === 'left' ? `
+          <div class="chat-widget__toggle-button">
+            <img class="chat-widget__toggle-icon" alt="Toggle Icon" src="${this.chatIconURL}" />
+          </div>
+          ${ctaText}
+        ` : `
           ${ctaText}
           <div class="chat-widget__toggle-button">
             <img class="chat-widget__toggle-icon" alt="Toggle Icon" src="${this.chatIconURL}" />
@@ -859,13 +1056,13 @@ class ChatToggle extends HTMLElement  {
       setTimeout(() => { 
         chatBox.style.display = 'none';
       }, 300);
-      sessionStorage.setItem('isChatBoxOpen', JSON.stringify(false));
+      sessionStorage.setItem('shopmate-isChatBoxOpen', JSON.stringify(false));
 
     } else {
       document.dispatchEvent(new CustomEvent('setupWebsocket')); // Dispatch an event to setup the websocket
 
       // Remove the text since the chat has now been opened
-      sessionStorage.setItem('hasBeenOpened', 'true');
+      sessionStorage.setItem('shopmate-hasBeenOpened', 'true');
       const animatedMessage = document.getElementById('animatedMessage');
       if (animatedMessage) {
           animatedMessage.style.animation = 'fadeInUp 0.4as reverse forwards';
@@ -881,7 +1078,7 @@ class ChatToggle extends HTMLElement  {
         chatBox.style.transform = 'translateY(0px)';
         chatBox.style.pointerEvents = 'auto';
       }, 50);
-      sessionStorage.setItem('isChatBoxOpen', JSON.stringify(true));
+      sessionStorage.setItem('shopmate-isChatBoxOpen', JSON.stringify(true));
     }
   } 
 }
@@ -892,10 +1089,14 @@ class ChatBox extends HTMLElement  {
     super();
     // Binding event handlers to this
     this.boundUpdatePosition = this.updatePosition.bind(this);
-    this.boundTrashIconClick = this.handleTrashIconClick.bind(this);
+    this.boundBackIconClick = this.handleBackIconClick.bind(this);
+    this.boundResetIconClick = this.handleResetIconClick.bind(this);
     this.boundCloseIconClick = this.handleCloseIconClick.bind(this);
     this.boundInputEvent = this.handleInputEvent.bind(this);
     this.boundSendButtonClick = this.handleSendButtonClick.bind(this);
+    this.boundNextCardClick = this.handleNextCardClick.bind(this);
+    this.boundPrevCardClick = this.handlePrevCardClick.bind(this);
+    this.boundCardClick = this.handleCardClick.bind(this);
     this.boundKeyDownEvent = this.handleKeyDownEvent.bind(this);
     this.boundSetupWebSocket = this.setupWebSocket.bind(this);
 
@@ -910,32 +1111,54 @@ class ChatBox extends HTMLElement  {
     this.position = this.getAttribute('data-position');
     this.accentColor = this.getAttribute('data-accent-color');
     this.assistantName = this.getAttribute('data-assistant-name');
-    this.avatarImageSrc = this.getAttribute('data-avatar-image-src');
-    this.welcomeMessage = this.getAttribute('data-welcome-message');
+    this.greetingLineOne = this.getAttribute('data-greeting-line-one');
+    this.greetingLineTwo = this.getAttribute('data-greeting-line-two');
     this.sendIconURL = this.getAttribute('data-send-icon-url');
-    this.capabilitiesIconURL = this.getAttribute('data-capabilities-icon-url');
     this.accentRgb = hexToRgb(this.accentColor);
     this.darkerAccentRgb = darkenRgb(this.accentRgb, 0.14);
     this.luminance = calculateLuminance(this.accentRgb);
-    this.trashIconURL = this.luminance > 0.7 ? this.getAttribute('data-trash-icon-dark-url') : this.getAttribute('data-trash-icon-url');
-    this.closeIconURL = this.luminance > 0.7 ? this.getAttribute('data-close-icon-dark-url') : this.getAttribute('data-close-icon-url');
+    this.closeIconURL = this.getAttribute('data-close-icon-url');
+    this.backIconURL = this.getAttribute('data-back-icon-url');
+    this.backIconDarkURL = this.getAttribute('data-back-icon-dark-url');
+    this.resetIconURL = this.getAttribute('data-reset-icon-url');
+    this.showSupportForm = this.getAttribute('data-show-support-form');
+    this.supportPagePath = this.getAttribute('data-support-page-path');
     
-    this.showClearChatScreen = false;
-    this.messages = [];
     this.isLoading = false;
+    this.messages = sessionStorage.getItem('shopmate-messages') ? 
+      JSON.parse(sessionStorage.getItem('shopmate-messages')) : [];
+
+    this.threadId = sessionStorage.getItem('shopmate-threadId') ? 
+      JSON.parse(sessionStorage.getItem('shopmate-threadId')) : null;
+  
+    this.currentPage = sessionStorage.getItem('shopmate-currentPage') ? 
+      JSON.parse(sessionStorage.getItem('shopmate-currentPage')) : 'home';
+
+    this.currentCardIndex = 0;
+    this.autoSwitch = true;
+    this.cardChangeInterval = null;
 
     // Update position initally
     this.updatePosition();
 
-    // Load previous messages from local storage if they exist
-    if (sessionStorage.getItem('messages')) {
-      this.messages = JSON.parse(sessionStorage.getItem('messages'));
-    } else {
-      this.messages.push({ role: "assistant", content: this.welcomeMessage })
-    }
+    const cachedFaqs = sessionStorage.getItem(`shopmate-faqs-${this.shop}`);
+    this.faqs = cachedFaqs ? JSON.parse(cachedFaqs) : [];
+
+    this.faqContent = this.setFaqContent();
+    this.cardsData = this.setCardsData();
+    // If faqs are in the cache, use them. Otherwise, fetch from API
+    const faqsPromise = cachedFaqs
+      ? Promise.resolve(JSON.parse(cachedFaqs))
+      : this.fetchFaqs(this.shop);
+
+    faqsPromise.then(data => {
+      this.faqs = data;
+      this.faqContent = this.setFaqContent();
+      this.cardsData = this.setCardsData();
+    });
 
     // Check session storage for open / closed state and set styling accordingly
-    if (sessionStorage.getItem('isChatBoxOpen') === 'true') {
+    if (sessionStorage.getItem('shopmate-isChatBoxOpen') === 'true') {
       this.setupWebSocket();
       this.style.display = 'block';
       this.style.pointerEvents = 'auto';
@@ -944,6 +1167,15 @@ class ChatBox extends HTMLElement  {
         this.style.transform = 'translateY(0px)';
       }, 50);
     }
+
+    const homeBgGradientStyle = `
+      background: linear-gradient(
+        ${this.accentColor} 0%, 
+        ${this.accentColor} 25%,
+        rgb(${this.accentRgb[0]}, ${this.accentRgb[1]}, ${this.accentRgb[2]}, 0.60) 75%, 
+        #FFFFFF 100%
+      );        
+    `;
 
     const bgGradientColorStyle = `
       background: linear-gradient(180deg, 
@@ -968,30 +1200,63 @@ class ChatBox extends HTMLElement  {
       color: ${this.luminance > 0.7 ? '#2a2a2a' : this.accentColor}
     `;
 
-    const trashIconPath = `${this.trashIconURL}`
-    const closeIconPath = `${this.closeIconURL}`
-
     this.innerHTML = `
-      <div class="chat-widget__header-container">
-        <div class="chat-widget__header-background-round" style="${bgColorStyle}">&nbsp;</div>
-        <div class="chat-widget__header-background-main" style="${bgGradientColorStyle}">&nbsp;</div>
-        <div class="chat-widget__header-content">
-          <img class="chat-widget__avatar" alt="Avatar" src="https://shopify-recommendation-app.s3.amazonaws.com/avatars/${this.avatarImageSrc}" />
-          <div class='chat-widget__title-container'>
-            <div class="chat-widget__assistant-name" style="${assistantNameStyle}">${this.assistantName}</div>
-            <div class="chat-widget__assistant-subtitle" style="${textColorStyle}">AI Shopping Assistant</div>
+      <div id="home-page" class='chat-widget__hidden'>
+        <div class="chat-widget__home-background" style="${homeBgGradientStyle}">&nbsp</div>
+        <div id="home-page-content" class="chat-widget__home-page">
+          <div class="chat-widget__home-header">
+            <div class='chat-widget__title-container'>
+              <div class="chat-widget__assistant-name" style="${textColorStyle}">${this.greetingLineOne}</div>
+              <div class="chat-widget__assistant-subtitle" style="${textColorStyle}">${this.greetingLineTwo}</div>
+            </div>
+            <div id="home-page-close-button" class='chat-widget__right-icon-container'>
+              <img class='chat-widget__header-icon' alt="Close icon" src="${this.closeIconURL}"/>
+            </div>
           </div>
-          <div class='chat-widget__trash-icon-container'>
-            <img class='chat-widget__header-icon' alt="Info icon" src="${trashIconPath}"/>
-          </div>
-          <div class='chat-widget__close-icon-container'>
-            <img class='chat-widget__header-icon' alt="Close icon" src="${closeIconPath}"/>
+  
+          <div id="card-container" class="chat-widget__home-card-container">
+            <div class="chat-widget__card-content"></div>
+            <div class="chat-widget__card-footer-container">
+              <div class="chat-widget__card-title">Title</div>
+              <div class="chat-widget__card-subtitle">Subtitle</div>
+              <div class="chat-widget__card-button-container">
+                <div id="prev-card-button" class="chat-widget__card-button">
+                  <img class='chat-widget__header-icon' alt="Prev Page" src="${this.backIconDarkURL}"/>
+                </div>
+                <div class="chat-widget__dot-container">
+                  <div class="chat-widget__card-dot">&nbsp;</div>
+                  <div class="chat-widget__card-dot">&nbsp;</div>
+                </div>
+                <div id="next-card-button" class="chat-widget__card-button chat-widget__flip">
+                  <img class='chat-widget__header-icon' alt="Next Page" src="${this.backIconDarkURL}"/>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    
-      <div class="chat-widget__body-container"></div>
-    
+
+      <div id="message-page" class="chat-widget__message-page chat-widget__hidden">
+        <div class="chat-widget__header-container">
+          <div class="chat-widget__header-background-round" style="${bgColorStyle}">&nbsp;</div>
+          <div class="chat-widget__header-background-main" style="${bgGradientColorStyle}">&nbsp;</div>
+          <div class="chat-widget__header-content">
+            <div id="message-page-back-button" class='chat-widget__icon-container'>
+              <img class='chat-widget__header-icon chat-widget__rotate90' alt="Back icon" src="${this.closeIconURL}"/>
+            </div>
+            <div class='chat-widget__title-container'>
+              <div class="chat-widget__assistant-name" style="${assistantNameStyle}">${this.assistantName}</div>
+              <div class="chat-widget__assistant-subtitle" style="${textColorStyle}">AI Shopping Assistant</div>
+            </div>
+            <div id="message-page-reset-button" class='chat-widget__right-icon-container'>
+              <img class='chat-widget__header-icon' alt="Info icon" src="${this.resetIconURL}"/>
+            </div>
+          </div>
+        </div>
+      
+        <div id="message-page-body" class="chat-widget__body-container"></div>
+      </div>
+
       <div class="chat-widget__footer-container">
         <div class="chat-widget__footer-divider"/>
         <div class="chat-widget__input-group">
@@ -1012,59 +1277,156 @@ class ChatBox extends HTMLElement  {
       </div>
     `;
 
+    this.currentPage === 'home' ? (
+      this.querySelector('#home-page').classList.remove('chat-widget__hidden')
+    ) : (
+      this.querySelector('#message-page').classList.remove('chat-widget__hidden')
+    )
+
     this.renderMessages();
+    this.setupCarousel();
 
     /* Add event listeners */
     window.addEventListener('resize', this.boundUpdatePosition);
 
-    const trashIcon = this.querySelector('.chat-widget__trash-icon-container');
-    trashIcon.addEventListener('click', this.boundTrashIconClick);
+    // Attach a single event listener to the bodyContainer
+    const bodyContainer = this.querySelector('#message-page-body');
+    
+    bodyContainer.addEventListener('click', (e) => {
+      const productLink = e.target.closest('.chat-widget__product-link');
+      if (productLink) {
+        const productId = productLink.getAttribute('data-product-id');
+        this.addProductViewEvent(productId);
 
-    const closeIcon = this.querySelector('.chat-widget__close-icon-container');
-    closeIcon.addEventListener('click', this.boundCloseIconClick);
+        let closeRequestEvent = new Event('requestChatBoxClose');
+        window.dispatchEvent(closeRequestEvent);
+        sessionStorage.setItem('shopmate-isChatBoxOpen', JSON.stringify(false));
+        return;
+      } 
+      const contactLink = e.target.closest('.chat-widget__contact-form-container');
+      if (contactLink) {
+        let closeRequestEvent = new Event('requestChatBoxClose');
+        window.dispatchEvent(closeRequestEvent);
+        sessionStorage.setItem('shopmate-isChatBoxOpen', JSON.stringify(false));
+        return;
+      }
+    });
+
+    this.querySelector('#next-card-button').addEventListener('click', this.boundNextCardClick);
+    this.querySelector('#prev-card-button').addEventListener('click', this.boundPrevCardClick);
+    this.querySelector('#card-container').addEventListener('click', this.boundCardClick);
+    this.querySelector('#message-page-back-button').addEventListener('click', this.boundBackIconClick);
+    this.querySelector('#message-page-reset-button').addEventListener('click', this.boundResetIconClick);
+    this.querySelector('#home-page-close-button').addEventListener('click', this.boundCloseIconClick);
+    this.querySelector('#send-button').addEventListener('click', this.boundSendButtonClick);
 
     const input = this.querySelector('#chat-input');
     input.addEventListener('input', this.boundInputEvent);
     input.addEventListener('keydown', this.boundKeyDownEvent);
 
-    const sendButton = this.querySelector('#send-button');
-    sendButton.addEventListener('click', this.boundSendButtonClick);
-
     document.addEventListener('setupWebsocket', this.boundSetupWebSocket); // Websocket event listner
   }
 
   disconnectedCallback() {
-    /* Remove event listeners */
-    const trashIcon = this.querySelector('.chat-widget__trash-icon-container');
-    if (trashIcon) {
-      trashIcon.removeEventListener('click', this.boundtrashIconClick);
-    }
-
-    const closeIcon = this.querySelector('.chat-widget__close-icon-container');
-    if (closeIcon) {
-      closeIcon.removeEventListener('click', this.boundCloseIconClick);
-    }
-
-    const input = this.querySelector('#chat-input');
-    if (input) {
-      input.removeEventListener('input', this.boundInputEvent);
-      input.removeEventListener('keydown', this.boundKeyDownEvent);
-    }
-
-    const sendButton = this.querySelector('#send-button');
-    if (sendButton) {
-      sendButton.removeEventListener('click', this.boundSendButtonClick);
-    }
-
+    /* Remove event listeners attached to Window or Document*/
     this.closeWebSocket();
     window.removeEventListener('resize', this.boundUpdatePosition);
     document.removeEventListener('setupWebsocket', this.boundSetupWebSocket);
   }
 
+  async fetchFaqs(shop) {
+    try {
+        const response = await fetch(`https://y143kaik7d.execute-api.us-east-1.amazonaws.com/shop/faqs?shop=${shop}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        });
+
+        // Check if the response is not OK
+        if (!response.ok) {
+            console.error('Error fetching FAQs:', response.statusText);
+            return [];
+        }
+
+        const jsonResponse = await response.json();
+        // Extract the FAQs array from the response
+        const faqs = jsonResponse.faqs || []; // Default to an empty array if faqs is not present
+
+        sessionStorage.setItem(`shopmate-faqs-${shop}`, JSON.stringify(faqs));
+        return faqs;
+
+    } catch (error) {
+        // Handle any exceptions during the fetch call
+        console.error('Error fetching FAQs:', error);
+        return [];
+    }
+  }
+
+  setFaqContent() {
+    const bgColorStyle = `
+      background-color: ${this.accentColor}
+    `;
+    const content = this.faqs.length ? `
+      <div id="faq-content">
+        ${this.faqs.map((faq, index) => {
+          return (
+            `
+              <div data-faq-index="${index}" class="chat-widget__faq-button" style="${bgColorStyle}">
+                <div class="chat-widget__faq-text">${faq.question}</div>
+                <img class='chat-widget__header-icon chat-widget__flip' alt="Next Page" src="${this.backIconURL}"/>
+              </div>
+            `)
+        }).join('')}
+      </div>
+    ` : `
+      <img class='chat-widget__card-image' 
+        src='https://shopify-recommendation-app.s3.amazonaws.com/illustrations/faq-card-illustration.svg'
+        alt='Illustration of a women standing with a question bubble above her head'
+      />
+    `;
+
+    return content
+  }
+
+  setCardsData() {
+    return [
+      { 
+        title: "AI Product Recommendations", 
+        subtitle: "Tell us what you need and we’ll help find the perfect product!", 
+        content: `
+          <img class='chat-widget__card-image' 
+            src='https://shopify-recommendation-app.s3.amazonaws.com/illustrations/recommendation-card-illustration.svg'
+            alt='Illustration of a women sitting using a computer'
+          />
+        `,
+        message: "What can I help you find?",
+        page: "recommendation"
+      },
+      { 
+        title: "FAQ", 
+        subtitle: "Have a question? Ask away for immediate answers to frequently asked questions.", 
+        content: this.faqContent,
+        message: "Let me know if you have any questions!",
+        page: "faq"
+      },
+    ]
+  }
+
   /* Event handlers */
-  handleTrashIconClick() {
-    this.showClearChatScreen = !this.showClearChatScreen;
-    this.renderMessages();
+  handleBackIconClick() {
+    this.switchPage('home');
+  }
+
+  handleResetIconClick() {
+    const resetButton = document.getElementById('message-page-reset-button');
+    
+    if (!resetButton.disabled) {
+      this.threadId = null;
+      sessionStorage.setItem('shopmate-threadId', this.threadId);
+
+      this.messages = [{role: 'assistant', content: 'How can I help you today?'}];
+      sessionStorage.setItem('shopmate-messages', JSON.stringify(this.messages));
+      this.renderMessages();
+    }
   }
 
   handleCloseIconClick() {
@@ -1100,12 +1462,46 @@ class ChatBox extends HTMLElement  {
         this.handleSubmit();
       }
     }
-  }  
+  }
+  
+  handleNextCardClick(e) {
+    e.stopPropagation();
+    this.autoSwitch = false;
+    clearInterval(this.cardChangeInterval);
+    this.moveToNextCard();
+  }
+
+  handlePrevCardClick(e) {
+    e.stopPropagation();
+    this.autoSwitch = false;
+    clearInterval(this.cardChangeInterval);
+    this.currentCardIndex = (this.currentCardIndex - 1 + this.cardsData.length) % this.cardsData.length;
+    this.updateCardContent(this.currentCardIndex);
+  }
+
+  handleCardClick() {
+    this.autoSwitch = false;
+    clearInterval(this.cardChangeInterval);
+    this.switchPage('message');
+    if (this.messages.length <= 1) {
+      this.messages = [{role: 'assistant', content: this.cardsData[this.currentCardIndex].message}];
+      sessionStorage.setItem('shopmate-messages', JSON.stringify(this.messages));
+      this.renderMessages();
+    }
+  }
 
   /* Other Functions */
+  setupCarousel() {
+    this.cardChangeInterval = setInterval(() => {
+        if (this.autoSwitch) this.moveToNextCard();
+    }, 5000);
+
+    this.updateCardContent(this.currentCardIndex);
+  }
+
   setupWebSocket() {
     if (!this.websocket || this.websocket.readyState !== WebSocket.OPEN) {
-      const connectionId = JSON.parse(sessionStorage.getItem('websocketConnectionId'));
+      const connectionId = JSON.parse(sessionStorage.getItem('shopmate-websocketConnectionId'));
       const webSocketUrl = `wss://4af0m2aw8b.execute-api.us-east-1.amazonaws.com/production?shop=${this.shop}${connectionId ? `&connectionId=${connectionId}` : ''}`;
       this.websocket = new WebSocket(webSocketUrl);
       
@@ -1146,10 +1542,23 @@ class ChatBox extends HTMLElement  {
           this.addMessage(data.role, data.content);
         },
         sendConnectionId: (payload) => {
-          sessionStorage.setItem('websocketConnectionId', JSON.stringify(payload.data.connectionId));
+          sessionStorage.setItem('shopmate-websocketConnectionId', JSON.stringify(payload.data.connectionId));
+        },
+        sendThreadId: (payload) => {
+          this.threadId = payload.data.threadId;
+          sessionStorage.setItem('shopmate-threadId', JSON.stringify(payload.data.threadId));
+        },
+        showContactForm: () => {
+          this.messages.push({ role: 'contact_form', content: '' });
+          this.renderMessages();
+        },
+        showLoadingState: (payload) => {
+          const data = payload.data;
+          this.showLoading(data.text);
         },
         finish: (payload) => {
-          sessionStorage.setItem('messages', JSON.stringify(this.messages));
+          if (this.isLoading) this.hideLoading(); 
+          sessionStorage.setItem('shopmate-messages', JSON.stringify(this.messages));
           this.nextIndex = 0;
           this.lastIndex = null;
           this.messageBuffer = [];
@@ -1187,13 +1596,14 @@ class ChatBox extends HTMLElement  {
       // Handle incoming messages
       this.handleMessage = (event) => {
         const dataFromServer = JSON.parse(event.data);
-        if (this.isLoading) this.hideLoading(); 
-
         const actionType = dataFromServer.action;
+
         if (typeof this.messageHandlers[actionType] === 'function') {
           this.messageHandlers[actionType](dataFromServer);
         } else {
           console.warn("No handler found for action type:", actionType);
+          if (this.isLoading) this.hideLoading(); 
+          this.setDisableSendButton(false);
         }
       };
     
@@ -1236,32 +1646,146 @@ class ChatBox extends HTMLElement  {
       this.websocket.close();
     }
   }  
+
+  switchPage(page) {
+    const homePage = this.querySelector('#home-page');
+    const homePageContent = this.querySelector('#home-page-content');
+    const messagePage = this.querySelector('#message-page');
+    const homeBackground = this.querySelector('.chat-widget__home-background');
+
+    this.currentPage = page;
+    sessionStorage.setItem('shopmate-currentPage', JSON.stringify(page));
+
+    switch (page) {
+      case('home'):
+        homePageContent.style.opacity = '0';
+        homePageContent.style.transition = 'opacity 0.2s ease-in-out'; 
+        homePage.classList.remove('chat-widget__hidden');
+        homeBackground.style.height = '124px';    
+        homeBackground.style.transition = 'height 0.3s ease-in-out, background 0.3s ease-in-out';
+        messagePage.style.opacity = '1';
+        messagePage.style.transition = 'opacity 0.3s ease-in-out'
+        setTimeout(() => {
+          homeBackground.style.height = '480px';
+          homePageContent.style.opacity = '1';
+          messagePage.style.opacity = '0';
+        }, 10);
+        setTimeout(() => {
+          messagePage.classList.add('chat-widget__hidden');
+        }, 300);
+        break;
+      case('message'): 
+        messagePage.style.opacity = '0';
+        messagePage.style.transition = 'opacity 0.3s ease-in-out'; 
+        messagePage.classList.remove('chat-widget__hidden'); 
+        homeBackground.style.height = '480px';  
+        homeBackground.style.transition = 'height 0.3s ease-in-out, background 0.3s ease-in-out';
+        homePageContent.style.opacity = '1';
+        homePageContent.style.transition = 'opacity 0.2s ease-in-out'
+        setTimeout(() => {
+          homeBackground.style.height = '124px';
+          messagePage.style.opacity = '1';
+          homePageContent.style.opacity = '0';
+        }, 10);
+        setTimeout(() => {
+          homePage.classList.add('chat-widget__hidden');
+        }, 300);
+        break; 
+    }
+  }
+
+  // Function to bind event listeners to FAQ buttons
+  bindFaqButtonListeners() {
+    const faqButtons = this.querySelectorAll('.chat-widget__faq-button');
+    faqButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        
+        // Retrieve the index from the data attribute
+        const index = e.currentTarget.getAttribute('data-faq-index');
+        const faqItem = this.faqs[index];
+
+        this.switchPage('message');
+        this.messages.length <= 1 ? 
+          this.messages = [{role: 'user', content: faqItem.question}] : this.messages.push({role: 'user', content: faqItem.question});
+
+        this.setDisableSendButton(true);
+        this.renderMessages();
+        this.showLoading();
+        setTimeout(() => {
+          this.hideLoading();
+          this.messages.push({role: 'assistant', content: faqItem.answer});
+          this.renderMessages();
+          this.setDisableSendButton(false);
+          sessionStorage.setItem('shopmate-messages', JSON.stringify(this.messages));
+        }, 1000);
+      });
+    });
+  }
+
+  updateCardContent(index) {
+    const cardContent = this.querySelector('.chat-widget__card-content');
+
+    // Start sliding out and fading out the old content
+    cardContent.classList.add('slide-out');
+
+    // After the old content has slid out, update and slide in the new content
+    setTimeout(() => {
+        const cardData = this.cardsData[index];
+        const cardTitle = this.querySelector('.chat-widget__card-title');
+        const cardSubtitle = this.querySelector('.chat-widget__card-subtitle');
+
+        cardTitle.textContent = cardData.title;
+        cardSubtitle.textContent = cardData.subtitle;
+        cardContent.innerHTML = cardData.content;
+
+        if (cardData.page === 'faq') {
+          this.bindFaqButtonListeners();
+        }
+
+        const dotList = this.querySelectorAll('.chat-widget__card-dot');
+        dotList.forEach((dot, i) => {
+          dot.classList.remove('active');
+          if (i === index) {
+            dot.classList.add('active')
+          }
+        })
+
+        // Reset to starting position (off-screen to the right) without transition
+        cardContent.classList.remove('slide-in', 'slide-out');
+        cardContent.style.transition = 'none';
+        cardContent.getBoundingClientRect(); // Trigger reflow to apply the changes without transition
+
+        // Start sliding in and fading in the new content with transition
+        cardContent.style.transition = '';
+        cardContent.classList.add('slide-in');
+    }, 250); // Delay should match the CSS transition duration
+  }
+
+  moveToNextCard() {
+    this.currentCardIndex = (this.currentCardIndex + 1) % this.cardsData.length;
+    this.updateCardContent(this.currentCardIndex);
+  }
   
   updatePosition() {
     const windowWidth = window.innerWidth;
     if (windowWidth >= 768) {
-      const transformValue = -20 + (windowWidth - 384) / 2
-
+      // const transformValue = -32 + (windowWidth - 384) / 2 --> FOR CENTERING (NO LONGER NEEDED)
       if(this.position === 'left') {
-          if (windowWidth < 524) {
-              this.style.left = `${transformValue}px`;
-              this.style.right = 'auto';
-          } else {
-              this.style.left = '50px';
-              this.style.right = 'auto';
-          }
+        this.style.left = '50px';
+        this.style.right = 'auto';
       } else {
-          if (windowWidth < 524) {
-              this.style.right = `${transformValue}px`;
-              this.style.left = 'auto';
-          } else {
-              this.style.right = '50px';
-              this.style.left = 'auto';
-          }
+        this.style.right = '50px';
+        this.style.left = 'auto';
       }
     } else {
-      this.style.left = 'auto';
-      this.style.right = '-20px';
+      if(this.position === 'left') {
+        this.style.right = 'auto';
+        this.style.left = '-32px';
+      } else {
+        this.style.left = 'auto';
+        this.style.right = '-32px';
+      }
     }
   }
 
@@ -1273,61 +1797,45 @@ class ChatBox extends HTMLElement  {
       this.messages.shift()
     }
     // Update messages in session storage
-    sessionStorage.setItem('messages', JSON.stringify(this.messages));
+    sessionStorage.setItem('shopmate-messages', JSON.stringify(this.messages));
     // Render all messages again
     this.renderMessages();
   }
 
   renderMessages(updateAll = true) {
-    const bodyContainer = this.querySelector('.chat-widget__body-container');
+    const bodyContainer = this.querySelector('#message-page-body');
   
-    if (this.showClearChatScreen) {
-      // Show the confirm clear markup
-      bodyContainer.innerHTML = `
-          <div class="chat-widget__confirm-clear-container">
-              <p class="chat-widget__confirm-clear-text">Are you sure you want to clear the chat?</p>
-              <button id="clearChatBtn" class="chat-widget__button-clear">Clear</button>
-              <button id="cancelClearChatBtn" class="chat-widget__button-cancel">Cancel</button>
-          </div>
-      `;
-  
-      // Event listener for the clear button
-      document.getElementById('clearChatBtn').addEventListener('click', () => {
-          this.messages = [{ role: "assistant", content: this.welcomeMessage }];
-          sessionStorage.setItem('messages', JSON.stringify(this.messages));
-          this.showClearChatScreen = false;
-          this.renderMessages();
+    // Display messages
+    if (updateAll) {
+      // Re-render all messages
+      const currentDate = new Date();
+      const formattedDate = currentDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
       });
-  
-      // Event listener for the cancel button
-      document.getElementById('cancelClearChatBtn').addEventListener('click', () => {
-          this.showClearChatScreen = false; 
-          this.renderMessages();
+
+      bodyContainer.innerHTML = `
+        <p class="chat-widget__date-text">${formattedDate}</p>
+      `;
+      this.messages.forEach((message, index) => {
+        this.appendMessage(message.role, message.content, index);
       });
     } else {
-      // Display messages
-      if (updateAll) {
-        // Re-render all messages
-        bodyContainer.innerHTML = '';
-        this.messages.forEach((message, index) => {
-          this.appendMessage(message.role, message.content, index);
-        });
-      } else {
-        // Remove the last message
-        const lastMessageElement = bodyContainer.lastElementChild;
-        if (lastMessageElement) {
-          lastMessageElement.remove();
-        }
-        // Append only the last message
-        const lastMessageIndex = this.messages.length - 1;
-        const lastMessage = this.messages[lastMessageIndex];
-        this.appendMessage(lastMessage.role, lastMessage.content, lastMessageIndex);
+      // Remove the last message
+      const lastMessageElement = bodyContainer.lastElementChild;
+      if (lastMessageElement) {
+        lastMessageElement.remove();
       }
+      // Append only the last message
+      const lastMessageIndex = this.messages.length - 1;
+      const lastMessage = this.messages[lastMessageIndex];
+      this.appendMessage(lastMessage.role, lastMessage.content, lastMessageIndex);
     }
   }  
 
-  appendMessage(role, content, index) {
-    const bodyContainer = this.querySelector('.chat-widget__body-container');
+  appendMessage(role, content) {
+    const bodyContainer = this.querySelector('#message-page-body');
     let markup;
 
     const bgColorStyle = `
@@ -1338,17 +1846,15 @@ class ChatBox extends HTMLElement  {
       color: ${this.luminance > 0.7 ? '#2a2a2a' : '#ffffff'};
     `;
 
-    const firstMessageClass = index === 0 ? 'chat-widget__first-message' : '';
-
     if (role === 'assistant') {
       markup = `
-      <div class="chat-widget__assistant-message ${firstMessageClass}">
+      <div class="chat-widget__assistant-message">
         <p class="chat-widget__assistant-text">${content}</p>
       </div>
       `;
     } else if (role === 'user') {
       markup = `
-      <div class="chat-widget__user-message ${firstMessageClass}" style="${bgColorStyle}">
+      <div class="chat-widget__user-message" style="${bgColorStyle}">
         <p class="chat-widget__user-text" style="${textColorStyle}">${content}</p>
       </div>
       `;
@@ -1371,36 +1877,40 @@ class ChatBox extends HTMLElement  {
       });
       
       markup += "</div>";
+    } else if (role === 'contact_form') {
+      const contactFormStyle = `
+        border: 2px solid rgba(${this.accentRgb[0]}, ${this.accentRgb[1]}, ${this.accentRgb[2]}, 0.80);
+        box-shadow: 0px 4px 6px 2px rgba(${this.accentRgb[0]}, ${this.accentRgb[1]}, ${this.accentRgb[2]}, 0.80);
+      `;
+      const website_url = window.location.origin;
+      const contactFormURL = `${website_url}${this.supportPagePath}`;
+      markup = `
+        <a href="${contactFormURL}" class="chat-widget__contact-form-container" style="${contactFormStyle}">
+          <img class="chat-widget__contact-form-image" 
+            src="https://shopify-recommendation-app.s3.amazonaws.com/illustrations/sent-message-illustration.svg"
+            alt="Image of a letter"
+          />
+          <p class="chat-widget__contact-form-text">Contact Us</p>
+        </a>
+      `;
     }
   
     bodyContainer.insertAdjacentHTML('beforeend', markup);
-
-    // Get all the product-link elements
-    const productLinks = bodyContainer.querySelectorAll('.chat-widget__product-link');
-    productLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        const productId = e.currentTarget.getAttribute('data-product-id');
-        this.addProductViewEvent(productId);
-
-        // Dispatch an event to request the chat box to toggle/close.
-        let closeRequestEvent = new Event('requestChatBoxClose');
-        window.dispatchEvent(closeRequestEvent);
-
-        sessionStorage.setItem('isChatBoxOpen', JSON.stringify(false));
-      });
-    });
 
     setTimeout(() => {
       bodyContainer.lastElementChild.scrollIntoView({ behavior: 'smooth' });
     }, 100);
   }
 
-  showLoading() {
-    if (!this.isLoading) {
+  showLoading(text) {
+    const bodyContainer = this.querySelector('#message-page-body');
+
+    if (text) {
+      this.hideLoading();
       this.isLoading = true;
-      const bodyContainer = this.querySelector('.chat-widget__body-container');
       const loadingMarkup = `
         <div class="chat-widget__loading-animation">
+          <p class="chat-widget__loading-text">${text}</p>
           <div class="chat-widget__dot" style="animation-delay: 0.2s;">&nbsp;</div>
           <div class="chat-widget__dot" style="animation-delay: 0.4s;">&nbsp;</div>
           <div class="chat-widget__dot" style="animation-delay: 0.6s;">&nbsp;</div>
@@ -1409,13 +1919,27 @@ class ChatBox extends HTMLElement  {
       setTimeout(() => {
         bodyContainer.lastElementChild.scrollIntoView({ behavior: 'smooth' });
       }, 100);
+    } else {
+      if (!this.isLoading) {
+        this.isLoading = true;
+        const loadingMarkup = `
+          <div class="chat-widget__loading-animation">
+            <div class="chat-widget__dot" style="animation-delay: 0.2s;">&nbsp;</div>
+            <div class="chat-widget__dot" style="animation-delay: 0.4s;">&nbsp;</div>
+            <div class="chat-widget__dot" style="animation-delay: 0.6s;">&nbsp;</div>
+          </div>`;
+        bodyContainer.insertAdjacentHTML('beforeend', loadingMarkup);
+        setTimeout(() => {
+          bodyContainer.lastElementChild.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
     }
   }
 
   hideLoading() {
     if (this.isLoading) {
       this.isLoading = false;
-      const bodyContainer = this.querySelector('.chat-widget__body-container');
+      const bodyContainer = this.querySelector('#message-page-body');
       const loadingElement = bodyContainer.querySelector('.chat-widget__loading-animation');
       if (loadingElement) {
         loadingElement.remove();
@@ -1426,16 +1950,20 @@ class ChatBox extends HTMLElement  {
   setDisableSendButton = (disable) => {
     const sendButton = document.getElementById('send-button');
     sendButton.disabled = disable;
-    
+    const resetButton = document.getElementById('message-page-reset-button')
+    resetButton.disabled = disable;
+
     if (disable) {
       sendButton.classList.add('disabled');
+      resetButton.classList.add('disabled');
     } else {
       sendButton.classList.remove('disabled');
+      resetButton.classList.remove('disabled');
     }
   };
 
   async addProductViewEvent(productId) {
-    const connectionId = JSON.parse(sessionStorage.getItem('websocketConnectionId'));
+    const connectionId = JSON.parse(sessionStorage.getItem('shopmate-websocketConnectionId'));
     if (!connectionId) return;
 
     fetch(`https://y143kaik7d.execute-api.us-east-1.amazonaws.com/events/product-view`, {
@@ -1459,11 +1987,12 @@ class ChatBox extends HTMLElement  {
     if (text === '') {
       return; // Exit the function early if the message is empty
     }
+
+    if (this.currentPage != 'message') this.switchPage('message'); // Switch to the messaging page (if not already on it)
   
     this.setDisableSendButton(true);
     this.addMessage('user', text);
 
-    this.showClearChatScreen = false;  // Don't show the homescreen, show the messages instead
     this.renderMessages();
     this.showLoading(); // Show the ... animation
 
@@ -1484,11 +2013,13 @@ class ChatBox extends HTMLElement  {
       this.websocket.send(JSON.stringify({ 
         action: 'sendMessage',
         shop: this.shop, 
-        messages: this.messages.slice(-9) // Only send the 9 most recent messages
+        message: this.messages[this.messages.length - 1], // Only send the most recent message (user)
+        thread: this.threadId,
+        showSupportForm: (this.showSupportForm === 'true')
       }));
     } catch (error) {
       console.error('Error sending message: ', error);
-    }    
+    }
   }
 }
 customElements.define('chat-box', ChatBox);

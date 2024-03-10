@@ -70,7 +70,7 @@ export default function CustomizeUIForm({isLoading, preferences, resetPreference
         launcherText: preferences.launcherText,
       }
 
-      const response = await fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/dev/preferences", {
+      const response = await fetch("https://8sxn47ovn7.execute-api.us-east-1.amazonaws.com/preferences", {
         method: "PATCH",
         body: JSON.stringify(body),
         headers: { "Content-Type": "application/json" },

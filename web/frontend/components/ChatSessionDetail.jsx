@@ -67,7 +67,6 @@ export default function ChatSessionDetail({ isLoading, activeSession, setActiveS
     mergedArray.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
   
     setSortedEvents(mergedArray);
-    console.log(mergedArray)
   }
   
   useEffect(() => {
@@ -207,13 +206,10 @@ export default function ChatSessionDetail({ isLoading, activeSession, setActiveS
           )
           break;
         case 'atc':
-          console.log(`Add to cart event: ${JSON.stringify(event)}`)
           break;
         case 'conversion':
-          console.log(`Conversion event: ${JSON.stringify(event)}`)
           break;
         default:
-          console.log("Unknown event type.")
       }
     })
   ) : (

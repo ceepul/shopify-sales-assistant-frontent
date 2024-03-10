@@ -71,7 +71,6 @@ export default function WidgetDynamicUI({ isLoading, fetchedPreferences }) {
     return luminance;
   } 
 
-  console.log(preferences.accentColour)
   const accentRgb = hexToRgb(preferences.accentColour);
   const darkerAccentRgb = darkenRgb(accentRgb, 0.14); // Darken by 14%
 

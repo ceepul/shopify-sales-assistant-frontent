@@ -96,7 +96,6 @@ export default function SetupPage() {
       }
 
       const data = await response.json();
-      console.log(data)
       setStoreInfo({edited: false, error: null, content: data.storeInfo ? data.storeInfo : "" })
       setShippingPolicy({edited: false, error: null, content: data.shippingPolicy ? data.shippingPolicy : "" })
       setReturnPolicy({edited: false, error: null, content: data.returnPolicy ? data.returnPolicy : "" })

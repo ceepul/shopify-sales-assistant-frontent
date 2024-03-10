@@ -136,9 +136,7 @@ export default function ContactUsPage() {
         body: JSON.stringify(body),
         headers: { "Content-Type": "application/json" },
       });
-
-      console.log(response)
-
+      
       if (!response.ok) {
         setFormSubmitionError(true);
         setIsFormSubmitting(false);
@@ -245,7 +243,7 @@ export default function ContactUsPage() {
                                 <TextField
                                     label="How can we help?"
                                     value={formData.message}
-                                    placeholder="E.g., I have questions about the pricing plans, or I encountered an issue while using the app..."
+                                    placeholder="I have questions about..."
                                     onChange={handleFormInputChange('message')}
                                     multiline={3}
                                     error={formMessageError}
